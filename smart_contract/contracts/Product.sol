@@ -55,7 +55,7 @@ contract Product {
     }
 
     // Function to get product details
-    function getProduct(uint256 _productId) public view returns (
+    function getListing(uint256 _productId) public view returns (
         string memory name,
         string memory description,
         string memory ipfsHash,

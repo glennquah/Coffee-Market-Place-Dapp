@@ -32,7 +32,7 @@ describe("CoffeeMarketplace", function () {
     ).to.emit(coffeeMarketplace, "ProductAdded");
 
     // Check if the product was added successfully
-    const product = await coffeeMarketplace.getProduct(1); // Product ID 1
+    const product = await coffeeMarketplace.getListing(1); // Product ID 1
     expect(product.name).to.equal("Colombian Coffee");
     expect(product.description).to.equal("Best Colombian Coffee");
     expect(product.ipfsHash).to.equal(ipfsHash);
@@ -91,7 +91,7 @@ describe("CoffeeMarketplace", function () {
     ).to.emit(coffeeMarketplace, "ProductAdded");
 
     // Fetch the product details
-    const product = await coffeeMarketplace.getProduct(1);
+    const product = await coffeeMarketplace.getListing(1);
 
     expect(product.name).to.equal("Colombian Coffee");
     expect(product.description).to.equal("Best Colombian Coffee");
