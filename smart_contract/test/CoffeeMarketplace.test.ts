@@ -79,7 +79,7 @@ describe("CoffeeMarketplace", function () {
     const price = ethers.parseEther("0.1");
     const quantity: number = 5;
 
-    // Add a product
+    // Add a listing
     await expect(
       coffeeMarketplace.connect(roaster).addRoasterListing(
         "Colombian Coffee",
