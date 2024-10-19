@@ -8,9 +8,19 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
-dist-ssr
-*.local
+.env
+coverage
+coverage.json
+typechain-types
+
+# Hardhat files
+cache
+artifacts
+
+# Depyloments
+## Ucomment if you want to save deployments
+deployments/*
+!deployments/.gitkeep
 
 # Editor directories and files
 .vscode/*
