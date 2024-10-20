@@ -73,4 +73,51 @@ describe('Coffee Voting E2E Test', function () {
     expect(CoffeeCandidateAdded.beanType).to.equal('Arabica');
     expect(CoffeeCandidateAdded.roastLevel).to.equal('Medium-Light');
   });
+
+  it('Should allow customer to vote for a coffee candidate', async function () {
+    await expect(coffeeVoting.connect(customer).vote(1)).to.emit(
+      coffeeVoting,
+      'CoffeeVoted',
+    );
+    const votes = await coffeeVoting.getAllVotesOfCoffeeCandiates();
+    // Check if the vote was added successfully
+    expect(votes[1].voteCount).to.equal(1);
+    expect(votes[0].voteCount).to.equal(0);
+  });
+
+  it('Should throw error when customer tries to vote for an invalid coffee candidate', async function () {
+    await expect(coffeeVoting.connect(customer).vote(5)).to.be.revertedWith(
+      'Invalid coffee candidate, please select a valid coffee candidate.',
+    );
+  });
+
+  it('Should throw error when customer tries to vote for a second time', async function () {
+    await expect(coffeeVoting.connect(customer).vote(1)).to.emit(
+      coffeeVoting,
+      'CoffeeVoted',
+    );
+    await expect(coffeeVoting.connect(customer).vote(1)).to.be.revertedWith(
+      'You have already voted for a coffee.',
+    );
+  });
+
+  it('Check if its open for voting', async function () {
+    expect(await coffeeVoting.isOpenToVote()).to.be.true;
+  });
+
+  it('Should give back the remaining time for voting', async function () {
+    expect(await coffeeVoting.getRemainingTimeLeftToVote()).to.be.greaterThan(
+      0,
+    );
+  });
+
+  it('Check if its closed for voting (AFTER 90 MINUTES)', async function () {
+    await ethers.provider.send('evm_increaseTime', [90 * 60]);
+    await ethers.provider.send('evm_mine');
+
+    expect(await coffeeVoting.isOpenToVote()).to.be.false;
+    await expect(coffeeVoting.connect(customer).vote(1)).to.be.revertedWith(
+      'Voting is closed.',
+    );
+  });
 });

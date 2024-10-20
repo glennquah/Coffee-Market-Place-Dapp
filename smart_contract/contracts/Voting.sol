@@ -19,6 +19,7 @@ contract Voting {
     uint256 public votingStartTime;
     uint256 public votingEndTime;
     event CoffeeCandidateAdded(string coffeeName, string imageUrl, string description, string coffeeOrigin, string beanType, string roastLevel);
+    event CoffeeVoted(uint256 candidateId);
 
 constructor(string[] memory _coffeeCandidateNames,
             string[] memory _coffeeImageUrls,
@@ -73,8 +74,10 @@ constructor(string[] memory _coffeeCandidateNames,
     function vote(uint256 _coffeeCandidateIndex) public {
         require(!customers[msg.sender], "You have already voted for a coffee.");
         require(_coffeeCandidateIndex < coffee_vote_candidates.length, "Invalid coffee candidate, please select a valid coffee candidate.");
+        require(isOpenToVote(), "Voting is closed.");
         coffee_vote_candidates[_coffeeCandidateIndex].voteCount++;
         customers[msg.sender] = true;
+        emit CoffeeVoted(_coffeeCandidateIndex);
     }
 
     // This function is used to get all the coffee candidates (used to get all their votes)
