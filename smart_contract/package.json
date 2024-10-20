@@ -1,5 +1,11 @@
 {
   "name": "hardhat-project",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "hardhat:network": "npx hardhat node",
+    "test": "npx hardhat test",
+    "deploy": "npx hardhat ignition deploy ./ignition/modules/ignition-deployment.ts --network localhost"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "hardhat": "^2.22.13"
