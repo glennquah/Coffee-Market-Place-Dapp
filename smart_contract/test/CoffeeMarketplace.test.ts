@@ -1,10 +1,10 @@
 import { expect } from 'chai';
+import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import {
   CoffeeMarketplace,
   CoffeeMarketplace__factory,
 } from '../typechain-types';
-import { Signer } from 'ethers';
 
 describe('CoffeeMarketplace', function () {
   let coffeeMarketplace: CoffeeMarketplace;

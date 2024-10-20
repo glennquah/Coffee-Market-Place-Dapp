@@ -1,7 +1,9 @@
 pragma solidity ^0.8.0;
 
 contract Voting {
+    uint256 public candidateCounter = 0;
     struct CoffeeVoteCandidate {
+        uint256 candidateId;
         string coffeeName;
         string imageUrl;
         string description;
@@ -16,6 +18,7 @@ contract Voting {
     mapping(address => bool) public customers;
     uint256 public votingStartTime;
     uint256 public votingEndTime;
+    event CoffeeCandidateAdded(string coffeeName, string imageUrl, string description, string coffeeOrigin, string beanType, string roastLevel);
 
 constructor(string[] memory _coffeeCandidateNames,
             string[] memory _coffeeImageUrls,
@@ -24,8 +27,9 @@ constructor(string[] memory _coffeeCandidateNames,
             string[] memory _beanTypes,
             string[] memory _roastLevels,
             uint256 _durationInMinutes) {
-    for (uint256 i = 0; i < coffee_vote_candidates.length; i++) {
+    for (uint256 i = 0; i < _coffeeCandidateNames.length; i++) {
         coffee_vote_candidates.push(CoffeeVoteCandidate({
+                        candidateId: candidateCounter++,
                         coffeeName: _coffeeCandidateNames[i],
                         imageUrl: _coffeeImageUrls[i],
                         description: _coffeeDescriptions[i],
@@ -53,6 +57,7 @@ constructor(string[] memory _coffeeCandidateNames,
                                 string memory _beanType,
                                 string memory _roastLevel) public onlyOwner {
         coffee_vote_candidates.push(CoffeeVoteCandidate({
+                candidateId: candidateCounter++,
                 coffeeName: _coffeeName,
                 imageUrl: _imageUrl,
                 description: _description,
@@ -61,6 +66,7 @@ constructor(string[] memory _coffeeCandidateNames,
                 roastLevel: _roastLevel,
                 voteCount: 0
         }));
+        emit CoffeeCandidateAdded(_coffeeName, _imageUrl, _description, _coffeeOrigin, _beanType, _roastLevel);
     }
 
     // This function is used to vote for a coffee candidate
@@ -74,6 +80,12 @@ constructor(string[] memory _coffeeCandidateNames,
     // This function is used to get all the coffee candidates (used to get all their votes)
     function getAllVotesOfCoffeeCandiates() public view returns (CoffeeVoteCandidate[] memory){
         return coffee_vote_candidates;
+    }
+
+    // This function is to get the specific coffee candidate details
+    function getCoffeeCandidate(uint256 _index) public view returns (CoffeeVoteCandidate memory) {
+        require(_index < coffee_vote_candidates.length, "Invalid coffee candidate, please select a valid coffee candidate.");
+        return coffee_vote_candidates[_index];
     }
 
     // This function is used to see if voting is still open
