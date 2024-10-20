@@ -25,3 +25,4 @@ typechain-types
 *.njsproj
 *.sln
 *.sw?
+/smart_contract/ignition/deployments

@@ -1,7 +1,6 @@
 async function main() {
   // Deploy Voting contract
   const Voting = await ethers.getContractFactory('Voting');
-  // TODO: ADD PROPER PICTURE URLS
   const Voting_ = await Voting.deploy(
     [
       'Jamaica Blue Mountain',
@@ -10,6 +9,7 @@ async function main() {
       'Sumatra Long Berry',
     ],
     [
+      // TODO: ADD PROPER PICTURE URLS
       'https://example.com/jamaica.png',
       'https://example.com/colombia.png',
       'https://example.com/vietnam.png',
@@ -24,7 +24,7 @@ async function main() {
     ['Jamaica', 'Colombia', 'Vietnam', 'Sumatra'],
     ['Arabica', 'Arabica', 'Robusta', 'Arabica'],
     ['Medium', 'Medium-Light', 'Dark', 'Dark'],
-    90, // Duration in minutes
+    90, // Currently using 90 Minutes for testing, should be 1 week
   );
 
   console.log('Voting Contract address:', Voting_.address);
