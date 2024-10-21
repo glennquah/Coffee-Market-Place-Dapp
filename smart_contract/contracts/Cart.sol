@@ -18,7 +18,7 @@ contract Cart {
     event CartCleared(address user);
 
     constructor(address _coffeeMarketplaceContractAddress) {
-        coffeeMarketplace = CoffeeMarketplace(_coffeeMarketplaceContractAddress);  // Reference to the deployed Product contract
+        coffeeMarketplace = CoffeeMarketplace(_coffeeMarketplaceContractAddress);  // Reference to the deployed CoffeeMarketplace contract since is buying coffee beans from there
     }
 
     // internal
