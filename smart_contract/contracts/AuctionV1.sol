@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  * The contract allows the bidder to commit a hashed bid and reveal the bid later.
  * The contract allows the bidder to withdraw the refund if the bid is not the highest.
  * 
+ * 
  */
 contract Auction {
     address public NFTAddress;
