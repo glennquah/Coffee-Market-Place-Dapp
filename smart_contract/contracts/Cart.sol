@@ -1,39 +1,64 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./Product.sol";  // Importing the Product contract
+import "./CoffeeMarketplace.sol"; 
 
 contract Cart {
-    struct CartItem {
+    CoffeeMarketplace public coffeeMarketplace;
+
+    struct CartProduct {
         uint256 productId;
         uint256 quantity;
     }
 
-    mapping(address => CartItem[]) public carts;
+    mapping(address => CartProduct[]) public carts;
 
-    Product productContract;
+    event ProductAddedToCart(address user, uint256 productId, uint256 quantity);
+    event ProductUpdatedInCart(address user, uint256 productId, uint256 newQuantity);
+    event ProductRemovedFromCart(address user, uint256 productId);
+    event CartCleared(address user);
 
-    constructor(address _productContractAddress) {
-        productContract = Product(_productContractAddress);  // Reference to the deployed Product contract
+    constructor(address _coffeeMarketplaceContractAddress) {
+        coffeeMarketplace = CoffeeMarketplace(_coffeeMarketplaceContractAddress);  // Reference to the deployed Product contract
     }
 
+    // internal
+    // after the user has confirmed an order - different from removeFromCart()
+    function clearCart() internal {
+        delete carts[msg.sender];
+        emit CartCleared(msg.sender);
+    }
+
+    // public
     function addToCart(uint256 _productId, uint256 _quantity) public {
-        // Check product availability and desired quantity
-        ( , , , , uint256 availableQuantity, , bool available) = productContract.getListing(_productId);
-        require(available, "Product is unavailable.");
+        ( , , , , uint256 availableQuantity, , bool available) = coffeeMarketplace.getListing(_productId);
+        require(available, "Product is not available.");
         require(availableQuantity >= _quantity, "Not enough stock available.");
 
-        // Add item to user's cart
-        carts[msg.sender].push(CartItem(_productId, _quantity));
+        CartProduct[] storage userCart = carts[msg.sender];
+        bool ProductFound = false;
+
+        for (uint256 i = 0; i < userCart.length; i++) {
+            if (userCart[i].productId == _productId) {
+                userCart[i].quantity += _quantity;
+                ProductFound = true;
+                break;
+            }
+        }
+
+        if (!ProductFound) {
+            userCart.push(CartProduct(_productId, _quantity));
+        }
+
+        emit ProductAddedToCart(msg.sender, _productId, _quantity);
     }
 
-    function viewCart() public view returns (CartItem[] memory) {
+    function viewCart() public view returns (CartProduct[] memory) {
         return carts[msg.sender];
     }
 
     // update quantity
     function updateCart(uint256 _productId, uint256 _newQuantity) public {
-        ( , , , , uint256 availableQuantity, , bool available) = productContract.getListing(_productId);
+        ( , , , , uint256 availableQuantity, , bool available) = coffeeMarketplace.getListing(_productId);
         require(available, "Product is not available.");
         require(availableQuantity >= _newQuantity, "Not enough stock available.");
 
@@ -42,34 +67,40 @@ contract Cart {
             return;
         }
 
-        CartItem[] storage userCart = carts[msg.sender];
-        bool itemFound = false;
+        CartProduct[] storage userCart = carts[msg.sender];
+        bool ProductFound = false;
 
         for (uint256 i = 0; i < userCart.length; i++) {
             if (userCart[i].productId == _productId) {
-                userCart[i].quantity = _newQuantity; 
-                itemFound = true;
+                userCart[i].quantity = _newQuantity; // Update quantity
+                ProductFound = true;
+                emit ProductUpdatedInCart(msg.sender, _productId, _newQuantity);
                 break;
             }
         }
 
-        require(itemFound, "Product not added in cart.");
+        require(ProductFound, "Product not found in cart.");
     }
 
     // delete the unwanted product from cart
     function removeFromCart(uint256 _productId) public {
-        CartItem[] storage userCart = carts[msg.sender];
+        CartProduct[] storage userCart = carts[msg.sender];
+        bool ProductFound = false;
+
         for (uint256 i = 0; i < userCart.length; i++) {
             if (userCart[i].productId == _productId) {
                 userCart[i] = userCart[userCart.length - 1];
                 userCart.pop();
+                ProductFound = true;
+                emit ProductRemovedFromCart(msg.sender, _productId); 
                 break;
             }
         }
+
+        require(ProductFound, "Product not found in cart.");
     }
 
-    // after the user has confirmed an order - different from removeFromCart()
-    function clearCart() internal {
-        delete carts[msg.sender];
+    function checkout() public {
+        clearCart();
     }
 }

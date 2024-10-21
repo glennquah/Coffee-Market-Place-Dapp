@@ -22,6 +22,30 @@ contract Product {
 
     // Events
     event ProductAdded(uint256 productId, address indexed roaster, string name, uint256 price, uint256 quantity);
+    
+    constructor(address[] memory _roasters, 
+                string[] memory _names, 
+                string[] memory _descriptions, 
+                string[] memory _ipfsHashes, 
+                uint256[] memory _prices, 
+                uint256[] memory _quantities, 
+                uint256[][] memory _nftIds) 
+    {
+        for (uint256 i = 0; i < _roasters.length; i++) {
+            productCounter++;
+            products[productCounter] = ProductDetails(
+                productCounter,
+                _roasters[i],
+                _names[i],
+                _descriptions[i],
+                _ipfsHashes[i],
+                _prices[i],
+                _quantities[i],
+                _nftIds[i],
+                true
+            );
+        }
+    }
 
     // Function to add a new product
     function addProduct(
