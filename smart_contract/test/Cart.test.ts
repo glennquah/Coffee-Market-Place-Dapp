@@ -252,7 +252,14 @@ describe('Cart', function () {
         const newProductId = 2;
         await expect(cart.connect(customer).removeFromCart(newProductId))
             .to.be.revertedWith('Product not found in cart.');
-        });
+    });
+
+    it('Should allow when customer wants to remove all products from cart', async function() {
+        await expect(cart.connect(customer).removeAllProductsFromCart()).to.emit(cart, 'CartCleared');
+
+        const userCart = await cart.connect(customer).viewCart();
+        expect(userCart.length).to.equal(0);
+    })
   });
 
   describe('checkout', function () {
