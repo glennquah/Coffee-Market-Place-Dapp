@@ -2,36 +2,57 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
+/*
+* Open Auction
+* 
+* An open auction contract that autioner to create auctions.
+* The contract allows the owner to set a minimum auction fee 
+* The contract allows the autioner to set the minimum bid and minimum bid increment.
+* The contract also allows the owner to withdraw the balance of the contract.
+* The contract allows the bidder to bid on the auction.
+* The contract will transfer the NFT to the highest bidder after the auction ends.
+* The contract will transfer the highest bid amount to the autioner after the auction ends.
+* The contract will return bid to the bidder if the bid is not the highest.
+* The contract will return the NFT to the seller if no bids were placed.
+*/
+
 contract Auction {
     address public NFTAddress;
     uint256 public auctionCounter = 0;
     address owner;
-    uint256 public minimumAuctionFee;
+    uint256 public minimumAuctionFee; // For auction creation
+
     struct AuctionData {
         uint256 auctionId;
         address payable seller;
         uint256 highestBid;
         address highestBidder;
         uint256 auctionStartTime;
-        uint256 auctionCommitEndTime;
-        uint256 auctionRevealEndTime;
+        uint256 auctionEndTime;
         uint256 miniumBidAmount;
-        bool finalized;
+        uint256 miniumBidIncrement;
         uint256 tokenId;
     }
-    struct Bid {
-        bytes32 commitHash;
-        uint256 bidAmount;
-        bool revealed;
-    }
     mapping(uint256 => AuctionData) public auctions;
-    mapping(uint256 => mapping(address => Bid)) public auctionsBid;
-    constructor(address _NFTAddress, uint256 _minimumAuctionFee) {
+    mapping(uint256 => mapping(address => uint256)) public auctionsBid;
+    constructor(address _NFTAddress, uint256 __minimumAuctionFee) {
         // Initialize the contract with the address of the NFT contract
         NFTAddress = _NFTAddress;
-        minimumAuctionFee = _minimumAuctionFee;
+        minimumAuctionFee = __minimumAuctionFee;
         owner = msg.sender;
     }
+    event AuctionAdded(
+        address  seller,
+        uint256 highestBid,
+        address highestBidder,
+        uint256 auctionStartTime,
+        uint256 auctionEndTime,
+        uint256 miniumBidAmount,
+        uint256 miniumBidIncrement,
+        uint256 tokenId
+    );
+    event AuctionBid(uint256 auctionId, address bidder, uint256 bidAmount);
+    event AuctionFinalized(uint256 auctionId, address winner, uint256 winningBid);
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this");
@@ -43,100 +64,111 @@ contract Auction {
         _;
     }
 
-    modifier withinCommitPhase(uint256 auctionId) {
-        require(block.timestamp < auctions[auctionId].auctionCommitEndTime, "Commit phase has ended");
-        _;
-    }
-
-    modifier withinRevealPhase(uint256 auctionId) {
-        require(block.timestamp >= auctions[auctionId].auctionCommitEndTime && block.timestamp < auctions[auctionId].auctionRevealEndTime, "Not within reveal phase");
-        _;
-    }
-
-    modifier afterRevealPhase(uint256 auctionId) {
-        require(block.timestamp >= auctions[auctionId].auctionRevealEndTime, "Reveal phase still ongoing");
-        _;
-    }
-
     modifier _minimumAuctionFee() {
         require(msg.value >=  minimumAuctionFee * 1e18, "Minimum auction fee is needed");
         _;
     }
 
+    modifier allowBid(uint256 auctionId) {
+        require(block.timestamp >= auctions[auctionId].auctionStartTime && block.timestamp <= auctions[auctionId].auctionEndTime, "Auction is not active");
+        _;
+    }
+
+    modifier finalized(uint256 auctionId) {
+        require(block.timestamp >= auctions[auctionId].auctionEndTime, "Auction already finalized");
+        _;
+    }
+
+    modifier higherBid(uint256 auctionId) {
+        require(msg.value > (auctions[auctionId].highestBid + auctions[auctionId].miniumBidIncrement), "Bid must be higher than the current bid and must be an increment of the minium bid increment");
+        _;
+    }
+
     // Create a new auction
-    function createAuction(uint256 _tokenId, uint256 _miniumBidAmount, uint256 _auctionCommitEndTime, uint256 _auctionRevealEndTime) public payable _minimumAuctionFee {
+    function createAuction(uint256 _tokenId, uint256 _miniumBidAmount, uint256 _auctionStartTime, uint256 _auctionEndTime, uint256 _miniumBidIncrement) public payable _minimumAuctionFee {
         IERC721(NFTAddress).transferFrom(msg.sender, address(this), _tokenId);
         auctionCounter++;
-        auctions[auctionCounter] = AuctionData(auctionCounter, payable(msg.sender), 0, address(0), block.timestamp, _auctionCommitEndTime, _auctionRevealEndTime, _miniumBidAmount, false, _tokenId);
+        auctions[auctionCounter] = AuctionData(auctionCounter, payable(msg.sender), 0, address(0), _auctionStartTime, _auctionEndTime, _miniumBidAmount, _miniumBidIncrement, _tokenId);
+
+        emit AuctionAdded(
+            msg.sender,
+            0,
+            address(0),
+            _auctionStartTime,
+            _auctionEndTime,
+            _miniumBidAmount,
+            _miniumBidIncrement,
+            _tokenId
+        );
     }
 
     // Commit phase: users submit their hashed bid
-    function commitBid(uint256 auctionId, bytes32 _commitHash) public payable withinCommitPhase(auctionId) {
-        require(auctionsBid[auctionId][msg.sender].commitHash == 0, "Already committed");
+    function bid(uint256 auctionId) public payable higherBid(auctionId) allowBid(auctionId) {
         require(msg.value > 0, "Must send ETH with your bid");
-        require(msg.value > auctions[auctionId].miniumBidAmount, "Bid must be higher than the current bid");
         
         // Record the commit hash and bid value (value is held in the contract)
-        auctionsBid[auctionId][msg.sender] = Bid(_commitHash, msg.value, false);
-    }
+        auctionsBid[auctionId][msg.sender] = msg.value;
 
-    // Reveal phase: users reveal their bid by submitting the original bid and nonce
-    function revealBid(uint256 auctionId, uint256 _bidAmount, uint256 _nonce) public withinRevealPhase(auctionId) {
-        Bid storage bid = auctionsBid[auctionId][msg.sender];
-        require(bid.commitHash != 0, "No bid to reveal");
-        require(!bid.revealed, "Already revealed");
+        // prevent re-entrancy
+        address oldHighestBidder = payable(auctions[auctionId].highestBidder);
+        uint256 oldHighestBid = auctions[auctionId].highestBid;
         
-        // Recreate the hash from the provided bid amount and nonce
-        bytes32 calculatedHash = keccak256(abi.encodePacked(_bidAmount, _nonce));
-
-        // Verify the hash matches the one submitted during the commit phase
-        require(calculatedHash == bid.commitHash, "Hash mismatch. Incorrect bid or nonce");
-
-        bid.revealed = true;
-        bid.bidAmount = _bidAmount;
-
-        // Check if it's the highest bid
-        if (_bidAmount > auctions[auctionId].highestBid) {
-            auctions[auctionId].highestBid = _bidAmount;
+        // Update the highest bid if the new bid is higher
+        if (msg.value > oldHighestBid) {
+            auctions[auctionId].highestBid = msg.value;
             auctions[auctionId].highestBidder = msg.sender;
         }
+        payable(oldHighestBidder).transfer(oldHighestBid);
+
+        emit AuctionBid(auctionId, msg.sender, msg.value);
+        
     }
 
-    // End auction and transfer funds to the winner
+    // End auction and transfer nft to the winner
     // Owner can also finalize the auction if no bids were placed or if the seller is inactive
-    function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId) afterRevealPhase(auctionId) {
-        require(auctions[auctionId].finalized == false, "Auction already finalized");
+    function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId) finalized(auctionId){
         if (auctions[auctionId].highestBidder != address(0)) { // If there are bids
-            // Mark the auction as finalized
-            auctions[auctionId].finalized = true;
             // Transfer the highest bid amount to the owner (auctioneer)
-            payable(owner).transfer(auctions[auctionId].highestBid);
+            // prevent re-entrancy
+            address highestBidder = auctions[auctionId].highestBidder;
+            uint256 highestBid = auctions[auctionId].highestBid;
+            auctions[auctionId].highestBid = 0;
+            auctions[auctionId].highestBidder = address(0);
+            payable(highestBidder).transfer(highestBid);
 
             // Transfer the NFT to the highest bidder
             IERC721(NFTAddress).transferFrom(address(this), auctions[auctionId].highestBidder, auctions[auctionId].tokenId);
+
+            emit AuctionFinalized(auctionId, highestBidder, highestBid);
         } else { // If no bids were placed
-            auctions[auctionId].finalized = true;
             // Transfer the NFT back to the seller
             IERC721(NFTAddress).transferFrom(address(this), auctions[auctionId].seller, auctions[auctionId].tokenId);
+            emit AuctionFinalized(auctionId, auctions[auctionId].seller, 0);
         }
-    }
-
-    // Withdraw refunds for non-winning bids
-    function withdrawRefund(uint256 auctionId) public afterRevealPhase(auctionId) {
-        require(auctions[auctionId].finalized == true, "Auction have yet finalized");
-        Bid storage bid = auctionsBid[auctionId][msg.sender];
-        require(bid.revealed, "Bid not revealed");
-        require(msg.sender != auctions[auctionId].highestBidder, "Winner cannot withdraw");
-
-        // Refund the user's bid amount
-        uint256 refundAmount = bid.bidAmount;
-        bid.bidAmount = 0; // Prevent re-entrancy
-        payable(msg.sender).transfer(refundAmount);
     }
 
     //Getters fuction
     function getAuction(uint256 auctionId) public view returns (AuctionData memory) {
         return auctions[auctionId];
+    }
+
+    function getHighestBid(uint256 auctionId) public view returns (uint256) {
+        return auctions[auctionId].highestBid;
+    }
+    function getAuctionEndTime(uint256 auctionId) public view returns (uint256) {
+        return auctions[auctionId].auctionEndTime;
+    }
+    function getAuctionStartTime(uint256 auctionId) public view returns (uint256) {
+        return auctions[auctionId].auctionStartTime;
+    }
+    function getMinimumBidAmount(uint256 auctionId) public view returns (uint256) {
+        return auctions[auctionId].miniumBidAmount;
+    }
+    function getMinimumBidIncrement(uint256 auctionId) public view returns (uint256) {
+        return auctions[auctionId].miniumBidIncrement;
+    }
+    function getTokenId(uint256 auctionId) public view returns (uint256) {
+        return auctions[auctionId].tokenId;
     }
 
     //Owner functions
@@ -147,7 +179,7 @@ contract Auction {
     }
 
     // Owner can change the minimum auction fee
-    function setMinimumAuctionFee(uint256 _minimumAuctionFee) public onlyOwner {
-        minimumAuctionFee = _minimumAuctionFee;
+    function setMinimumAuctionFee(uint256 __minimumAuctionFee) public onlyOwner {
+        minimumAuctionFee = __minimumAuctionFee;
     }
 }
