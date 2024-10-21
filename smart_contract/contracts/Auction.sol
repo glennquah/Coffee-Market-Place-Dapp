@@ -14,6 +14,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 * The contract will transfer the highest bid amount to the autioner after the auction ends.
 * The contract will return bid to the bidder if the bid is not the highest.
 * The contract will return the NFT to the seller if no bids were placed.
+* 
 */
 
 contract Auction {
@@ -102,7 +103,7 @@ contract Auction {
         );
     }
 
-    // Commit phase: users submit their hashed bid
+    // Bid on an auction
     function bid(uint256 auctionId) public payable higherBid(auctionId) allowBid(auctionId) {
         require(msg.value > 0, "Must send ETH with your bid");
         
