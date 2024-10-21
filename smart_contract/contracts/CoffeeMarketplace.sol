@@ -13,7 +13,15 @@ contract CoffeeMarketplace is ERC721URIStorage, Ownable, IERC721Receiver, Produc
     event ListingAdded(uint256 productId, address indexed roaster, string name, uint256 price, uint256 quantity);
 
     // Constructor for initializing ERC721 with a name and symbol and passing msg.sender to Ownable
-    constructor() ERC721("CoffeeNFT", "COFFEE") Ownable(msg.sender) {}
+    constructor(
+        address[] memory _roasters,
+        string[] memory _names,
+        string[] memory _descriptions,
+        string[] memory _ipfsHashes,
+        uint256[] memory _prices,
+        uint256[] memory _quantities,
+        uint256[][] memory _nftIds
+    ) ERC721("CoffeeNFT", "COFFEE") Ownable(msg.sender) Product(_roasters, _names, _descriptions, _ipfsHashes, _prices, _quantities, _nftIds) {}
 
     // Add a new product and mint NFTs for the product
     function addRoasterListing(
