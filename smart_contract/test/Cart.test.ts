@@ -367,35 +367,29 @@ describe('Cart with Multiple Customers', function () {
         it('Should allow when customers remove products from their carts independently', async function () {
             await cart.connect(customer1).addToCart(firstProductId, singleQuantity);
             await cart.connect(customer1).addToCart(secondProductId, singleQuantity);
+            
             await cart.connect(customer2).addToCart(firstProductId, singleQuantity);
             await cart.connect(customer2).addToCart(secondProductId, singleQuantity);
 
-            // Customer 1 removes an item
             await cart.connect(customer1).removeFromCart(1);
 
-            // Check Customer 1's cart
             const customer1Cart = await cart.connect(customer1).viewCart();
             expect(customer1Cart.length).to.equal(1);
             expect(customer1Cart[0].productId).to.equal(2);
 
-            // Check Customer 2's cart (should be unchanged)
             const customer2Cart = await cart.connect(customer2).viewCart();
             expect(customer2Cart.length).to.equal(2);
         });
 
         it('Should allow when customers checkout independently', async function () {
-            // Both customers add products to their carts
             await cart.connect(customer1).addToCart(firstProductId, singleQuantity);
             await cart.connect(customer2).addToCart(secondProductId, singleQuantity);
 
-            // Customer 1 checks out
             await cart.connect(customer1).checkout();
 
-            // Check Customer 1's cart (should be empty)
             const customer1Cart = await cart.connect(customer1).viewCart();
             expect(customer1Cart.length).to.equal(0);
 
-            // Check Customer 2's cart (should be unchanged)
             const customer2Cart = await cart.connect(customer2).viewCart();
             expect(customer2Cart.length).to.equal(1);
             expect(customer2Cart[0].productId).to.equal(2);
