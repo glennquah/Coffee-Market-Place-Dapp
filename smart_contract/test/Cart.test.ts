@@ -5,7 +5,7 @@ import {
   CoffeeMarketplace,
   CoffeeMarketplace__factory,
   Cart,
-  Cart__factory
+  Cart__factory,
 } from '../typechain-types';
 
 const roasters = [
@@ -271,6 +271,13 @@ describe('Cart', function () {
       for (let i = 0; i < productIds.length; i++) {
         await cart.connect(customer).addToCart(productIds[i], quantities[i]);
       }
+    });
+
+    it('Should emit event and create an order on checkout', async function () {
+        // Emit CartCheckout event
+        await expect(cart.connect(customer).checkout())
+          .to.emit(cart, 'CartCheckout')
+          .withArgs(await customer.getAddress(), 1); // Order ID should be 1
     });
 
     it('Should allow when customer wants to clear all items from the cart after checkout', async function () {

@@ -1,6 +1,8 @@
 pragma solidity ^0.8.0;
 
 import "./CoffeeMarketplace.sol"; 
+import "./Product.sol";
+import "./Order.sol";
 
 contract Cart {
     CoffeeMarketplace public coffeeMarketplace;
@@ -11,6 +13,7 @@ contract Cart {
     }
 
     mapping(address => CartProduct[]) public carts;
+    mapping(address => Order[]) public orders; 
     // mapping(address => mapping(uint256 => CartProduct[])) public customerCheckouts; // customers who have placed an order
     // mapping(address => uint256[]) public customerFinalisedCartIds;
     uint256 public nextFinalisedCartId = 1;
@@ -20,6 +23,7 @@ contract Cart {
     event ProductRemovedFromCart(address customer, uint256 productId);
     event CartCleared(address customer);
     event CartCheckout(address customer, uint256 finalisedCartId);
+    event OrderCreated(address customer, uint256 orderId, bool isCompleted);
 
     constructor(address _coffeeMarketplaceContractAddress) {
         coffeeMarketplace = CoffeeMarketplace(_coffeeMarketplaceContractAddress);  // Reference to the deployed CoffeeMarketplace contract since is buying coffee beans from there
@@ -120,16 +124,28 @@ contract Cart {
         clearCart();
     }
 
+    // Checkout function to create an order from the cart
     function checkout() public {
         require(carts[msg.sender].length > 0, "Cart is empty");
         
-        uint256 finalisedCartId = nextFinalisedCartId++;
-        // customerCheckouts[msg.sender][finalisedCartId] = carts[msg.sender];
-        // customerFinalisedCartIds[msg.sender].push(finalisedCartId);
-        
+        // Create a new order with the current cart items as ProductId[]
+        CartProduct[] memory customerCart = carts[msg.sender];
+        uint256[] memory productIds = new uint256[](customerCart.length);
+        uint256 totalAmount = 0;
+        for (uint256 i = 0; i < customerCart.length; i++) {
+            productIds[i] = customerCart[i].productId;
+            (, , , , uint256 price, , ) = coffeeMarketplace.getListing(customerCart[i].productId);
+            totalAmount += price * customerCart[i].quantity;
+        }
+
+        Order orderContract = new Order();
+        uint256 orderId = orderContract.createOrder(msg.sender, productIds, totalAmount, block.timestamp);
+
+        // Clear the cart after checkout
         clearCart();
         
-        emit CartCheckout(msg.sender, finalisedCartId);
+        // Emit a checkout event
+        emit CartCheckout(msg.sender, orderId);
     }
 
     // function getCheckout(address customer, uint256 finalisedCartId) public view returns (CartProduct[] memory) {
