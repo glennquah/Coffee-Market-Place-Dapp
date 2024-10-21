@@ -66,7 +66,7 @@ contract Auction {
     }
 
     modifier _minimumAuctionFee() {
-        require(msg.value >=  minimumAuctionFee * 1e18, "Minimum auction fee is needed");
+        require(msg.value >=  minimumAuctionFee, "Minimum auction fee is needed");
         _;
     }
 
@@ -170,6 +170,10 @@ contract Auction {
     }
     function getTokenId(uint256 auctionId) public view returns (uint256) {
         return auctions[auctionId].tokenId;
+    }
+
+    function getFee() public view returns (uint256) {
+        return minimumAuctionFee;
     }
 
     //Owner functions
