@@ -14,7 +14,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  * 
  * 
  */
-contract Auction {
+contract AuctionV1 {
     address public NFTAddress;
     uint256 public auctionCounter = 0;
     address owner;
@@ -28,6 +28,8 @@ contract Auction {
         uint256 auctionCommitEndTime;
         uint256 auctionRevealEndTime;
         bool finalized;
+        bool withdrawnByWinner;
+        bool withdrawnBySeller;
         uint256 tokenId;
     }
     struct Bid {
@@ -51,6 +53,11 @@ contract Auction {
 
     modifier onlySellerOrOwner(uint256 auctionId) {
         require(msg.sender == auctions[auctionId].seller || msg.sender == owner, "Only seller and owner can call this");
+        _;
+    }
+
+    modifier onlySeller(uint256 auctionId) {
+        require(msg.sender == auctions[auctionId].seller, "Only seller can call this");
         _;
     }
 
@@ -78,7 +85,7 @@ contract Auction {
     function createAuction(uint256 _tokenId, uint256 _auctionCommitEndTime, uint256 _auctionRevealEndTime) public payable _minimumAuctionFee {
         IERC721(NFTAddress).transferFrom(msg.sender, address(this), _tokenId);
         auctionCounter++;
-        auctions[auctionCounter] = AuctionData(auctionCounter, payable(msg.sender), 0, address(0), block.timestamp, _auctionCommitEndTime, _auctionRevealEndTime, false, _tokenId);
+        auctions[auctionCounter] = AuctionData(auctionCounter, payable(msg.sender), 0, address(0), block.timestamp, _auctionCommitEndTime, _auctionRevealEndTime, false, false,false, _tokenId);
     }
 
     // Commit phase: users submit their hashed bid
@@ -108,6 +115,14 @@ contract Auction {
         if (_bidAmount > auctions[auctionId].highestBid) {
             auctions[auctionId].highestBid = _bidAmount;
             auctions[auctionId].highestBidder = msg.sender;
+        } else if (_bidAmount == auctions[auctionId].highestBid) {
+            // In case of a tie,  random winner is selected 
+            uint a = block.timestamp;
+            uint msgSender = uint(keccak256(abi.encodePacked(msg.sender))) % (a / 1000);
+            uint highestBidder = uint(keccak256(abi.encodePacked(auctions[auctionId].highestBidder))) % (a / 1000);
+            if (msgSender > highestBidder) {
+                auctions[auctionId].highestBidder = msg.sender;
+            }
         }
     }
 
@@ -115,28 +130,46 @@ contract Auction {
     // Owner can also finalize the auction if no bids were placed or if the seller is inactive
     function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId) afterRevealPhase(auctionId) {
         require(auctions[auctionId].finalized == false, "Auction already finalized");
-        if (auctions[auctionId].highestBidder != address(0)) { // If there are bids
-            // Mark the auction as finalized
-            auctions[auctionId].finalized = true;
-            // Transfer the highest bid amount to the owner (auctioneer)
-            payable(auctions[auctionId].seller).transfer(auctions[auctionId].highestBid);
+        auctions[auctionId].finalized = true;
+    }
 
-            // Transfer the NFT to the highest bidder
-            IERC721(NFTAddress).transferFrom(address(this), auctions[auctionId].highestBidder, auctions[auctionId].tokenId);
+    // Withdraw Highest Bid for the seller
+    function withdrawHighestBid(uint256 auctionId) public onlySeller(auctionId) afterRevealPhase(auctionId) {
+        require(auctions[auctionId].finalized == true, "Auction have yet finalized");
+        require(auctions[auctionId].withdrawnBySeller == false, "Seller have already withdrawn");
+        if (auctions[auctionId].highestBidder != address(0)) { // If there are bids
+            require(auctions[auctionId].withdrawnByWinner == true, "Winner have yet withdrawn");
+            // Mark the auction as finalized
+            // Transfer the highest bid amount to the owner (auctioneer)
+            // prevent re-entrancy
+            auctions[auctionId].withdrawnBySeller = true;
+
+            payable(auctions[auctionId].seller).transfer(auctions[auctionId].highestBid);
         } else { // If no bids were placed
-            auctions[auctionId].finalized = true;
+            auctions[auctionId].withdrawnBySeller = true;
             // Transfer the NFT back to the seller
             IERC721(NFTAddress).transferFrom(address(this), auctions[auctionId].seller, auctions[auctionId].tokenId);
         }
     }
 
+    // Withdraw the NFT for the winner
+    function withdrawNFT(uint256 auctionId) public payable afterRevealPhase(auctionId) {
+        require(auctions[auctionId].finalized == true, "Auction have yet finalized");
+        Bid storage bid = auctionsBid[auctionId][msg.sender];
+        require(bid.revealed, "Bid not revealed");
+        require(msg.sender == auctions[auctionId].highestBidder, "Only winner can withdraw");
+        require(msg.value >= auctions[auctionId].highestBid, "Insufficient funds");
+
+        // Transfer the highest bid amount to the winner
+        IERC721(NFTAddress).transferFrom(address(this), auctions[auctionId].highestBidder, auctions[auctionId].tokenId);
+        auctions[auctionId].withdrawnByWinner = true;
+    }
     // Withdraw refunds for non-winning bids
     function withdrawRefund(uint256 auctionId) public afterRevealPhase(auctionId) {
         require(auctions[auctionId].finalized == true, "Auction have yet finalized");
         Bid storage bid = auctionsBid[auctionId][msg.sender];
         require(bid.revealed, "Bid not revealed");
         require(msg.sender != auctions[auctionId].highestBidder, "Winner cannot withdraw");
-
         // Refund the user's bid amount
         uint256 refundAmount = bid.bidAmount;
         bid.bidAmount = 0; // Prevent re-entrancy
