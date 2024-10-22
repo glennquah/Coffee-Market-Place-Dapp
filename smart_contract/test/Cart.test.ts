@@ -8,6 +8,8 @@ import {
   Cart__factory,
   Product,
   Product__factory,
+  Order,
+  Order__factory,
 } from '../typechain-types';
 
 const roasters = [
@@ -63,6 +65,7 @@ const nftIds = [ // can be any number of elements in the arr since the main init
 describe('Cart', function () {
   let coffeeMarketplace: CoffeeMarketplace;
   let cart: Cart;
+  let order: Order;
   let product: Product;
   let roaster: Signer;
   let customer: Signer;
@@ -80,6 +83,7 @@ describe('Cart', function () {
       (await ethers.getContractFactory(
         'Product',
       )) as Product__factory;
+      const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
     [roaster, customer] = await ethers.getSigners();
     
 
@@ -93,9 +97,9 @@ describe('Cart', function () {
         nftIds
       );
     
-      coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
+    coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
         product
-      );
+    );
     await coffeeMarketplace.waitForDeployment();
 
     for (let i = 0; i < roasters.length; i++) {
@@ -108,7 +112,10 @@ describe('Cart', function () {
       );
     }
 
-    cart = await CartFactory.deploy(coffeeMarketplace.getAddress());
+    order = await OrderFactory.deploy([], [], [], []);
+    await order.waitForDeployment();
+
+    cart = await CartFactory.deploy(coffeeMarketplace.getAddress(), order.getAddress());
     await cart.waitForDeployment();
   });
 
@@ -307,6 +314,7 @@ describe('Cart with Multiple Customers', function () {
     let cart: Cart;
     let product: Product;
     let roaster: Signer;
+    let order: Order;
     let customer1: Signer;
     let customer2: Signer;
 
@@ -324,6 +332,7 @@ describe('Cart with Multiple Customers', function () {
         (await ethers.getContractFactory(
           'Product',
         )) as Product__factory;
+        const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
 
         product = await ProductFactory.deploy(
             roasters,
@@ -350,7 +359,10 @@ describe('Cart with Multiple Customers', function () {
             );
         }
 
-        cart = await CartFactory.deploy(coffeeMarketplace.getAddress());
+        order = await OrderFactory.deploy([], [], [], []);
+        await order.waitForDeployment();
+
+        cart = await CartFactory.deploy(coffeeMarketplace.getAddress(), order.getAddress());
         await cart.waitForDeployment();
     });
 

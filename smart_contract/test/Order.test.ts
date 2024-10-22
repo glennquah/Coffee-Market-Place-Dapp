@@ -13,22 +13,22 @@ describe('Order Contract', function () {
     [owner, customer] = await ethers.getSigners();
 
     // Deploy Order contract
-    order = await OrderFactory.deploy();
+    order = await OrderFactory.deploy(
+      [await customer.getAddress(), await customer.getAddress()],
+      [
+        [
+          { productId: 1, quantity: 2 },
+          { productId: 2, quantity: 3 },
+        ],
+        [
+          { productId: 4, quantity: 1 },
+          { productId: 5, quantity: 2 },
+        ],
+      ],
+      [ethers.parseEther('1.0'), ethers.parseEther('0.5')],
+      [Date.now(), Date.now()]
+    );
     await order.waitForDeployment();
-
-    // Add some sample orders for testing
-    const sampleOrderItems1 = [
-      { productId: 1, quantity: 2 },
-      { productId: 2, quantity: 3 },
-    ];
-    const sampleOrderItems2 = [
-      { productId: 4, quantity: 1 },
-      { productId: 5, quantity: 2 },
-    ];
-
-    // Create orders using sample data
-    await order.createOrder(await customer.getAddress(), sampleOrderItems1, ethers.parseEther('1.0'), Date.now());
-    await order.createOrder(await customer.getAddress(), sampleOrderItems2, ethers.parseEther('0.5'), Date.now());
   });
 
   it('Should create a new order successfully', async function () {

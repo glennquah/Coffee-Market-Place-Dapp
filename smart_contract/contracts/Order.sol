@@ -16,13 +16,41 @@ contract Order {
         uint256 timestamp;
     }
 
+    constructor(
+        address[] memory _customerAddresses,
+        OrderItem[][] memory _orderItems,
+        uint256[] memory _totalAmounts,
+        uint256[] memory _timestamps
+    ) {
+        require(
+            _customerAddresses.length == _orderItems.length &&
+            _orderItems.length == _totalAmounts.length &&
+            _totalAmounts.length == _timestamps.length,
+            "Constructor input arrays must have the same length"
+        );
+
+        for (uint256 i = 0; i < _customerAddresses.length; i++) {
+            orderCounter++;
+            OrderDetail storage newOrder = orders[orderCounter];
+            newOrder.orderId = orderCounter;
+            newOrder.customer = _customerAddresses[i];
+            newOrder.totalAmount = _totalAmounts[i];
+            newOrder.isCompleted = false;
+            newOrder.timestamp = _timestamps[i];
+
+            for (uint256 j = 0; j < _orderItems[i].length; j++) {
+                newOrder.orderItems.push(_orderItems[i][j]);
+            }
+        }
+    }
+
     mapping(uint256 => OrderDetail) public orders;
     uint256 public orderCounter = 0;
 
     event OrderCreated(uint256 orderId, address customer, uint256 totalAmount, uint256 timestamp);
     event OrderCompleted(uint256 orderId);
 
-    function createOrder(address _customer, OrderItem[] memory _items, uint256 _totalAmount, uint256 _timestamp) public returns (uint256) {
+    function createOrder(address _customer, OrderItem[] memory _items, uint256 _totalAmount, uint256 _timestamp) public returns (uint256 orderId) {
         require(_totalAmount > 0, "Total amount must be greater than zero.");
         require(_items.length > 0, "Order must contain at least one item.");
 

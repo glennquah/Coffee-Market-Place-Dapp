@@ -6,6 +6,7 @@ import "./Order.sol";
 
 contract Cart {
     CoffeeMarketplace public coffeeMarketplace;
+    Order public orderContract;
 
     struct CartProduct {
         uint256 productId;
@@ -25,8 +26,9 @@ contract Cart {
     event CartCheckout(address customer, uint256 finalisedCartId);
     event OrderCreated(address customer, uint256 orderId, bool isCompleted);
 
-    constructor(address _coffeeMarketplaceContractAddress) {
+    constructor(address _coffeeMarketplaceContractAddress, address _orderContractAddress) {
         coffeeMarketplace = CoffeeMarketplace(_coffeeMarketplaceContractAddress);  // Reference to the deployed CoffeeMarketplace contract since is buying coffee beans from there
+        orderContract = Order(_orderContractAddress);
     }
 
     // getter
@@ -134,12 +136,11 @@ contract Cart {
 
         // Calculate the total amount
         for (uint256 i = 0; i < customerCart.length; i++) {
-            (, , , , uint256 price, , ) = coffeeMarketplace.getListing(customerCart[i].productId);
+            (, , , uint256 price, , , ) = coffeeMarketplace.getListing(customerCart[i].productId);
             totalAmount += price * customerCart[i].quantity;
         }
 
         // Create the order using the orderContract
-        Order orderContract = new Order();
         Order.OrderItem[] memory orderItems = new Order.OrderItem[](customerCart.length);
         
         for (uint256 i = 0; i < customerCart.length; i++) {
