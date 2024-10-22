@@ -5,23 +5,17 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "./Product.sol";
 
-contract CoffeeMarketplace is ERC721URIStorage, Ownable, IERC721Receiver, Product {
+contract CoffeeMarketplace is ERC721URIStorage, Ownable, IERC721Receiver {
     uint256 public tokenCounter = 0;   // Counter for NFT IDs
+    Product public productContract;
 
-    // Events
     event NFTMinted(uint256 indexed tokenId, address indexed owner, string tokenURI);
     event ListingAdded(uint256 productId, address indexed roaster, string name, uint256 price, uint256 quantity);
 
-    // Constructor for initializing ERC721 with a name and symbol and passing msg.sender to Ownable
-    constructor(
-        address[] memory _roasters,
-        string[] memory _names,
-        string[] memory _descriptions,
-        string[] memory _ipfsHashes,
-        uint256[] memory _prices,
-        uint256[] memory _quantities,
-        uint256[][] memory _nftIds
-    ) ERC721("CoffeeNFT", "COFFEE") Ownable(msg.sender) Product(_roasters, _names, _descriptions, _ipfsHashes, _prices, _quantities, _nftIds) {}
+    // Constructor for initializing ERC721 with a name and symbol, and setting the product contract address
+    constructor(address _productContractAddress) ERC721("CoffeeNFT", "COFFEE") Ownable(msg.sender) {
+        productContract = Product(_productContractAddress);
+    }
 
     // Add a new product and mint NFTs for the product
     function addRoasterListing(
@@ -47,10 +41,24 @@ contract CoffeeMarketplace is ERC721URIStorage, Ownable, IERC721Receiver, Produc
             emit NFTMinted(tokenId, address(this), _ipfsHash);
         }
 
-        // Add product to the mapping via the inherited Product contract
-        addProduct(msg.sender, _name, _description, _ipfsHash, _price, _quantity, nftIds);
-        emit ListingAdded(productCounter, msg.sender, _name, _price, _quantity);
+        // Add product to the Product contract using its function
+        productContract.addProduct(msg.sender, _name, _description, _ipfsHash, _price, _quantity, nftIds);
+        emit ListingAdded(productContract.productCounter(), msg.sender, _name, _price, _quantity);
     }
+
+    // Function to get product details
+    function getListing(uint256 _productId) public view returns (
+        string memory name,
+        string memory description,
+        string memory ipfsHash,
+        uint256 price,
+        uint256 quantity,
+        uint256[] memory nftIds,
+        bool available
+    ) {
+        return productContract.getProduct(_productId);
+    }
+
 
     // Implement the onERC721Received function to accept NFTs
     function onERC721Received(

@@ -6,6 +6,8 @@ import {
   CoffeeMarketplace__factory,
   Cart,
   Cart__factory,
+  Product,
+  Product__factory,
 } from '../typechain-types';
 
 const roasters = [
@@ -61,6 +63,7 @@ const nftIds = [ // can be any number of elements in the arr since the main init
 describe('Cart', function () {
   let coffeeMarketplace: CoffeeMarketplace;
   let cart: Cart;
+  let product: Product;
   let roaster: Signer;
   let customer: Signer;
 
@@ -73,17 +76,26 @@ describe('Cart', function () {
       (await ethers.getContractFactory(
         'Cart',
       )) as Cart__factory;
+      const ProductFactory: Product__factory =
+      (await ethers.getContractFactory(
+        'Product',
+      )) as Product__factory;
     [roaster, customer] = await ethers.getSigners();
+    
 
-    coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
-      roasters,
-      names,
-      descriptions,
-      ipfsHashes,
-      prices,
-      quantities,
-      nftIds
-    );
+    product = await ProductFactory.deploy(
+        roasters,
+        names,
+        descriptions,
+        ipfsHashes,
+        prices,
+        quantities,
+        nftIds
+      );
+    
+      coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
+        product
+      );
     await coffeeMarketplace.waitForDeployment();
 
     for (let i = 0; i < roasters.length; i++) {
@@ -293,6 +305,7 @@ describe('Cart', function () {
 describe('Cart with Multiple Customers', function () {
     let coffeeMarketplace: CoffeeMarketplace;
     let cart: Cart;
+    let product: Product;
     let roaster: Signer;
     let customer1: Signer;
     let customer2: Signer;
@@ -307,8 +320,12 @@ describe('Cart with Multiple Customers', function () {
             'Cart',
             )) as Cart__factory;
         [roaster, customer1, customer2] = await ethers.getSigners();
+        const ProductFactory: Product__factory =
+        (await ethers.getContractFactory(
+          'Product',
+        )) as Product__factory;
 
-        coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
+        product = await ProductFactory.deploy(
             roasters,
             names,
             descriptions,
@@ -316,7 +333,11 @@ describe('Cart with Multiple Customers', function () {
             prices,
             quantities,
             nftIds
-        );
+          );
+        
+          coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
+            product
+          );
         await coffeeMarketplace.waitForDeployment();
 
         for (let i = 0; i < roasters.length; i++) {

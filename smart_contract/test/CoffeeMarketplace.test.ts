@@ -4,10 +4,13 @@ import { ethers } from 'hardhat';
 import {
   CoffeeMarketplace,
   CoffeeMarketplace__factory,
+  Product,
+  Product__factory,
 } from '../typechain-types';
 
 describe('CoffeeMarketplace', function () {
   let coffeeMarketplace: CoffeeMarketplace;
+  let product: Product;
   let owner: Signer;
   let roaster: Signer;
 
@@ -16,6 +19,12 @@ describe('CoffeeMarketplace', function () {
       (await ethers.getContractFactory(
         'CoffeeMarketplace',
       )) as CoffeeMarketplace__factory;
+
+    const ProductFactory: Product__factory =
+      (await ethers.getContractFactory(
+        'Product',
+      )) as Product__factory;
+    
     [owner, roaster] = await ethers.getSigners();
 
     const roasters = [
@@ -68,7 +77,7 @@ describe('CoffeeMarketplace', function () {
         [13, 14, 15] 
       ];
 
-    coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
+    product = await ProductFactory.deploy(
       roasters,
       names,
       descriptions,
@@ -76,6 +85,10 @@ describe('CoffeeMarketplace', function () {
       prices,
       quantities,
       nftIds
+    );
+  
+    coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
+      product
     );
     await coffeeMarketplace.waitForDeployment();
 
@@ -106,7 +119,7 @@ describe('CoffeeMarketplace', function () {
           price,
           quantity,
         ),
-    ).to.emit(coffeeMarketplace, 'ProductAdded');
+    ).to.emit(coffeeMarketplace, 'ListingAdded');
 
     // Check if the product was added successfully
     const product = await coffeeMarketplace.getListing(6); // Listing ID will be 6, after 5 pre-existing listings
