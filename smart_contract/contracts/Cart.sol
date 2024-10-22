@@ -128,18 +128,28 @@ contract Cart {
     function checkout() public {
         require(carts[msg.sender].length > 0, "Cart is empty");
         
-        // Create a new order with the current cart items as ProductId[]
+        // Get the cart of the customer
         CartProduct[] memory customerCart = carts[msg.sender];
-        uint256[] memory productIds = new uint256[](customerCart.length);
         uint256 totalAmount = 0;
+
+        // Calculate the total amount
         for (uint256 i = 0; i < customerCart.length; i++) {
-            productIds[i] = customerCart[i].productId;
             (, , , , uint256 price, , ) = coffeeMarketplace.getListing(customerCart[i].productId);
             totalAmount += price * customerCart[i].quantity;
         }
 
+        // Create the order using the orderContract
         Order orderContract = new Order();
-        uint256 orderId = orderContract.createOrder(msg.sender, productIds, totalAmount, block.timestamp);
+        Order.OrderItem[] memory orderItems = new Order.OrderItem[](customerCart.length);
+        
+        for (uint256 i = 0; i < customerCart.length; i++) {
+            orderItems[i] = Order.OrderItem({
+                productId: customerCart[i].productId,
+                quantity: customerCart[i].quantity
+            });
+        }
+
+        uint256 orderId = orderContract.createOrder(msg.sender, orderItems, totalAmount, block.timestamp);
 
         // Clear the cart after checkout
         clearCart();

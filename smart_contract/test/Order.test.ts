@@ -12,44 +12,36 @@ describe('Order Contract', function () {
     const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
     [owner, customer] = await ethers.getSigners();
 
-    // Deploy Order contract with initial values
+    // Deploy Order contract
     order = await OrderFactory.deploy();
     await order.waitForDeployment();
 
     // Add some sample orders for testing
-    const sampleOrders = [
-      {
-        customer: await customer.getAddress(),
-        productIds: [1, 2, 3],
-        totalAmount: ethers.parseEther('1.0'),
-        timestamp: Date.now(),
-      },
-      {
-        customer: await customer.getAddress(),
-        productIds: [4, 5],
-        totalAmount: ethers.parseEther('0.5'),
-        timestamp: Date.now(),
-      },
+    const sampleOrderItems1 = [
+      { productId: 1, quantity: 2 },
+      { productId: 2, quantity: 3 },
+    ];
+    const sampleOrderItems2 = [
+      { productId: 4, quantity: 1 },
+      { productId: 5, quantity: 2 },
     ];
 
-    for (const sampleOrder of sampleOrders) {
-      await order.createOrder(
-        sampleOrder.customer,
-        sampleOrder.productIds,
-        sampleOrder.totalAmount,
-        sampleOrder.timestamp
-      );
-    }
+    // Create orders using sample data
+    await order.createOrder(await customer.getAddress(), sampleOrderItems1, ethers.parseEther('1.0'), Date.now());
+    await order.createOrder(await customer.getAddress(), sampleOrderItems2, ethers.parseEther('0.5'), Date.now());
   });
 
   it('Should create a new order successfully', async function () {
-    const orderId = 3;
-    const productIds = [6, 7, 8];
+    const orderId = 3; // Order ID will be 3, after two pre-existing orders
+    const orderItems = [
+      { productId: 6, quantity: 1 },
+      { productId: 7, quantity: 2 },
+    ];
     const totalAmount = ethers.parseEther('2.0');
     const timestamp = Date.now();
 
     // Call the createOrder function
-    await expect(order.createOrder(await customer.getAddress(), productIds, totalAmount, timestamp))
+    await expect(order.createOrder(await customer.getAddress(), orderItems, totalAmount, timestamp))
       .to.emit(order, 'OrderCreated')
       .withArgs(orderId, await customer.getAddress(), totalAmount, timestamp);
 
@@ -57,30 +49,37 @@ describe('Order Contract', function () {
     const createdOrder = await order.getOrder(orderId);
     expect(createdOrder.orderId).to.equal(orderId);
     expect(createdOrder.customer).to.equal(await customer.getAddress());
-    expect(createdOrder.productIds.length).to.equal(productIds.length);
+    expect(createdOrder.orderItems.length).to.equal(orderItems.length);
     expect(createdOrder.totalAmount).to.equal(totalAmount);
     expect(createdOrder.isCompleted).to.be.false;
     expect(createdOrder.timestamp).to.equal(timestamp);
+
+    // Verify each item in the order
+    for (let i = 0; i < orderItems.length; i++) {
+      const item = await createdOrder.orderItems[i];
+      expect(item.productId).to.equal(orderItems[i].productId);
+      expect(item.quantity).to.equal(orderItems[i].quantity);
+    }
   });
 
   it('Should fail to create an order with zero total amount', async function () {
-    const productIds = [9, 10];
+    const orderItems = [{ productId: 9, quantity: 1 }];
     const totalAmount = 0;
     const timestamp = Date.now();
 
     await expect(
-      order.createOrder(await customer.getAddress(), productIds, totalAmount, timestamp)
+      order.createOrder(await customer.getAddress(), orderItems, totalAmount, timestamp)
     ).to.be.revertedWith('Total amount must be greater than zero.');
   });
 
   it('Should fail to create an order without products', async function () {
-    const productIds: number[] = [];
+    const orderItems: any[] = [];
     const totalAmount = ethers.parseEther('1.0');
     const timestamp = Date.now();
 
     await expect(
-      order.createOrder(await customer.getAddress(), productIds, totalAmount, timestamp)
-    ).to.be.revertedWith('Order must contain at least one product.');
+      order.createOrder(await customer.getAddress(), orderItems, totalAmount, timestamp)
+    ).to.be.revertedWith('Order must contain at least one item.');
   });
 
   it('Should mark an order as completed successfully', async function () {
@@ -101,9 +100,11 @@ describe('Order Contract', function () {
     await expect(order.completeOrder(nonExistentOrderId)).to.be.revertedWith('Order does not exist.');
   });
 
-  it('Should allow viewing all created orders', async function () {
-    const orders = await order.getOrder(1);
-    expect(orders.orderId).to.equal(1);
-    expect(orders.productIds.length).to.equal(3);
+  it('Should allow viewing an existing order', async function () {
+    const orderId = 1;
+    const orderDetails = await order.getOrder(orderId);
+    expect(orderDetails.orderId).to.equal(orderId);
+    expect(orderDetails.orderItems.length).to.equal(2); // The order contains 2 items
+    expect(orderDetails.customer).to.equal(await customer.getAddress());
   });
 });
