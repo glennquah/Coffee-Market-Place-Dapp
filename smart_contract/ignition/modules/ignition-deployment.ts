@@ -1,8 +1,7 @@
 import { buildModule } from '@nomicfoundation/hardhat-ignition/modules';
-import { ethers } from 'hardhat';
 import { votingSeedData } from './seed_data/votingSeedData';
-import { coffeeMarketplaceSeedData } from './seed_data/coffeeMarketplaceSeedData';
 import { productSeedData } from './seed_data/productSeedData';
+import { orderSeedData } from './seed_data/orderSeedData';
 
 export default buildModule('TESTING_MODULES', (m) => { 
   const deployer = m.getAccount(0);
@@ -43,5 +42,16 @@ export default buildModule('TESTING_MODULES', (m) => {
     { from: deployer }
   );
 
-  return { votingContract, coffeeMarketplaceContract, productContract };
+  const orderContract = m.contract(
+    'Order',
+    [
+      orderSeedData.customerAddresses,
+      orderSeedData.orderItems,
+      orderSeedData.totalAmounts,
+      orderSeedData.timestamps
+    ],
+    { from: deployer }
+  );
+
+  return { votingContract, coffeeMarketplaceContract, productContract, orderContract };
 });
