@@ -53,5 +53,14 @@ export default buildModule('TESTING_MODULES', (m) => {
     { from: deployer }
   );
 
-  return { votingContract, coffeeMarketplaceContract, productContract, orderContract };
+  const cartContract = m.contract(
+    'Cart',
+    [
+      coffeeMarketplaceContract,
+      orderContract
+    ],
+    { from: deployer }
+  );
+
+  return { votingContract, coffeeMarketplaceContract, productContract, orderContract, cartContract };
 });
