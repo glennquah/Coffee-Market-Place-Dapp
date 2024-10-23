@@ -91,16 +91,6 @@ describe('CoffeeMarketplace', function () {
       product
     );
     await coffeeMarketplace.waitForDeployment();
-
-    // for (let i = 0; i < roasters.length; i++) {
-    //   await coffeeMarketplace.connect(owner).addRoasterListing(
-    //     names[i],
-    //     descriptions[i],
-    //     ipfsHashes[i],
-    //     prices[i],
-    //     quantities[i],
-    //   );
-    // }
   });
 
   it('Should allow roaster to add product and mint NFTs', async function () {
