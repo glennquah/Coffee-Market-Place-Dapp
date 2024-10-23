@@ -57,7 +57,7 @@ contract Product {
         uint256 _price,
         uint256 _quantity,
         uint256[] memory _nftIds
-    ) internal returns (uint256) {
+    ) public returns (uint256) {
         require(_price > 0, "Price must be greater than zero.");
         require(_quantity > 0, "Quantity must be greater than zero.");
 
@@ -80,7 +80,7 @@ contract Product {
     }
 
     // Function to get product details
-    function getListing(uint256 _productId) public view returns (
+    function getProduct(uint256 _productId) public view returns (
         string memory name,
         string memory description,
         string memory ipfsHash,

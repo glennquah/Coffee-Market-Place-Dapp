@@ -1,9 +1,12 @@
 pragma solidity ^0.8.0;
 
 import "./CoffeeMarketplace.sol"; 
+import "./Product.sol";
+import "./Order.sol";
 
 contract Cart {
     CoffeeMarketplace public coffeeMarketplace;
+    Order public orderContract;
 
     struct CartProduct {
         uint256 productId;
@@ -11,6 +14,7 @@ contract Cart {
     }
 
     mapping(address => CartProduct[]) public carts;
+    mapping(address => Order[]) public orders; 
     // mapping(address => mapping(uint256 => CartProduct[])) public customerCheckouts; // customers who have placed an order
     // mapping(address => uint256[]) public customerFinalisedCartIds;
     uint256 public nextFinalisedCartId = 1;
@@ -20,9 +24,14 @@ contract Cart {
     event ProductRemovedFromCart(address customer, uint256 productId);
     event CartCleared(address customer);
     event CartCheckout(address customer, uint256 finalisedCartId);
+    event OrderCreated(address customer, uint256 orderId, bool isCompleted);
 
-    constructor(address _coffeeMarketplaceContractAddress) {
+    constructor(address _coffeeMarketplaceContractAddress, address _orderContractAddress) {
+        require(_coffeeMarketplaceContractAddress != address(0), "Invalid CoffeeMarketplace contract address");
+        require(_orderContractAddress != address(0), "Invalid Order contract address");
+
         coffeeMarketplace = CoffeeMarketplace(_coffeeMarketplaceContractAddress);  // Reference to the deployed CoffeeMarketplace contract since is buying coffee beans from there
+        orderContract = Order(_orderContractAddress);
     }
 
     // getter
@@ -120,16 +129,37 @@ contract Cart {
         clearCart();
     }
 
+    // Checkout function to create an order from the cart
     function checkout() public {
         require(carts[msg.sender].length > 0, "Cart is empty");
         
-        uint256 finalisedCartId = nextFinalisedCartId++;
-        // customerCheckouts[msg.sender][finalisedCartId] = carts[msg.sender];
-        // customerFinalisedCartIds[msg.sender].push(finalisedCartId);
+        // Get the cart of the customer
+        CartProduct[] memory customerCart = carts[msg.sender];
+        uint256 totalAmount = 0;
+
+        // Calculate the total amount
+        for (uint256 i = 0; i < customerCart.length; i++) {
+            (, , , uint256 price, , , ) = coffeeMarketplace.getListing(customerCart[i].productId);
+            totalAmount += price * customerCart[i].quantity;
+        }
+
+        // Create the order using the orderContract
+        Order.OrderItem[] memory orderItems = new Order.OrderItem[](customerCart.length);
         
+        for (uint256 i = 0; i < customerCart.length; i++) {
+            orderItems[i] = Order.OrderItem({
+                productId: customerCart[i].productId,
+                quantity: customerCart[i].quantity
+            });
+        }
+
+        uint256 orderId = orderContract.createOrder(msg.sender, orderItems, totalAmount, block.timestamp);
+
+        // Clear the cart after checkout
         clearCart();
         
-        emit CartCheckout(msg.sender, finalisedCartId);
+        // Emit a checkout event
+        emit CartCheckout(msg.sender, orderId);
     }
 
     // function getCheckout(address customer, uint256 finalisedCartId) public view returns (CartProduct[] memory) {

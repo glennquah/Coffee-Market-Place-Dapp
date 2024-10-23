@@ -104,4 +104,37 @@ constructor(string[] memory _coffeeCandidateNames,
     }
         return votingEndTime - block.timestamp;
     }
+
+    // Pseudo-random number generator
+    function random(uint256 _length) private view returns (uint256) {
+        require(_length > 0, "Array length must be greater than 0.");
+        return uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao))) % _length;
+    }
+
+    // To get the winner (with tie-breaker logic)
+    function getWinner() public view returns (CoffeeVoteCandidate memory) {
+        require(!isOpenToVote(), "Voting is still open.");
+
+        uint256 maxVotes = 0;
+        uint256 count = 0;
+        CoffeeVoteCandidate[] memory potentialWinners = new CoffeeVoteCandidate[](coffee_vote_candidates.length);
+
+        for (uint256 i = 0; i < coffee_vote_candidates.length; i++) {
+            uint256 votes = coffee_vote_candidates[i].voteCount;
+
+            if (votes > maxVotes) {
+                maxVotes = votes;
+                count = 1; // Reset count to 1 if its a new potential winner
+                potentialWinners[0] = coffee_vote_candidates[i]; // Store the new potential winner to the first index in the array
+            } else if (votes == maxVotes) {
+                // Same vote count, add to potential winners
+                potentialWinners[count] = coffee_vote_candidates[i];
+                count++;
+            }
+        }
+
+        // Randomly select one winner from the potential winners
+        uint256 winnerIndex = random(count);
+        return potentialWinners[winnerIndex];
+    }
 }

@@ -4,10 +4,13 @@ import { ethers } from 'hardhat';
 import {
   CoffeeMarketplace,
   CoffeeMarketplace__factory,
+  Product,
+  Product__factory,
 } from '../typechain-types';
 
 describe('CoffeeMarketplace', function () {
   let coffeeMarketplace: CoffeeMarketplace;
+  let product: Product;
   let owner: Signer;
   let roaster: Signer;
 
@@ -16,6 +19,12 @@ describe('CoffeeMarketplace', function () {
       (await ethers.getContractFactory(
         'CoffeeMarketplace',
       )) as CoffeeMarketplace__factory;
+
+    const ProductFactory: Product__factory =
+      (await ethers.getContractFactory(
+        'Product',
+      )) as Product__factory;
+    
     [owner, roaster] = await ethers.getSigners();
 
     const roasters = [
@@ -43,7 +52,7 @@ describe('CoffeeMarketplace', function () {
       ];
     
       const ipfsHashes = [
-        'DummyHash',
+        'https://example.com/columbian.png',
         'https://example.com/brazil.png',
         'https://example.com/costa_rica.png',
         'https://example.com/kenya.png',
@@ -68,7 +77,7 @@ describe('CoffeeMarketplace', function () {
         [13, 14, 15] 
       ];
 
-    coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
+    product = await ProductFactory.deploy(
       roasters,
       names,
       descriptions,
@@ -77,58 +86,50 @@ describe('CoffeeMarketplace', function () {
       quantities,
       nftIds
     );
+  
+    coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
+      product
+    );
     await coffeeMarketplace.waitForDeployment();
-
-    for (let i = 0; i < roasters.length; i++) {
-      await coffeeMarketplace.connect(owner).addRoasterListing(
-        names[i],
-        descriptions[i],
-        ipfsHashes[i],
-        prices[i],
-        quantities[i],
-      );
-    }
   });
 
   it('Should allow roaster to add product and mint NFTs', async function () {
-    const ipfsHash: string = 'DummyHash'; // Dummy IPFS hash
+    const ipfsHash: string = 'https://example.com/panama.png'; // Dummy IPFS hash
     const price = ethers.parseEther('0.1'); // 0.1 ETH
     const quantity: number = 5; // Mint 5 NFTs
 
     // Add a product from the roaster's address
-    // await expect(
-    //   coffeeMarketplace
-    //     .connect(roaster)
-    //     .addRoasterListing(
-    //       'Colombian Coffee',
-    //       'Best Colombian Coffee',
-    //       ipfsHash,
-    //       price,
-    //       quantity,
-    //     ),
-    // ).to.emit(coffeeMarketplace, 'ProductAdded');
+    await expect(
+      coffeeMarketplace
+        .connect(roaster)
+        .addRoasterListing(
+          'Panama Geisha',
+          'Delicate, jasmine-like aroma with hints of peach.',
+          ipfsHash,
+          price,
+          quantity,
+        ),
+    ).to.emit(coffeeMarketplace, 'ListingAdded');
 
     // Check if the product was added successfully
-    const product = await coffeeMarketplace.getListing(1); // Product ID 1
-    expect(product.name).to.equal('Colombian Coffee');
-    expect(product.description).to.equal('Best Colombian Coffee');
+    const product = await coffeeMarketplace.getListing(6); // Listing ID will be 6, after 5 pre-existing listings
+    expect(product.name).to.equal('Panama Geisha');
+    expect(product.description).to.equal('Delicate, jasmine-like aroma with hints of peach.');
     expect(product.ipfsHash).to.equal(ipfsHash);
     expect(product.price).to.equal(price);
     expect(product.quantity).to.equal(quantity);
     expect(product.available).to.be.true;
 
-    // Check if NFTs were minted and owned by the smart contract (not the roaster)
-    for (let i = 0; i < quantity; i++) {
-      const tokenId = i + 1; // Token IDs start at 1
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(
-        await coffeeMarketplace.getAddress(),
-      );
+    // Iterate over each NFT ID and verify ownership and metadata
+    for (let i = 0; i < product.nftIds.length; i++) {
+      const tokenId = product.nftIds[i];
+      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(await coffeeMarketplace.getAddress());
       expect(await coffeeMarketplace.tokenURI(tokenId)).to.equal(ipfsHash);
     }
   });
 
   it('Should revert when trying to add product with zero price or quantity', async function () {
-    const ipfsHash: string = 'DummyHash';
+    const ipfsHash: string = 'https://example.com/panama.png';
     const zeroPrice = ethers.parseEther('0'); // 0 ETH
     const zeroQuantity: number = 0; // Invalid quantity
 
@@ -136,8 +137,8 @@ describe('CoffeeMarketplace', function () {
       coffeeMarketplace
         .connect(roaster)
         .addRoasterListing(
-          'Colombian Coffee',
-          'Best Colombian Coffee',
+          'Panama Geisha',
+          'Delicate, jasmine-like aroma with hints of peach.',
           ipfsHash,
           zeroPrice,
           5,
@@ -148,8 +149,8 @@ describe('CoffeeMarketplace', function () {
       coffeeMarketplace
         .connect(roaster)
         .addRoasterListing(
-          'Colombian Coffee',
-          'Best Colombian Coffee',
+          'Panama Geisha',
+          'Delicate, jasmine-like aroma with hints of peach.',
           ipfsHash,
           ethers.parseEther('0.1'),
           zeroQuantity,
@@ -158,22 +159,9 @@ describe('CoffeeMarketplace', function () {
   });
 
   it('Should allow viewing product details', async function () {
-    const ipfsHash: string = 'DummyHash';
+    const ipfsHash: string = 'https://example.com/columbian.png';
     const price = ethers.parseEther('0.1');
     const quantity: number = 5;
-
-    // Add a listing
-    // await expect(
-    //   coffeeMarketplace
-    //     .connect(roaster)
-    //     .addRoasterListing(
-    //       'Colombian Coffee',
-    //       'Best Colombian Coffee',
-    //       ipfsHash,
-    //       price,
-    //       quantity,
-    //     ),
-    // ).to.emit(coffeeMarketplace, 'ProductAdded');
 
     // Fetch the product details
     const product = await coffeeMarketplace.getListing(1);
