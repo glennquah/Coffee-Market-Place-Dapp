@@ -14,10 +14,6 @@ contract Cart {
     }
 
     mapping(address => CartProduct[]) public carts;
-    mapping(address => Order[]) public orders; 
-    // mapping(address => mapping(uint256 => CartProduct[])) public customerCheckouts; // customers who have placed an order
-    // mapping(address => uint256[]) public customerFinalisedCartIds;
-    uint256 public nextFinalisedCartId = 1;
 
     event ProductAddedToCart(address customer, uint256 productId, uint256 quantity);
     event ProductUpdatedInCart(address customer, uint256 productId, uint256 newQuantity);
@@ -33,18 +29,6 @@ contract Cart {
         coffeeMarketplace = CoffeeMarketplace(_coffeeMarketplaceContractAddress);  // Reference to the deployed CoffeeMarketplace contract since is buying coffee beans from there
         orderContract = Order(_orderContractAddress);
     }
-
-    // getter
-    // function getCustomerCheckouts(address _customer) public view returns (uint256[] memory, CartProduct[][] memory) {
-    //     uint256[] memory finalisedCartIds = customerFinalisedCartIds[_customer];
-    //     CartProduct[][] memory checkouts = new CartProduct[][](finalisedCartIds.length);
-
-    //     for (uint256 i = 0; i < finalisedCartIds.length; i++) {
-    //         checkouts[i] = customerCheckouts[_customer][finalisedCartIds[i]];
-    //     }
-
-    //     return (finalisedCartIds, checkouts);
-    // }
 
     // internal
     // after the customer has confirmed an order - different from removeFromCart()
@@ -161,13 +145,4 @@ contract Cart {
         // Emit a checkout event
         emit CartCheckout(msg.sender, orderId);
     }
-
-    // function getCheckout(address customer, uint256 finalisedCartId) public view returns (CartProduct[] memory) {
-    //     require(customerCheckouts[customer][finalisedCartId].length > 0, "Order does not exist");
-    //     return customerCheckouts[customer][finalisedCartId];
-    // }
-
-    // function getcustomerCheckoutIds(address customer) public view returns (uint256[] memory) {
-    //     return customerFinalisedCartIds[customer];
-    // }
 }

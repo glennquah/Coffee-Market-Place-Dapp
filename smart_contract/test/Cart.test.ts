@@ -298,13 +298,6 @@ describe('Cart', function () {
           .withArgs(await customer.getAddress(), 1); // Order ID should be 1
     });
 
-    it('Should emit event and create an order on checkout', async function () {
-        // Emit CartCheckout event
-        await expect(cart.connect(customer).checkout())
-          .to.emit(cart, 'CartCheckout')
-          .withArgs(await customer.getAddress(), 1); // Order ID should be 1
-    });
-
     it('Should allow when customer wants to clear all products from the cart after checkout', async function () {
       await expect(cart.connect(customer).checkout())
         .to.emit(cart, 'CartCleared');
