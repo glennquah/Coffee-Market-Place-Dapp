@@ -286,7 +286,6 @@ describe('Cart', function () {
     const quantities = [2, 3];
 
     beforeEach(async function () {
-      // Add some items to the cart
       for (let i = 0; i < productIds.length; i++) {
         await cart.connect(customer).addToCart(productIds[i], quantities[i]);
       }
@@ -299,7 +298,14 @@ describe('Cart', function () {
           .withArgs(await customer.getAddress(), 1); // Order ID should be 1
     });
 
-    it('Should allow when customer wants to clear all items from the cart after checkout', async function () {
+    it('Should emit event and create an order on checkout', async function () {
+        // Emit CartCheckout event
+        await expect(cart.connect(customer).checkout())
+          .to.emit(cart, 'CartCheckout')
+          .withArgs(await customer.getAddress(), 1); // Order ID should be 1
+    });
+
+    it('Should allow when customer wants to clear all products from the cart after checkout', async function () {
       await expect(cart.connect(customer).checkout())
         .to.emit(cart, 'CartCleared');
 
