@@ -5,7 +5,11 @@ import {
   CoffeeMarketplace,
   CoffeeMarketplace__factory,
   Cart,
-  Cart__factory
+  Cart__factory,
+  Product,
+  Product__factory,
+  Order,
+  Order__factory,
 } from '../typechain-types';
 
 const roasters = [
@@ -61,6 +65,8 @@ const nftIds = [ // can be any number of elements in the arr since the main init
 describe('Cart', function () {
   let coffeeMarketplace: CoffeeMarketplace;
   let cart: Cart;
+  let order: Order;
+  let product: Product;
   let roaster: Signer;
   let customer: Signer;
 
@@ -73,16 +79,26 @@ describe('Cart', function () {
       (await ethers.getContractFactory(
         'Cart',
       )) as Cart__factory;
+      const ProductFactory: Product__factory =
+      (await ethers.getContractFactory(
+        'Product',
+      )) as Product__factory;
+      const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
     [roaster, customer] = await ethers.getSigners();
+    
 
+    product = await ProductFactory.deploy(
+        roasters,
+        names,
+        descriptions,
+        ipfsHashes,
+        prices,
+        quantities,
+        nftIds
+      );
+    
     coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
-      roasters,
-      names,
-      descriptions,
-      ipfsHashes,
-      prices,
-      quantities,
-      nftIds
+        product
     );
     await coffeeMarketplace.waitForDeployment();
 
@@ -96,7 +112,10 @@ describe('Cart', function () {
       );
     }
 
-    cart = await CartFactory.deploy(coffeeMarketplace.getAddress());
+    order = await OrderFactory.deploy([], [], [], []);
+    await order.waitForDeployment();
+
+    cart = await CartFactory.deploy(coffeeMarketplace.getAddress(), order.getAddress());
     await cart.waitForDeployment();
   });
 
@@ -273,6 +292,13 @@ describe('Cart', function () {
       }
     });
 
+    it('Should emit event and create an order on checkout', async function () {
+        // Emit CartCheckout event
+        await expect(cart.connect(customer).checkout())
+          .to.emit(cart, 'CartCheckout')
+          .withArgs(await customer.getAddress(), 1); // Order ID should be 1
+    });
+
     it('Should allow when customer wants to clear all items from the cart after checkout', async function () {
       await expect(cart.connect(customer).checkout())
         .to.emit(cart, 'CartCleared');
@@ -286,7 +312,9 @@ describe('Cart', function () {
 describe('Cart with Multiple Customers', function () {
     let coffeeMarketplace: CoffeeMarketplace;
     let cart: Cart;
+    let product: Product;
     let roaster: Signer;
+    let order: Order;
     let customer1: Signer;
     let customer2: Signer;
 
@@ -300,8 +328,13 @@ describe('Cart with Multiple Customers', function () {
             'Cart',
             )) as Cart__factory;
         [roaster, customer1, customer2] = await ethers.getSigners();
+        const ProductFactory: Product__factory =
+        (await ethers.getContractFactory(
+          'Product',
+        )) as Product__factory;
+        const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
 
-        coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
+        product = await ProductFactory.deploy(
             roasters,
             names,
             descriptions,
@@ -309,7 +342,11 @@ describe('Cart with Multiple Customers', function () {
             prices,
             quantities,
             nftIds
-        );
+          );
+        
+          coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
+            product
+          );
         await coffeeMarketplace.waitForDeployment();
 
         for (let i = 0; i < roasters.length; i++) {
@@ -322,7 +359,10 @@ describe('Cart with Multiple Customers', function () {
             );
         }
 
-        cart = await CartFactory.deploy(coffeeMarketplace.getAddress());
+        order = await OrderFactory.deploy([], [], [], []);
+        await order.waitForDeployment();
+
+        cart = await CartFactory.deploy(coffeeMarketplace.getAddress(), order.getAddress());
         await cart.waitForDeployment();
     });
 
