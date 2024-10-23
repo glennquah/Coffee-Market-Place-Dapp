@@ -104,4 +104,18 @@ constructor(string[] memory _coffeeCandidateNames,
     }
         return votingEndTime - block.timestamp;
     }
+
+    // This function is used to get the winner of the voting
+    function getWinner() public view returns (CoffeeVoteCandidate memory) {
+        require(!isOpenToVote(), "Voting is still open.");
+        uint256 maxVotes = 0;
+        uint256 winnerIndex = 0;
+        for (uint256 i = 0; i < coffee_vote_candidates.length; i++) {
+            if (coffee_vote_candidates[i].voteCount > maxVotes) {
+                maxVotes = coffee_vote_candidates[i].voteCount;
+                winnerIndex = i;
+            }
+        }
+        return coffee_vote_candidates[winnerIndex];
+    }
 }
