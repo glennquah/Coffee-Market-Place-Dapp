@@ -120,4 +120,21 @@ describe('Coffee Voting E2E Test', function () {
       'Voting is closed.',
     );
   });
+
+  it('Should return error when getting coffee candidate when voting is still ongoing', async function () {
+    await coffeeVoting.connect(customer).vote(1);
+    await expect(coffeeVoting.getWinner()).to.be.revertedWith(
+      'Voting is still open.',
+    );
+  });
+
+  it('Should return winner when voting has ended', async function () {
+    await coffeeVoting.connect(customer).vote(1);
+    await ethers.provider.send('evm_increaseTime', [90 * 60]);
+    await ethers.provider.send('evm_mine');
+    expect(await coffeeVoting.isOpenToVote()).to.be.false;
+    const winner = await coffeeVoting.getWinner();
+    expect(winner.coffeeName).to.equal('Colombia Narino Granos De Espreranza');
+    expect(winner.voteCount).to.equal(1);
+  });
 });
