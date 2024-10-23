@@ -27,6 +27,9 @@ contract Cart {
     event OrderCreated(address customer, uint256 orderId, bool isCompleted);
 
     constructor(address _coffeeMarketplaceContractAddress, address _orderContractAddress) {
+        require(_coffeeMarketplaceContractAddress != address(0), "Invalid CoffeeMarketplace contract address");
+        require(_orderContractAddress != address(0), "Invalid Order contract address");
+
         coffeeMarketplace = CoffeeMarketplace(_coffeeMarketplaceContractAddress);  // Reference to the deployed CoffeeMarketplace contract since is buying coffee beans from there
         orderContract = Order(_orderContractAddress);
     }

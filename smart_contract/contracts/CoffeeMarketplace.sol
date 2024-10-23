@@ -14,6 +14,8 @@ contract CoffeeMarketplace is ERC721URIStorage, Ownable, IERC721Receiver {
 
     // Constructor for initializing ERC721 with a name and symbol, and setting the product contract address
     constructor(address _productContractAddress) ERC721("CoffeeNFT", "COFFEE") Ownable(msg.sender) {
+        require(_productContractAddress != address(0), "Invalid Product contract address");
+        
         productContract = Product(_productContractAddress);
     }
 
