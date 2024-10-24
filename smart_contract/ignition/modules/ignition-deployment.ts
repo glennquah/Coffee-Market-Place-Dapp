@@ -59,11 +59,19 @@ export default buildModule('TESTING_MODULES', (m) => {
     { from: deployer },
   );
 
+  const leaderboardContract = m.contract(
+    'Leaderboard',
+    [orderContract],
+    { from: deployer },
+  );
+
+
   return {
     votingContract,
     coffeeMarketplaceContract,
     productContract,
     orderContract,
     cartContract,
+    leaderboardContract
   };
 });

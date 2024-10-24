@@ -1,7 +1,9 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+import './Leaderboard.sol';
 
 contract Order {
+    Leaderboard public leaderboardContract;
+
     struct OrderItem {
         uint256 productId;
         uint256 quantity;
@@ -24,9 +26,9 @@ contract Order {
     ) {
         require(
             _customerAddresses.length == _orderItems.length &&
-            _orderItems.length == _totalAmounts.length &&
-            _totalAmounts.length == _timestamps.length,
-            "Constructor input arrays must have the same length"
+                _orderItems.length == _totalAmounts.length &&
+                _totalAmounts.length == _timestamps.length,
+            'Constructor input arrays must have the same length'
         );
 
         for (uint256 i = 0; i < _customerAddresses.length; i++) {
@@ -47,12 +49,31 @@ contract Order {
     mapping(uint256 => OrderDetail) public orders;
     uint256 public orderCounter = 0;
 
-    event OrderCreated(uint256 orderId, address customer, uint256 totalAmount, uint256 timestamp);
+    event OrderCreated(
+        uint256 orderId,
+        address customer,
+        uint256 totalAmount,
+        uint256 timestamp
+    );
     event OrderCompleted(uint256 orderId);
 
-    function createOrder(address _customer, OrderItem[] memory _items, uint256 _totalAmount, uint256 _timestamp) public returns (uint256 orderId) {
-        require(_totalAmount > 0, "Total amount must be greater than zero.");
-        require(_items.length > 0, "Order must contain at least one item.");
+    // Setter for the Leaderboard contract
+    function setLeaderboardContract(address _leaderboardContract) external {
+        require(
+            _leaderboardContract != address(0),
+            'Invalid leaderboard address'
+        );
+        leaderboardContract = Leaderboard(_leaderboardContract);
+    }
+
+    function createOrder(
+        address _customer,
+        OrderItem[] memory _items,
+        uint256 _totalAmount,
+        uint256 _timestamp
+    ) public returns (uint256 orderId) {
+        require(_totalAmount > 0, 'Total amount must be greater than zero.');
+        require(_items.length > 0, 'Order must contain at least one item.');
 
         orderCounter++;
         OrderDetail storage newOrder = orders[orderCounter];
@@ -69,20 +90,31 @@ contract Order {
 
         emit OrderCreated(orderCounter, _customer, _totalAmount, _timestamp);
 
+        // Update leaderboard
+        uint256 nftCount = 0;
+        for (uint256 i = 0; i < _items.length; i++) {
+            nftCount += _items[i].quantity;
+        }
+        if (address(leaderboardContract) != address(0)) {
+            leaderboardContract.updateLeaderboard(_customer, nftCount);
+        }
+
         return orderCounter;
     }
 
     function completeOrder(uint256 _orderId) public {
-        require(orders[_orderId].orderId == _orderId, "Order does not exist.");
-        require(!orders[_orderId].isCompleted, "Order is already completed.");
+        require(orders[_orderId].orderId == _orderId, 'Order does not exist.');
+        require(!orders[_orderId].isCompleted, 'Order is already completed.');
 
         orders[_orderId].isCompleted = true;
 
         emit OrderCompleted(_orderId);
     }
 
-    function getOrder(uint256 _orderId) public view returns (OrderDetail memory) {
-        require(orders[_orderId].orderId == _orderId, "Order does not exist.");
+    function getOrder(
+        uint256 _orderId
+    ) public view returns (OrderDetail memory) {
+        require(orders[_orderId].orderId == _orderId, 'Order does not exist.');
         return orders[_orderId];
     }
 }
