@@ -29,13 +29,14 @@ export default buildModule('TESTING_MODULES', (m) => {
   const votingContract = m.contract(
     'Voting',
     [
-      // await coffeeMarketplaceContract.address(),
+      votingSeedData.coffeeMarketAddresses,
       votingSeedData.coffeeNames,
       votingSeedData.imageUrls,
       votingSeedData.descriptions,
       votingSeedData.origins,
       votingSeedData.types,
       votingSeedData.roastLevels,
+      votingSeedData.prices,
       votingSeedData.duration,
     ],
     { from: deployer },
