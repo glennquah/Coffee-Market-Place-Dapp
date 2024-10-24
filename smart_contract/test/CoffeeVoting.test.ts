@@ -35,6 +35,12 @@ describe('Coffee Voting E2E Test', function () {
       ['Jamaica', 'Colombia', 'Vietnam', 'Sumatra'],
       ['Arabica', 'Arabica', 'Robusta', 'Arabica'],
       ['Medium', 'Medium-Light', 'Dark', 'Dark'],
+      [
+        ethers.parseEther('0.1'),
+        ethers.parseEther('0.03'),
+        ethers.parseEther('0.025'),
+        ethers.parseEther('0.04'),
+      ],
       90,
     );
     await coffeeVoting.waitForDeployment();
@@ -57,6 +63,7 @@ describe('Coffee Voting E2E Test', function () {
           'Ethiopia',
           'Arabica',
           'Medium-Light',
+          ethers.parseEther('0.05'),
         ),
     ).to.emit(coffeeVoting, 'CoffeeCandidateAdded');
 

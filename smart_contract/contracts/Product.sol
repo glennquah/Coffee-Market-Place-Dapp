@@ -15,6 +15,7 @@ contract Product {
         uint256 quantity;
         uint256[] nftIds;  // Array of NFT IDs for this product
         bool available;
+        bool isFeaturedCoffee;
     }
 
     // Mapping to store products
@@ -43,7 +44,8 @@ contract Product {
                 _prices[i],
                 _quantities[i],
                 _nftIds[i],
-                true
+                true,
+                false
             );
         }
     }
@@ -72,7 +74,8 @@ contract Product {
             _price,
             _quantity,
             _nftIds,
-            true
+            true,
+            false
         );
 
         emit ProductAdded(productCounter, _roaster, _name, _price, _quantity);

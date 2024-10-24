@@ -10,6 +10,7 @@ contract Voting {
         string coffeeOrigin;
         string beanType;
         string roastLevel;
+        uint256 price;
         uint256 voteCount;
     }
 
@@ -18,7 +19,7 @@ contract Voting {
     mapping(address => bool) public customers;
     uint256 public votingStartTime;
     uint256 public votingEndTime;
-    event CoffeeCandidateAdded(string coffeeName, string imageUrl, string description, string coffeeOrigin, string beanType, string roastLevel);
+    event CoffeeCandidateAdded(string coffeeName, string imageUrl, string description, string coffeeOrigin, string beanType, string roastLevel, uint256 price);
     event CoffeeVoted(uint256 candidateId);
 
 constructor(string[] memory _coffeeCandidateNames,
@@ -27,6 +28,7 @@ constructor(string[] memory _coffeeCandidateNames,
             string[] memory _coffeeOrigins,
             string[] memory _beanTypes,
             string[] memory _roastLevels,
+            uint256[] memory _prices,
             uint256 _durationInMinutes) {
     for (uint256 i = 0; i < _coffeeCandidateNames.length; i++) {
         coffee_vote_candidates.push(CoffeeVoteCandidate({
@@ -37,6 +39,7 @@ constructor(string[] memory _coffeeCandidateNames,
                         coffeeOrigin: _coffeeOrigins[i],
                         beanType: _beanTypes[i],
                         roastLevel: _roastLevels[i],
+                        price: _prices[i],
                         voteCount: 0
         }));
     }
@@ -56,7 +59,8 @@ constructor(string[] memory _coffeeCandidateNames,
                                 string memory _description,
                                 string memory _coffeeOrigin,
                                 string memory _beanType,
-                                string memory _roastLevel) public onlyOwner {
+                                string memory _roastLevel,
+                                uint256 _price) public onlyOwner {
         coffee_vote_candidates.push(CoffeeVoteCandidate({
                 candidateId: candidateCounter++,
                 coffeeName: _coffeeName,
@@ -65,9 +69,10 @@ constructor(string[] memory _coffeeCandidateNames,
                 coffeeOrigin: _coffeeOrigin,
                 beanType: _beanType,
                 roastLevel: _roastLevel,
+                price: _price,
                 voteCount: 0
         }));
-        emit CoffeeCandidateAdded(_coffeeName, _imageUrl, _description, _coffeeOrigin, _beanType, _roastLevel);
+        emit CoffeeCandidateAdded(_coffeeName, _imageUrl, _description, _coffeeOrigin, _beanType, _roastLevel, _price);
     }
 
     // This function is used to vote for a coffee candidate
