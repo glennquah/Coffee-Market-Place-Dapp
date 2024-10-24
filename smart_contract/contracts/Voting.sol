@@ -68,7 +68,7 @@ constructor(
                                 string memory _coffeeOrigin,
                                 string memory _beanType,
                                 string memory _roastLevel,
-                                uint256 _price) public onlyOwner {
+                                uint256 _price) private onlyOwner {
         coffee_vote_candidates.push(CoffeeVoteCandidate({
                 candidateId: candidateCounter++,
                 coffeeName: _coffeeName,
@@ -119,13 +119,13 @@ constructor(
     }
 
     // Pseudo-random number generator
-    function random(uint256 _length) private view returns (uint256) {
+    function random(uint256 _length) private onlyOwner() view returns (uint256) {
         require(_length > 0, "Array length must be greater than 0.");
         return uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao))) % _length;
     }
 
     // To get the winner (with tie-breaker logic)
-    function getWinner() public view returns (CoffeeVoteCandidate memory) {
+    function getWinner() private view returns (CoffeeVoteCandidate memory) {
         require(!isOpenToVote(), "Voting is still open.");
 
         uint256 maxVotes = 0;
@@ -151,7 +151,7 @@ constructor(
         return potentialWinners[winnerIndex];
     }
 
-    function finalizeVotingAndMintNFTs() public onlyOwner() {
+    function finalizeVotingAndMintNFTs() private onlyOwner() {
         CoffeeVoteCandidate memory winner = getWinner();
 
         // Mint 100 NFTs using the CoffeeMarketplace's addRoasterListing function
