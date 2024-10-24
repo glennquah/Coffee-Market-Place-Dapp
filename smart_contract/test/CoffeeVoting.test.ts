@@ -18,75 +18,68 @@ describe('Coffee Voting E2E Test', function () {
   let roaster: Signer;
   let customer: Signer;
 
-  beforeEach(async function () {
-    const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
-      (await ethers.getContractFactory(
-        'CoffeeMarketplace',
-      )) as CoffeeMarketplace__factory;
+  const roasters = [
+    '0x1234567890abcdef1234567890abcdef12345678',
+    '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+    '0x9876543210abcdef9876543210abcdef98765432',
+    '0xabcabcabcabcabcabcabcabcabcabcabcabcabc0',
+    '0x1111111111111111111111111111111111111111',
+  ];
 
+  const names = [
+    'Colombian Coffee',
+    'Brazilian Santos',
+    'Costa Rican Tarrazu',
+    'Kenya AA',
+    'Guatemala Antigua',
+  ];
+
+  const descriptions = [
+    'Best Colombian Coffee',
+    'A smooth coffee with mild acidity and balanced flavor.',
+    'Rich body and flavor with notes of chocolate and citrus.',
+    'Full-bodied coffee with wine-like acidity and berry flavors.',
+    'Smooth and balanced with notes of cocoa and nuts.',
+  ];
+
+  const ipfsHashes = [
+    'https://example.com/columbian.png',
+    'https://example.com/brazil.png',
+    'https://example.com/costa_rica.png',
+    'https://example.com/kenya.png',
+    'https://example.com/guatemala.png',
+  ];
+
+  const prices = [
+    ethers.parseEther('0.1'), // 0.1 ETH
+    ethers.parseEther('0.03'), // 0.03 ETH
+    ethers.parseEther('0.025'), // 0.025 ETH
+    ethers.parseEther('0.04'), // 0.04 ETH
+    ethers.parseEther('0.015'), // 0.015 ETH
+  ];
+
+  const quantities = [5, 10, 15, 20, 30];
+  const nftIds = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+    [10, 11, 12],
+    [13, 14, 15],
+  ];
+
+  beforeEach(async function () {
+    [owner, roaster, customer] = await ethers.getSigners();
+
+    product = await deployProduct();
+    coffeeMarketplace = await deployCoffeeMarketplace(product);
+    coffeeVoting = await deployVoting(coffeeMarketplace);
+  });
+
+  async function deployProduct() {
     const ProductFactory: Product__factory = (await ethers.getContractFactory(
       'Product',
     )) as Product__factory;
-
-    const Voting: Voting__factory = (await ethers.getContractFactory(
-      'Voting',
-    )) as Voting__factory;
-
-    [owner, customer] = await ethers.getSigners();
-    [owner, roaster] = await ethers.getSigners();
-
-    const roasters = [
-      '0x1234567890abcdef1234567890abcdef12345678',
-      '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-      '0x9876543210abcdef9876543210abcdef98765432',
-      '0xabcabcabcabcabcabcabcabcabcabcabcabcabc0',
-      '0x1111111111111111111111111111111111111111',
-    ];
-
-    const names = [
-      'Colombian Coffee',
-      'Brazilian Santos',
-      'Costa Rican Tarrazu',
-      'Kenya AA',
-      'Guatemala Antigua',
-    ];
-
-    const descriptions = [
-      'Best Colombian Coffee',
-      'A smooth coffee with mild acidity and balanced flavor.',
-      'Rich body and flavor with notes of chocolate and citrus.',
-      'Full-bodied coffee with wine-like acidity and berry flavors.',
-      'Smooth and balanced with notes of cocoa and nuts.',
-    ];
-
-    const ipfsHashes = [
-      'https://example.com/columbian.png',
-      'https://example.com/brazil.png',
-      'https://example.com/costa_rica.png',
-      'https://example.com/kenya.png',
-      'https://example.com/guatemala.png',
-    ];
-
-    const prices = [
-      ethers.parseEther('0.1'), // 0.1 ETH
-      ethers.parseEther('0.03'), // 0.03 ETH
-      ethers.parseEther('0.025'), // 0.025 ETH
-      ethers.parseEther('0.04'), // 0.04 ETH
-      ethers.parseEther('0.015'), // 0.015 ETH
-    ];
-
-    const quantities = [5, 10, 15, 20, 30];
-
-    const nftIds = [
-      // can be any number of elements in the arr since the main initialisation of nftIds is addRoasterListing() in CoffeeMarketplace.sol
-      [1, 2, 3],
-      [4, 5, 6],
-      [7, 8, 9],
-      [10, 11, 12],
-      [13, 14, 15],
-    ];
-
-    product = await ProductFactory.deploy(
+    return ProductFactory.deploy(
       roasters,
       names,
       descriptions,
@@ -95,9 +88,22 @@ describe('Coffee Voting E2E Test', function () {
       quantities,
       nftIds,
     );
-    coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(product);
-    coffeeVoting = await Voting.deploy(
-      coffeeMarketplace.getAddress(),
+  }
+
+  async function deployCoffeeMarketplace(product: Product) {
+    const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
+      (await ethers.getContractFactory(
+        'CoffeeMarketplace',
+      )) as CoffeeMarketplace__factory;
+    return CoffeeMarketplaceFactory.deploy(product);
+  }
+
+  async function deployVoting(marketplace: CoffeeMarketplace) {
+    const VotingFactory: Voting__factory = (await ethers.getContractFactory(
+      'Voting',
+    )) as Voting__factory;
+    const voting = await VotingFactory.deploy(
+      marketplace.getAddress(),
       [
         'Jamaica Blue Mountain',
         'Colombia Narino Granos De Espreranza',
@@ -127,8 +133,9 @@ describe('Coffee Voting E2E Test', function () {
       ],
       90,
     );
-    await coffeeVoting.waitForDeployment();
-  });
+    await voting.waitForDeployment();
+    return voting;
+  }
 
   it('Should have 4 initial coffee candidates', async function () {
     const candidates = await coffeeVoting.getAllVotesOfCoffeeCandiates();

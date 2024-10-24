@@ -37,8 +37,8 @@ constructor(
             string[] memory _roastLevels,
             uint256[] memory _prices,
             uint256 _durationInMinutes) {
+    coffeeMarketplace = CoffeeMarketplace(_marketplaceContractAddress);
     for (uint256 i = 0; i < _coffeeCandidateNames.length; i++) {
-        coffeeMarketplace = CoffeeMarketplace(_marketplaceContractAddress);
         coffee_vote_candidates.push(CoffeeVoteCandidate({
                         candidateId: candidateCounter++,
                         coffeeName: _coffeeCandidateNames[i],

@@ -29,6 +29,7 @@ export default buildModule('TESTING_MODULES', (m) => {
   const votingContract = m.contract(
     'Voting',
     [
+      // await coffeeMarketplaceContract.address(),
       votingSeedData.coffeeNames,
       votingSeedData.imageUrls,
       votingSeedData.descriptions,
