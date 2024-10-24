@@ -1,9 +1,9 @@
 import { buildModule } from '@nomicfoundation/hardhat-ignition/modules';
-import { votingSeedData } from './seed_data/votingSeedData';
-import { productSeedData } from './seed_data/productSeedData';
 import { orderSeedData } from './seed_data/orderSeedData';
+import { productSeedData } from './seed_data/productSeedData';
+import { votingSeedData } from './seed_data/votingSeedData';
 
-export default buildModule('TESTING_MODULES', (m) => { 
+export default buildModule('TESTING_MODULES', (m) => {
   const deployer = m.getAccount(0);
 
   const productContract = m.contract(
@@ -15,9 +15,15 @@ export default buildModule('TESTING_MODULES', (m) => {
       productSeedData.ipfsHashes,
       productSeedData.prices,
       productSeedData.quantities,
-      productSeedData.nftIds
+      productSeedData.nftIds,
     ],
-    { from: deployer }
+    { from: deployer },
+  );
+
+  const coffeeMarketplaceContract = m.contract(
+    'CoffeeMarketplace',
+    [productContract],
+    { from: deployer },
   );
 
   const votingContract = m.contract(
@@ -29,17 +35,9 @@ export default buildModule('TESTING_MODULES', (m) => {
       votingSeedData.origins,
       votingSeedData.types,
       votingSeedData.roastLevels,
-      votingSeedData.duration
+      votingSeedData.duration,
     ],
     { from: deployer },
-  );
-
-  const coffeeMarketplaceContract = m.contract(
-    'CoffeeMarketplace',
-    [
-      productContract
-    ],
-    { from: deployer }
   );
 
   const orderContract = m.contract(
@@ -48,19 +46,22 @@ export default buildModule('TESTING_MODULES', (m) => {
       orderSeedData.customerAddresses,
       orderSeedData.orderItems,
       orderSeedData.totalAmounts,
-      orderSeedData.timestamps
+      orderSeedData.timestamps,
     ],
-    { from: deployer }
+    { from: deployer },
   );
 
   const cartContract = m.contract(
     'Cart',
-    [
-      coffeeMarketplaceContract,
-      orderContract
-    ],
-    { from: deployer }
+    [coffeeMarketplaceContract, orderContract],
+    { from: deployer },
   );
 
-  return { votingContract, coffeeMarketplaceContract, productContract, orderContract, cartContract };
+  return {
+    votingContract,
+    coffeeMarketplaceContract,
+    productContract,
+    orderContract,
+    cartContract,
+  };
 });

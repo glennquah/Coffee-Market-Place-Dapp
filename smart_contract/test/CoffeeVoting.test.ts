@@ -1,19 +1,103 @@
 import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import { Voting, Voting__factory } from '../typechain-types';
+import {
+  CoffeeMarketplace,
+  CoffeeMarketplace__factory,
+  Product,
+  Product__factory,
+  Voting,
+  Voting__factory,
+} from '../typechain-types';
 
 describe('Coffee Voting E2E Test', function () {
+  let coffeeMarketplace: CoffeeMarketplace;
   let coffeeVoting: Voting;
+  let product: Product;
   let owner: Signer;
+  let roaster: Signer;
   let customer: Signer;
 
   beforeEach(async function () {
+    const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
+      (await ethers.getContractFactory(
+        'CoffeeMarketplace',
+      )) as CoffeeMarketplace__factory;
+
+    const ProductFactory: Product__factory = (await ethers.getContractFactory(
+      'Product',
+    )) as Product__factory;
+
     const Voting: Voting__factory = (await ethers.getContractFactory(
       'Voting',
     )) as Voting__factory;
+
     [owner, customer] = await ethers.getSigners();
+    [owner, roaster] = await ethers.getSigners();
+
+    const roasters = [
+      '0x1234567890abcdef1234567890abcdef12345678',
+      '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+      '0x9876543210abcdef9876543210abcdef98765432',
+      '0xabcabcabcabcabcabcabcabcabcabcabcabcabc0',
+      '0x1111111111111111111111111111111111111111',
+    ];
+
+    const names = [
+      'Colombian Coffee',
+      'Brazilian Santos',
+      'Costa Rican Tarrazu',
+      'Kenya AA',
+      'Guatemala Antigua',
+    ];
+
+    const descriptions = [
+      'Best Colombian Coffee',
+      'A smooth coffee with mild acidity and balanced flavor.',
+      'Rich body and flavor with notes of chocolate and citrus.',
+      'Full-bodied coffee with wine-like acidity and berry flavors.',
+      'Smooth and balanced with notes of cocoa and nuts.',
+    ];
+
+    const ipfsHashes = [
+      'https://example.com/columbian.png',
+      'https://example.com/brazil.png',
+      'https://example.com/costa_rica.png',
+      'https://example.com/kenya.png',
+      'https://example.com/guatemala.png',
+    ];
+
+    const prices = [
+      ethers.parseEther('0.1'), // 0.1 ETH
+      ethers.parseEther('0.03'), // 0.03 ETH
+      ethers.parseEther('0.025'), // 0.025 ETH
+      ethers.parseEther('0.04'), // 0.04 ETH
+      ethers.parseEther('0.015'), // 0.015 ETH
+    ];
+
+    const quantities = [5, 10, 15, 20, 30];
+
+    const nftIds = [
+      // can be any number of elements in the arr since the main initialisation of nftIds is addRoasterListing() in CoffeeMarketplace.sol
+      [1, 2, 3],
+      [4, 5, 6],
+      [7, 8, 9],
+      [10, 11, 12],
+      [13, 14, 15],
+    ];
+
+    product = await ProductFactory.deploy(
+      roasters,
+      names,
+      descriptions,
+      ipfsHashes,
+      prices,
+      quantities,
+      nftIds,
+    );
+    coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(product);
     coffeeVoting = await Voting.deploy(
+      coffeeMarketplace.getAddress(),
       [
         'Jamaica Blue Mountain',
         'Colombia Narino Granos De Espreranza',
@@ -143,5 +227,19 @@ describe('Coffee Voting E2E Test', function () {
     const winner = await coffeeVoting.getWinner();
     expect(winner.coffeeName).to.equal('Colombia Narino Granos De Espreranza');
     expect(winner.voteCount).to.equal(1);
+  });
+
+  it('Should Get Winner and Mint 100 NFTs when voting has ended', async function () {
+    await coffeeVoting.connect(customer).vote(1);
+    await ethers.provider.send('evm_increaseTime', [90 * 60]);
+    await ethers.provider.send('evm_mine');
+    expect(await coffeeVoting.isOpenToVote()).to.be.false;
+    const winner = await coffeeVoting.getWinner();
+    expect(winner.coffeeName).to.equal('Colombia Narino Granos De Espreranza');
+    expect(winner.voteCount).to.equal(1);
+    await expect(coffeeVoting.finalizeVotingAndMintNFTs()).to.emit(
+      coffeeVoting,
+      'VotingFinalized',
+    );
   });
 });

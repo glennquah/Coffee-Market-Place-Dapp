@@ -1,5 +1,7 @@
 pragma solidity ^0.8.0;
 
+import "./CoffeeMarketplace.sol";
+
 contract Voting {
     uint256 public candidateCounter = 0;
     struct CoffeeVoteCandidate {
@@ -13,16 +15,21 @@ contract Voting {
         uint256 price;
         uint256 voteCount;
     }
-
+    CoffeeMarketplace public coffeeMarketplace;
     CoffeeVoteCandidate[] public coffee_vote_candidates;
     address owner;
     mapping(address => bool) public customers;
     uint256 public votingStartTime;
     uint256 public votingEndTime;
+    bool public votingFinalized = false;
+
     event CoffeeCandidateAdded(string coffeeName, string imageUrl, string description, string coffeeOrigin, string beanType, string roastLevel, uint256 price);
     event CoffeeVoted(uint256 candidateId);
+    event VotingFinalized(string coffeeName, string imageUrl, string description, string coffeeOrigin, string beanType, string roastLevel, uint256 price);
 
-constructor(string[] memory _coffeeCandidateNames,
+constructor(
+            address _marketplaceContractAddress,
+            string[] memory _coffeeCandidateNames,
             string[] memory _coffeeImageUrls,
             string[] memory _coffeeDescriptions,
             string[] memory _coffeeOrigins,
@@ -31,6 +38,7 @@ constructor(string[] memory _coffeeCandidateNames,
             uint256[] memory _prices,
             uint256 _durationInMinutes) {
     for (uint256 i = 0; i < _coffeeCandidateNames.length; i++) {
+        coffeeMarketplace = CoffeeMarketplace(_marketplaceContractAddress);
         coffee_vote_candidates.push(CoffeeVoteCandidate({
                         candidateId: candidateCounter++,
                         coffeeName: _coffeeCandidateNames[i],
@@ -141,5 +149,19 @@ constructor(string[] memory _coffeeCandidateNames,
         // Randomly select one winner from the potential winners
         uint256 winnerIndex = random(count);
         return potentialWinners[winnerIndex];
+    }
+
+    function finalizeVotingAndMintNFTs() public onlyOwner() {
+        CoffeeVoteCandidate memory winner = getWinner();
+
+        // Mint 100 NFTs using the CoffeeMarketplace's addRoasterListing function
+        coffeeMarketplace.addRoasterListing(
+            winner.coffeeName,
+            winner.description,
+            winner.imageUrl,
+            winner.price,
+            100
+        );
+        emit VotingFinalized(winner.coffeeName, winner.imageUrl, winner.description, winner.coffeeOrigin, winner.beanType, winner.roastLevel, winner.price);
     }
 }
