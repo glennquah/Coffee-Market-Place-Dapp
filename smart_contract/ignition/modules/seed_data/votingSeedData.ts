@@ -1,7 +1,6 @@
 import { ethers } from 'hardhat';
 
 export const votingSeedData = {
-  coffeeMarketAddresses: '0x1234567890abcdef1234567890abcdef12345678',
   coffeeNames: [
     'Jamaica Blue Mountain',
     'Colombia Narino Granos De Espreranza',

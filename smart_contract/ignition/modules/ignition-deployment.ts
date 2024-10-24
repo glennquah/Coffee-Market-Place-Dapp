@@ -29,7 +29,7 @@ export default buildModule('TESTING_MODULES', (m) => {
   const votingContract = m.contract(
     'Voting',
     [
-      votingSeedData.coffeeMarketAddresses,
+      coffeeMarketplaceContract,
       votingSeedData.coffeeNames,
       votingSeedData.imageUrls,
       votingSeedData.descriptions,
