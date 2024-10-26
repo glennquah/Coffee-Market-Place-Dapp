@@ -1,5 +1,5 @@
 import ResponsiveContainer from '../components/ResponsiveContainer';
-import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
+import CoffeeCardList from '../components/CoffeeCardList';
 import { CoffeeCardProps } from '../types/types';
 import mockCoffeeData from '../data/mockCoffeeItems';
 
@@ -23,7 +23,12 @@ function AuctionPage() {
           velit magni modi odio earum impedit distinctio inventore laborum,
           ipsam repellendus, fuga dolor.
         </p>
-        <CoffeeCarousel items={coffeeAuctionItems} title='Bid Now' subtitle='Auction' />
+
+        <CoffeeCardList
+          items={coffeeAuctionItems}
+          title="Vote Now"
+          subtitle="Voting"
+        />
       </ResponsiveContainer>
     </div>
   );
