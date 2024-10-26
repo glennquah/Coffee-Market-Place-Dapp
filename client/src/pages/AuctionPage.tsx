@@ -1,4 +1,14 @@
 import ResponsiveContainer from '../components/ResponsiveContainer';
+import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
+import { CoffeeCardProps } from '../types/types';
+import mockCoffeeData from '../data/mockCoffeeItems';
+
+const coffeeAuctionItems: CoffeeCardProps[] = [];
+for (let i = 0; i < 6; i++) {
+  coffeeAuctionItems.push(
+    mockCoffeeData[3]
+  );
+}
 
 function AuctionPage() {
   return (
@@ -12,6 +22,7 @@ function AuctionPage() {
           velit magni modi odio earum impedit distinctio inventore laborum,
           ipsam repellendus, fuga dolor.
         </p>
+        <CoffeeCarousel items={coffeeAuctionItems} title='Bid Now' subtitle='Auction' />
       </ResponsiveContainer>
     </div>
   );
