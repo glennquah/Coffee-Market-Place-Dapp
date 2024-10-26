@@ -160,7 +160,11 @@ constructor(
             winner.description,
             winner.imageUrl,
             winner.price,
-            100
+            100,
+            winner.coffeeOrigin,
+            winner.roastLevel,
+            winner.beanType,
+            'Washed' // IMPT: CHANGE the rest of the contract accordingly
         );
         emit VotingFinalized(winner.coffeeName, winner.imageUrl, winner.description, winner.coffeeOrigin, winner.beanType, winner.roastLevel, winner.price);
     }
