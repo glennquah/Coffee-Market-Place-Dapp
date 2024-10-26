@@ -1,36 +1,13 @@
 import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import { Order, Order__factory } from '../typechain-types';
+import { Order } from '../typechain-types';
 import { deployContracts } from './test_setup/deployContract';
 import { orderSeedData } from '../ignition/modules/seed_data/orderSeedData';
 
 describe('Order Contract', function () {
   let order: Order;
   let customer: Signer;
-
-//   beforeEach(async function () {
-//     const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
-//     [customer] = await ethers.getSigners();
-
-//     // Deploy Order contract
-//     order = await OrderFactory.deploy(
-//       [await customer.getAddress(), await customer.getAddress()],
-//       [
-//         [
-//           { productId: 1, quantity: 2 },
-//           { productId: 2, quantity: 3 },
-//         ],
-//         [
-//           { productId: 4, quantity: 1 },
-//           { productId: 5, quantity: 2 },
-//         ],
-//       ],
-//       [ethers.parseEther('1.0'), ethers.parseEther('0.5')],
-//       [Date.now(), Date.now()]
-//     );
-//     await order.waitForDeployment();
-//   });
 
   beforeEach(async function () {
     const contracts = await deployContracts();
