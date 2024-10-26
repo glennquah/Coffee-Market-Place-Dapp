@@ -80,29 +80,38 @@ function Navbar() {
         <ul className="flex flex-col gap-9 mt-10 ">
           <li>
             <a
-              href="/"
+              href="/auction"
               onClick={() => setNav(false)}
               className="text-xl uppercase hover:border-b-4 hover:border-red-300"
             >
-              Home
+              AUCTION
             </a>
           </li>
           <li>
             <a
-              href="/"
+              href="/marketplace"
               onClick={() => setNav(false)}
               className="text-xl uppercase hover:border-b-4 hover:border-red-300"
             >
-              About
+              MARKETPLACE
             </a>
           </li>
           <li>
             <a
-              href="/"
+              href="/voting"
               onClick={() => setNav(false)}
               className="text-xl uppercase hover:border-b-4 hover:border-red-300"
             >
-              Contact
+              VOTING
+            </a>
+          </li>
+          <li>
+            <a
+              href="/leaderboard"
+              onClick={() => setNav(false)}
+              className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+            >
+              LEADERBOARD
             </a>
           </li>
         </ul>
