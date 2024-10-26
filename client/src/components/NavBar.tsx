@@ -8,6 +8,7 @@ import { FaBars } from 'react-icons/fa';
 import Logo from '../assets/NFTRoasterLogo.svg';
 
 import { useState } from 'react';
+import ResponsiveContainer from './ResponsiveContainer';
 
 function Navbar() {
   const [nav, setNav] = useState(false);
@@ -18,50 +19,52 @@ function Navbar() {
 
   return (
     <nav className="fixed w-full h-24 shadow-xl use-main-bg">
-      <div className="flex items-center w-full h-full px-4 2xl:px-16 xl:px-14">
-        <a href="/">
-          <img src={Logo} alt="logo" className="h-24 w-24" />
-        </a>
-        <div className="hidden sm:flex pl-12">
-          <ul className="hidden sm:flex gap-12">
-            <li>
-              <a
-                href="/auction"
-                className="text-xl uppercase hover:border-b-4 hover:border-red-300"
-              >
-                AUCTION
-              </a>
-            </li>
-            <li>
-              <a
-                href="/marketplace"
-                className="text-xl uppercase hover:border-b-4 hover:border-red-300"
-              >
-                MARKETPLACE
-              </a>
-            </li>
-            <li>
-              <a
-                href="/voting"
-                className="text-xl uppercase hover:border-b-4 hover:border-red-300"
-              >
-                VOTING
-              </a>
-            </li>
-            <li className="mr-8">
-              <a
-                href="/leaderboard"
-                className="text-xl uppercase hover:border-b-4 hover:border-red-300"
-              >
-                LEADERBOARD
-              </a>
-            </li>
-          </ul>
+      <ResponsiveContainer>
+        <div className="flex items-center w-full h-full">
+          <a href="/">
+            <img src={Logo} alt="logo" className="h-24 w-24" />
+          </a>
+          <div className="hidden sm:flex pl-12">
+            <ul className="hidden sm:flex gap-12">
+              <li>
+                <a
+                  href="/auction"
+                  className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+                >
+                  AUCTION
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/marketplace"
+                  className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+                >
+                  MARKETPLACE
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/voting"
+                  className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+                >
+                  VOTING
+                </a>
+              </li>
+              <li className="mr-8">
+                <a
+                  href="/leaderboard"
+                  className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+                >
+                  LEADERBOARD
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div onClick={handleNav} className="sm:hidden cursor-pointer pl-24">
+            <FaBars size={25} />
+          </div>
         </div>
-        <div onClick={handleNav} className="sm:hidden cursor-pointer pl-24">
-          <FaBars size={25} />
-        </div>
-      </div>
+      </ResponsiveContainer>
       <div
         className={
           nav
