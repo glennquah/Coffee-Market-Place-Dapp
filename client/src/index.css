@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html,
+body {
+  @apply bg-main-bg min-h-screen;
+}
+
+.use-main-bg {
+  @apply bg-main-bg;
+}
