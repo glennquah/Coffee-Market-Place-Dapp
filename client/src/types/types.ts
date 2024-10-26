@@ -24,9 +24,15 @@ interface CoffeeCarouselProps {
   subtitle: string;
 }
 
+interface TimerHeroProps {
+  title: string;
+  countdown: number;
+}
+
 export type {
+  ButtonProps,
   CoffeeCardProps,
   CoffeeCardType,
-  ButtonProps,
   CoffeeCarouselProps,
+  TimerHeroProps,
 };
