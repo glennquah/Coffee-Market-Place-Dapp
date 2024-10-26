@@ -14,7 +14,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  * 
  * 
  */
-contract AuctionV1 {
+contract SealedAuction {
     address public NFTAddress;
     uint256 public auctionCounter = 0;
     address owner;
@@ -100,8 +100,8 @@ contract AuctionV1 {
     }
 
     // Reveal phase: users reveal their bid by submitting the original bid and nonce
-    function revealBid(uint256 auctionId, uint256 _bidAmount, uint256 _nonce) public payable withinRevealPhase(auctionId) {
-    // function revealBid(uint256 auctionId, uint256 _bidAmount, uint256 _nonce) public payable  {
+    // function revealBid(uint256 auctionId, uint256 _bidAmount, uint256 _nonce) public payable withinRevealPhase(auctionId) {
+    function revealBid(uint256 auctionId, uint256 _bidAmount, uint256 _nonce) public payable  {
 
         Bid storage bid = auctionsBid[auctionId][msg.sender];
         require(bid.commitHash != 0, "No bid to reveal");
@@ -134,8 +134,8 @@ contract AuctionV1 {
 
     // End auction and transfer funds to the winner
     // Owner can also finalize the auction if no bids were placed or if the seller is inactive
-    function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId) afterRevealPhase(auctionId) {
-    // function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId)  {
+    // function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId) afterRevealPhase(auctionId) {
+    function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId)  {
         require(auctions[auctionId].finalized == false, "Auction already finalized");
         auctions[auctionId].finalized = true;
         
@@ -153,8 +153,8 @@ contract AuctionV1 {
     }
 
     // Withdraw refunds for non-winning bids
-    function withdrawRefund(uint256 auctionId) public afterRevealPhase(auctionId) {
-    // function withdrawRefund(uint256 auctionId) public {
+    // function withdrawRefund(uint256 auctionId) public afterRevealPhase(auctionId) {
+    function withdrawRefund(uint256 auctionId) public {
         require(auctions[auctionId].finalized == true, "Auction have yet finalized");
         Bid storage bid = auctionsBid[auctionId][msg.sender];
         require(bid.revealed, "Bid not revealed");

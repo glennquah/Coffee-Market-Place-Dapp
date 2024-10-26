@@ -17,7 +17,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 * 
 */
 
-contract Auction {
+contract OpenAuction {
     address public NFTAddress;
     uint256 public auctionCounter = 0;
     address owner;
