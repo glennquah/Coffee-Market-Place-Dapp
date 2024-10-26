@@ -1,3 +1,17 @@
+@import '@fontsource/poppins/400.css'; /* Regular */
+@import '@fontsource/poppins/500.css'; /* Medium */
+@import '@fontsource/poppins/700.css'; /* Bold */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html,
+body {
+  @apply bg-main-bg min-h-screen;
+  font-family: 'Poppins', sans-serif;
+}
+
+.use-main-bg {
+  @apply bg-main-bg;
+}

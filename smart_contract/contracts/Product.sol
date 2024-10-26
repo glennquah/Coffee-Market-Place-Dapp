@@ -15,6 +15,7 @@ contract Product {
         uint256 quantity;
         uint256[] nftIds;  // Array of NFT IDs for this product
         bool available;
+        bool isFeaturedCoffee;
     }
 
     // Mapping to store products
@@ -43,7 +44,8 @@ contract Product {
                 _prices[i],
                 _quantities[i],
                 _nftIds[i],
-                true
+                true,
+                false
             );
         }
     }
@@ -57,7 +59,7 @@ contract Product {
         uint256 _price,
         uint256 _quantity,
         uint256[] memory _nftIds
-    ) internal returns (uint256) {
+    ) public returns (uint256) {
         require(_price > 0, "Price must be greater than zero.");
         require(_quantity > 0, "Quantity must be greater than zero.");
 
@@ -72,7 +74,8 @@ contract Product {
             _price,
             _quantity,
             _nftIds,
-            true
+            true,
+            false
         );
 
         emit ProductAdded(productCounter, _roaster, _name, _price, _quantity);
@@ -80,7 +83,7 @@ contract Product {
     }
 
     // Function to get product details
-    function getListing(uint256 _productId) public view returns (
+    function getProduct(uint256 _productId) public view returns (
         string memory name,
         string memory description,
         string memory ipfsHash,

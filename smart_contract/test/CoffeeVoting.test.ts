@@ -1,43 +1,29 @@
 import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import { Voting, Voting__factory } from '../typechain-types';
+import {
+  CoffeeMarketplace,
+  Product,
+  Voting,
+} from '../typechain-types';
+import { deployContracts } from './test_setup/deployContract';
 
 describe('Coffee Voting E2E Test', function () {
+  let coffeeMarketplace: CoffeeMarketplace;
   let coffeeVoting: Voting;
+  let product: Product;
   let owner: Signer;
+  let roaster: Signer;
   let customer: Signer;
 
   beforeEach(async function () {
-    const Voting: Voting__factory = (await ethers.getContractFactory(
-      'Voting',
-    )) as Voting__factory;
-    [owner, customer] = await ethers.getSigners();
-    coffeeVoting = await Voting.deploy(
-      [
-        'Jamaica Blue Mountain',
-        'Colombia Narino Granos De Espreranza',
-        'Vietnam Da Lat',
-        'Sumatra Long Berry',
-      ],
-      [
-        'https://example.com/jamaica.png',
-        'https://example.com/colombia.png',
-        'https://example.com/vietnam.png',
-        'https://example.com/sumatra.png',
-      ],
-      [
-        'A smooth, mild coffee with floral and nutty undertones.',
-        'A bright, fruity coffee with hints of citrus and chocolate.',
-        'A bold coffee with nutty, chocolate flavors.',
-        'Earthy and spicy with notes of herbs and tobacco.',
-      ],
-      ['Jamaica', 'Colombia', 'Vietnam', 'Sumatra'],
-      ['Arabica', 'Arabica', 'Robusta', 'Arabica'],
-      ['Medium', 'Medium-Light', 'Dark', 'Dark'],
-      90,
-    );
-    await coffeeVoting.waitForDeployment();
+    const contracts = await deployContracts();
+    coffeeMarketplace = contracts.coffeeMarketplace;
+    coffeeVoting = contracts.coffeeVoting;
+    product = contracts.product;
+    owner = contracts.owner;
+    roaster = contracts.roaster;
+    customer = contracts.customer1;
   });
 
   it('Should have 4 initial coffee candidates', async function () {
@@ -57,6 +43,7 @@ describe('Coffee Voting E2E Test', function () {
           'Ethiopia',
           'Arabica',
           'Medium-Light',
+          ethers.parseEther('0.05'),
         ),
     ).to.emit(coffeeVoting, 'CoffeeCandidateAdded');
 
@@ -118,6 +105,37 @@ describe('Coffee Voting E2E Test', function () {
     expect(await coffeeVoting.isOpenToVote()).to.be.false;
     await expect(coffeeVoting.connect(customer).vote(1)).to.be.revertedWith(
       'Voting is closed.',
+    );
+  });
+
+  it('Should return error when getting coffee candidate when voting is still ongoing', async function () {
+    await coffeeVoting.connect(customer).vote(1);
+    await expect(coffeeVoting.getWinner()).to.be.revertedWith(
+      'Voting is still open.',
+    );
+  });
+
+  it('Should return winner when voting has ended', async function () {
+    await coffeeVoting.connect(customer).vote(1);
+    await ethers.provider.send('evm_increaseTime', [90 * 60]);
+    await ethers.provider.send('evm_mine');
+    expect(await coffeeVoting.isOpenToVote()).to.be.false;
+    const winner = await coffeeVoting.getWinner();
+    expect(winner.coffeeName).to.equal('Colombia Narino Granos De Espreranza');
+    expect(winner.voteCount).to.equal(1);
+  });
+
+  it('Should Get Winner and Mint 100 NFTs when voting has ended', async function () {
+    await coffeeVoting.connect(customer).vote(1);
+    await ethers.provider.send('evm_increaseTime', [90 * 60]);
+    await ethers.provider.send('evm_mine');
+    expect(await coffeeVoting.isOpenToVote()).to.be.false;
+    const winner = await coffeeVoting.getWinner();
+    expect(winner.coffeeName).to.equal('Colombia Narino Granos De Espreranza');
+    expect(winner.voteCount).to.equal(1);
+    await expect(coffeeVoting.finalizeVotingAndMintNFTs()).to.emit(
+      coffeeVoting,
+      'VotingFinalized',
     );
   });
 });

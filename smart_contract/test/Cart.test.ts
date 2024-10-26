@@ -1,103 +1,18 @@
 import { expect } from 'chai';
 import { Signer } from 'ethers';
-import { ethers } from 'hardhat';
 import {
-  CoffeeMarketplace,
-  CoffeeMarketplace__factory,
   Cart,
-  Cart__factory
 } from '../typechain-types';
-
-const roasters = [
-    '0x1234567890abcdef1234567890abcdef12345678',
-    '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-    '0x9876543210abcdef9876543210abcdef98765432',
-    '0xabcabcabcabcabcabcabcabcabcabcabcabcabc0',
-    '0x1111111111111111111111111111111111111111'
-];
-
-const names = [
-    'Colombian Coffee',
-    'Brazilian Santos',
-    'Costa Rican Tarrazu',
-    'Kenya AA',
-    'Guatemala Antigua'
-];
-
-const descriptions = [
-    'Best Colombian Coffee',
-    'A smooth coffee with mild acidity and balanced flavor.',
-    'Rich body and flavor with notes of chocolate and citrus.',
-    'Full-bodied coffee with wine-like acidity and berry flavors.',
-    'Smooth and balanced with notes of cocoa and nuts.'
-];
-
-const ipfsHashes = [
-    'DummyHash',
-    'https://example.com/brazil.png',
-    'https://example.com/costa_rica.png',
-    'https://example.com/kenya.png',
-    'https://example.com/guatemala.png'
-];
-
-const prices = [
-    ethers.parseEther('0.1'), // 0.1 ETH
-    ethers.parseEther('0.03'), // 0.03 ETH
-    ethers.parseEther('0.025'), // 0.025 ETH
-    ethers.parseEther('0.04'), // 0.04 ETH
-    ethers.parseEther('0.015') // 0.015 ETH
-];
-
-const quantities = [5, 10, 15, 20, 30];
-
-const nftIds = [ // can be any number of elements in the arr since the main initialisation of nftIds is addRoasterListing() in CoffeeMarketplace.sol 
-    [1, 2, 3], 
-    [4, 5, 6], 
-    [7, 8, 9], 
-    [10, 11, 12], 
-    [13, 14, 15] 
-];
+import { deployContracts } from './test_setup/deployContract';
 
 describe('Cart', function () {
-  let coffeeMarketplace: CoffeeMarketplace;
   let cart: Cart;
-  let roaster: Signer;
   let customer: Signer;
 
   beforeEach(async function () {
-    const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
-      (await ethers.getContractFactory(
-        'CoffeeMarketplace',
-      )) as CoffeeMarketplace__factory;
-      const CartFactory: Cart__factory =
-      (await ethers.getContractFactory(
-        'Cart',
-      )) as Cart__factory;
-    [roaster, customer] = await ethers.getSigners();
-
-    coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
-      roasters,
-      names,
-      descriptions,
-      ipfsHashes,
-      prices,
-      quantities,
-      nftIds
-    );
-    await coffeeMarketplace.waitForDeployment();
-
-    for (let i = 0; i < roasters.length; i++) {
-      await coffeeMarketplace.connect(roaster).addRoasterListing(
-        names[i],
-        descriptions[i],
-        ipfsHashes[i],
-        prices[i],
-        quantities[i],
-      );
-    }
-
-    cart = await CartFactory.deploy(coffeeMarketplace.getAddress());
-    await cart.waitForDeployment();
+    const contracts = await deployContracts();
+    customer = contracts.customer1;
+    cart = contracts.cart;
   });
 
   describe('addToCart', function () {
@@ -267,13 +182,26 @@ describe('Cart', function () {
     const quantities = [2, 3];
 
     beforeEach(async function () {
-      // Add some items to the cart
       for (let i = 0; i < productIds.length; i++) {
         await cart.connect(customer).addToCart(productIds[i], quantities[i]);
       }
     });
 
-    it('Should allow when customer wants to clear all items from the cart after checkout', async function () {
+    it('Should emit event and create an order on checkout', async function () {
+        // Emit CartCheckout event
+        await expect(cart.connect(customer).checkout())
+          .to.emit(cart, 'CartCheckout')
+          .withArgs(await customer.getAddress(), 5); // Order ID should be 5, as 4 orders were created before
+    });
+
+    it('Should emit event and create an order on checkout', async function () {
+        // Emit CartCheckout event
+        await expect(cart.connect(customer).checkout())
+          .to.emit(cart, 'CartCheckout')
+          .withArgs(await customer.getAddress(), 5); // Order ID should be 5, as 4 orders were created before
+    });
+
+    it('Should allow when customer wants to clear all products from the cart after checkout', async function () {
       await expect(cart.connect(customer).checkout())
         .to.emit(cart, 'CartCleared');
 
@@ -284,47 +212,16 @@ describe('Cart', function () {
 });
 
 describe('Cart with Multiple Customers', function () {
-    let coffeeMarketplace: CoffeeMarketplace;
     let cart: Cart;
-    let roaster: Signer;
     let customer1: Signer;
     let customer2: Signer;
 
     beforeEach(async function () {
-        const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
-            (await ethers.getContractFactory(
-            'CoffeeMarketplace',
-            )) as CoffeeMarketplace__factory;
-        const CartFactory: Cart__factory =
-            (await ethers.getContractFactory(
-            'Cart',
-            )) as Cart__factory;
-        [roaster, customer1, customer2] = await ethers.getSigners();
-
-        coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
-            roasters,
-            names,
-            descriptions,
-            ipfsHashes,
-            prices,
-            quantities,
-            nftIds
-        );
-        await coffeeMarketplace.waitForDeployment();
-
-        for (let i = 0; i < roasters.length; i++) {
-            await coffeeMarketplace.connect(roaster).addRoasterListing(
-            names[i],
-            descriptions[i],
-            ipfsHashes[i],
-            prices[i],
-            quantities[i],
-            );
-        }
-
-        cart = await CartFactory.deploy(coffeeMarketplace.getAddress());
-        await cart.waitForDeployment();
-    });
+        const contracts = await deployContracts();
+        cart = contracts.cart;
+        customer1 = contracts.customer1;
+        customer2 = contracts.customer2;
+      });
 
     describe('Multiple Customers with Different Carts', function () {
         const firstProductId = 1;
