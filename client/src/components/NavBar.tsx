@@ -4,7 +4,7 @@ import {
   AiOutlineInstagram,
   AiOutlineTwitter,
 } from 'react-icons/ai';
-import { FaBars } from 'react-icons/fa';
+import { FaBars, FaShoppingCart } from 'react-icons/fa';
 import Logo from '../assets/NFTRoasterLogo.svg';
 
 import { useState } from 'react';
@@ -20,11 +20,11 @@ function Navbar() {
   return (
     <nav className="fixed w-full h-24 shadow-xl use-main-bg">
       <ResponsiveContainer>
-        <div className="flex items-center w-full h-full">
-          <a href="/">
-            <img src={Logo} alt="logo" className="h-24 w-24" />
-          </a>
-          <div className="hidden sm:flex pl-12">
+        <div className="flex items-center justify-between h-full">
+          <div className="flex items-center gap-12">
+            <a href="/">
+              <img src={Logo} alt="logo" className="h-24 w-24" />
+            </a>
             <ul className="hidden sm:flex gap-12">
               <li>
                 <a
@@ -50,7 +50,7 @@ function Navbar() {
                   VOTING
                 </a>
               </li>
-              <li className="mr-8">
+              <li>
                 <a
                   href="/leaderboard"
                   className="text-xl uppercase hover:border-b-4 hover:border-green-700"
@@ -60,16 +60,24 @@ function Navbar() {
               </li>
             </ul>
           </div>
-          <div onClick={handleNav} className="sm:hidden cursor-pointer pl-24">
-            <FaBars size={25} />
+          <div className="flex items-center">
+            <div
+              // onClick={} TODO: Add onClick event handler here
+              className="hidden sm:block cursor-pointer"
+            >
+              <FaShoppingCart size={25} />
+            </div>
+            <div onClick={handleNav} className="sm:hidden cursor-pointer">
+              <FaBars size={25} />
+            </div>
           </div>
         </div>
       </ResponsiveContainer>
       <div
         className={
           nav
-            ? 'fixed left-0 top-0 w-48 sm:hidden h-screen bg-white p-10 ease-in-out duration-500 shadow-lg'
-            : 'fixed left-[-100%] top-0 w-48 sm:hidden h-screen bg-white p-10 ease-in-out duration-500 shadow-lg'
+            ? 'fixed left-0 top-0 w-62 sm:hidden h-screen bg-white p-10 ease-in-out duration-500 shadow-lg z-50'
+            : 'fixed left-[-100%] top-0 w-48 sm:hidden h-screen bg-white p-10 ease-in-out duration-500 shadow-lg z-50'
         }
       >
         <div className="flex w-full items-center justify-end">
@@ -77,32 +85,41 @@ function Navbar() {
             <AiOutlineClose size={25} />
           </div>
         </div>
-        <ul className="flex flex-col gap-9 mt-10 ">
+        <ul className="flex flex-col gap-9 mt-10">
           <li>
             <a
-              href="/"
+              href="/auction"
               onClick={() => setNav(false)}
               className="text-xl uppercase hover:border-b-4 hover:border-red-300"
             >
-              Home
+              AUCTION
             </a>
           </li>
           <li>
             <a
-              href="/"
+              href="/marketplace"
               onClick={() => setNav(false)}
               className="text-xl uppercase hover:border-b-4 hover:border-red-300"
             >
-              About
+              MARKETPLACE
             </a>
           </li>
           <li>
             <a
-              href="/"
+              href="/voting"
               onClick={() => setNav(false)}
               className="text-xl uppercase hover:border-b-4 hover:border-red-300"
             >
-              Contact
+              VOTING
+            </a>
+          </li>
+          <li>
+            <a
+              href="/leaderboard"
+              onClick={() => setNav(false)}
+              className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+            >
+              LEADERBOARD
             </a>
           </li>
         </ul>
