@@ -125,7 +125,7 @@ contract Leaderboard {
 
         for (uint256 i = 0; i < topCustomers.length; i++) {
             if (topCustomers[i].customer != address(0)) {
-                // Mint reward NFT (you need to integrate with the NFT minting function)
+                // ! Once NFT is ready, Mint reward NFT (integrate with the NFT minting function)
                 // TODO: Reward logic here (e.g., minting and transferring a reward NFT);
             }
         }
