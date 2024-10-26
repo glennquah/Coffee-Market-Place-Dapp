@@ -13,6 +13,8 @@ import {
   Voting__factory,
   Cart,
   Cart__factory,
+  SealedAuction,
+  SealedAuction__factory,
 } from '../../typechain-types';
 import { votingSeedData } from '../../ignition/modules/seed_data/votingSeedData';
 import { orderSeedData } from '../../ignition/modules/seed_data/orderSeedData';
@@ -29,6 +31,7 @@ export async function deployContracts(): Promise<{
   roaster: Signer;
   customer1: Signer;
   customer2: Signer;
+  coffeeAuction: SealedAuction;
 }> {
   const ProductFactory: Product__factory = (await ethers.getContractFactory(
     'Product'
@@ -48,6 +51,9 @@ export async function deployContracts(): Promise<{
   const CartFactory: Cart__factory = (await ethers.getContractFactory(
     'Cart'
   )) as Cart__factory;
+  const SealedAuction: SealedAuction__factory = (await ethers.getContractFactory(
+    'SealedAuction'
+  )) as SealedAuction__factory;
 
   const [owner, roaster, customer1, customer2] = await ethers.getSigners();
 
@@ -100,6 +106,12 @@ export async function deployContracts(): Promise<{
   );
   await cart.waitForDeployment();
 
+  const coffeeAuction = await SealedAuction.deploy(
+    coffeeMarketplace.getAddress(),
+    ethers.parseEther('0.01')
+  );
+  await coffeeAuction.waitForDeployment();
+
   return {
     coffeeMarketplace,
     product,
@@ -111,5 +123,6 @@ export async function deployContracts(): Promise<{
     roaster,
     customer1,
     customer2,
+    coffeeAuction: coffeeAuction,
   };
 }

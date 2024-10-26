@@ -19,7 +19,8 @@ contract SealedAuction {
     uint256 public auctionCounter = 0;
     address owner;
     uint256 public minimumAuctionFee;
-    
+    uint256 private withdrawableFund = 0;
+
     struct AuctionData {
         uint256 auctionId;
         address payable seller;
@@ -85,6 +86,7 @@ contract SealedAuction {
     // Create a new auction
     function createAuction(uint256 _tokenId, uint256 _auctionCommitEndTimeInHour, uint256 _auctionRevealEndTimeInHour) public payable _minimumAuctionFee {
         require(_auctionRevealEndTimeInHour > _auctionCommitEndTimeInHour, "Timing is wrong");
+        withdrawableFund += minimumAuctionFee; 
         IERC721(NFTAddress).transferFrom(msg.sender, address(this), _tokenId);
         auctionCounter++;
         auctions[auctionCounter] = AuctionData(auctionCounter, payable(msg.sender), 0, address(0), block.timestamp, block.timestamp + _auctionCommitEndTimeInHour * 1 hours, block.timestamp + _auctionRevealEndTimeInHour * 1 hours, false, false,false, _tokenId);
@@ -174,7 +176,9 @@ contract SealedAuction {
 
     // Owner can withdraw the balance of the contract
     function ownerWithdraw() public onlyOwner {
-        payable(owner).transfer(address(this).balance);
+        require(withdrawableFund > 0, "No funds to withdraw");
+        payable(owner).transfer(withdrawableFund * 1 ether);
+        withdrawableFund = 0;
     }
 
     // Owner can change the minimum auction fee
