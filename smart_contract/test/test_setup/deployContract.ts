@@ -27,6 +27,8 @@ export async function deployContracts(): Promise<{
   cart: Cart;
   owner: Signer;
   roaster: Signer;
+  buyer: Signer;
+  secondBuyer: Signer;
   customer1: Signer;
   customer2: Signer;
 }> {
@@ -49,7 +51,7 @@ export async function deployContracts(): Promise<{
     'Cart'
   )) as Cart__factory;
 
-  const [owner, roaster, customer1, customer2] = await ethers.getSigners();
+  const [owner, roaster, buyer, secondBuyer, customer1, customer2] = await ethers.getSigners();
 
   const product = await ProductFactory.deploy(
     productSeedData.roasters,
@@ -114,6 +116,8 @@ export async function deployContracts(): Promise<{
     cart,
     owner,
     roaster,
+    buyer,
+    secondBuyer,
     customer1,
     customer2,
   };
