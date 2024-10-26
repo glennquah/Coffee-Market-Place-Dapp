@@ -10,7 +10,7 @@ import ResponsiveContainer from './ResponsiveContainer';
 
 function Footer() {
   return (
-    <footer className="fixed bottom-0 w-full h-24 shadow-xl use-main-bg">
+    <footer className="w-full use-main-bg pb-8">
       <ResponsiveContainer>
         <div className="flex flex-col items-center justify-center h-full gap-3 bg-primary-white py-4 rounded-2xl">
           <h2>Follow us</h2>
