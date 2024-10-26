@@ -18,13 +18,13 @@ function Navbar() {
 
   return (
     <nav className="fixed w-full h-24 shadow-xl use-main-bg">
-      <div className="flex justify-between items-center w-full h-full px-4 2xl:px-16">
+      <div className="flex items-center w-full h-full px-4 2xl:px-16 xl:px-14">
         <a href="/">
           <img src={Logo} alt="logo" className="h-24 w-24" />
         </a>
-        <div className="hidden sm:flex">
-          <ul className="hidden sm:flex gap-2">
-            <li className="mr-8">
+        <div className="hidden sm:flex pl-12">
+          <ul className="hidden sm:flex gap-12">
+            <li>
               <a
                 href="/auction"
                 className="text-xl uppercase hover:border-b-4 hover:border-red-300"
@@ -32,7 +32,7 @@ function Navbar() {
                 AUCTION
               </a>
             </li>
-            <li className="mr-8">
+            <li>
               <a
                 href="/marketplace"
                 className="text-xl uppercase hover:border-b-4 hover:border-red-300"
@@ -40,7 +40,7 @@ function Navbar() {
                 MARKETPLACE
               </a>
             </li>
-            <li className="mr-8">
+            <li>
               <a
                 href="/voting"
                 className="text-xl uppercase hover:border-b-4 hover:border-red-300"
