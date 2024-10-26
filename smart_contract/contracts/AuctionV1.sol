@@ -19,6 +19,7 @@ contract AuctionV1 {
     uint256 public auctionCounter = 0;
     address owner;
     uint256 public minimumAuctionFee;
+    
     struct AuctionData {
         uint256 auctionId;
         address payable seller;
@@ -67,7 +68,7 @@ contract AuctionV1 {
     }
 
     modifier withinRevealPhase(uint256 auctionId) {
-        require(block.timestamp >= auctions[auctionId].auctionCommitEndTime && block.timestamp < auctions[auctionId].auctionRevealEndTime, "Not within reveal phase");
+        require(block.timestamp >= auctions[auctionId].auctionCommitEndTime && block.timestamp < auctions[auctionId].auctionRevealEndTime , "Not within reveal phase");
         _;
     }
 
@@ -82,24 +83,29 @@ contract AuctionV1 {
     }
 
     // Create a new auction
-    function createAuction(uint256 _tokenId, uint256 _auctionCommitEndTime, uint256 _auctionRevealEndTime) public payable _minimumAuctionFee {
+    function createAuction(uint256 _tokenId, uint256 _auctionCommitEndTimeInHour, uint256 _auctionRevealEndTimeInHour) public payable _minimumAuctionFee {
+        require(_auctionRevealEndTimeInHour > _auctionCommitEndTimeInHour, "Timing is wrong");
         IERC721(NFTAddress).transferFrom(msg.sender, address(this), _tokenId);
         auctionCounter++;
-        auctions[auctionCounter] = AuctionData(auctionCounter, payable(msg.sender), 0, address(0), block.timestamp, _auctionCommitEndTime, _auctionRevealEndTime, false, false,false, _tokenId);
+        auctions[auctionCounter] = AuctionData(auctionCounter, payable(msg.sender), 0, address(0), block.timestamp, block.timestamp + _auctionCommitEndTimeInHour * 1 hours, block.timestamp + _auctionRevealEndTimeInHour * 1 hours, false, false,false, _tokenId);
     }
 
     // Commit phase: users submit their hashed bid
-    function commitBid(uint256 auctionId, bytes32 _commitHash) public payable withinCommitPhase(auctionId) {
+    // function commitBid(uint256 auctionId, bytes32 _commitHash) public  withinCommitPhase(auctionId) {
+    function commitBid(uint256 auctionId, bytes32 _commitHash) public  {
         require(auctionsBid[auctionId][msg.sender].commitHash == 0, "Already committed");
         
         // Record the commit hash and bid value (value is held in the contract)
-        auctionsBid[auctionId][msg.sender] = Bid(_commitHash, msg.value, false);
+        auctionsBid[auctionId][msg.sender] = Bid(_commitHash, 0, false);
     }
 
     // Reveal phase: users reveal their bid by submitting the original bid and nonce
-    function revealBid(uint256 auctionId, uint256 _bidAmount, uint256 _nonce) public withinRevealPhase(auctionId) {
+    function revealBid(uint256 auctionId, uint256 _bidAmount, uint256 _nonce) public payable withinRevealPhase(auctionId) {
+    // function revealBid(uint256 auctionId, uint256 _bidAmount, uint256 _nonce) public payable  {
+
         Bid storage bid = auctionsBid[auctionId][msg.sender];
         require(bid.commitHash != 0, "No bid to reveal");
+        
         require(!bid.revealed, "Already revealed");
         
         // Recreate the hash from the provided bid amount and nonce
@@ -107,9 +113,9 @@ contract AuctionV1 {
 
         // Verify the hash matches the one submitted during the commit phase
         require(calculatedHash == bid.commitHash, "Hash mismatch. Incorrect bid or nonce");
-
-        bid.revealed = true;
-        bid.bidAmount = _bidAmount;
+        require(_bidAmount * 1E18 == msg.value, "Incorrect bid amount");
+        auctionsBid[auctionId][msg.sender].revealed = true;
+        auctionsBid[auctionId][msg.sender].bidAmount = _bidAmount;
 
         // Check if it's the highest bid
         if (_bidAmount > auctions[auctionId].highestBid) {
@@ -129,22 +135,16 @@ contract AuctionV1 {
     // End auction and transfer funds to the winner
     // Owner can also finalize the auction if no bids were placed or if the seller is inactive
     function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId) afterRevealPhase(auctionId) {
+    // function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId)  {
         require(auctions[auctionId].finalized == false, "Auction already finalized");
         auctions[auctionId].finalized = true;
-    }
-
-    // Withdraw Highest Bid for the seller
-    function withdrawHighestBid(uint256 auctionId) public onlySeller(auctionId) afterRevealPhase(auctionId) {
-        require(auctions[auctionId].finalized == true, "Auction have yet finalized");
-        require(auctions[auctionId].withdrawnBySeller == false, "Seller have already withdrawn");
+        
+        //settle the auction
         if (auctions[auctionId].highestBidder != address(0)) { // If there are bids
-            require(auctions[auctionId].withdrawnByWinner == true, "Winner have yet withdrawn");
-            // Mark the auction as finalized
+            // Transfer the NFT to the winner
+            IERC721(NFTAddress).transferFrom(address(this), auctions[auctionId].highestBidder, auctions[auctionId].tokenId);
             // Transfer the highest bid amount to the owner (auctioneer)
-            // prevent re-entrancy
-            auctions[auctionId].withdrawnBySeller = true;
-
-            payable(auctions[auctionId].seller).transfer(auctions[auctionId].highestBid);
+            payable(auctions[auctionId].seller).transfer(auctions[auctionId].highestBid * 1 ether);
         } else { // If no bids were placed
             auctions[auctionId].withdrawnBySeller = true;
             // Transfer the NFT back to the seller
@@ -152,35 +152,24 @@ contract AuctionV1 {
         }
     }
 
-    // Withdraw the NFT for the winner
-    function withdrawNFT(uint256 auctionId) public payable afterRevealPhase(auctionId) {
-        require(auctions[auctionId].finalized == true, "Auction have yet finalized");
-        Bid storage bid = auctionsBid[auctionId][msg.sender];
-        require(bid.revealed, "Bid not revealed");
-        require(msg.sender == auctions[auctionId].highestBidder, "Only winner can withdraw");
-        require(msg.value >= auctions[auctionId].highestBid, "Insufficient funds");
-
-        // Transfer the highest bid amount to the winner
-        IERC721(NFTAddress).transferFrom(address(this), auctions[auctionId].highestBidder, auctions[auctionId].tokenId);
-        auctions[auctionId].withdrawnByWinner = true;
-    }
     // Withdraw refunds for non-winning bids
     function withdrawRefund(uint256 auctionId) public afterRevealPhase(auctionId) {
+    // function withdrawRefund(uint256 auctionId) public {
         require(auctions[auctionId].finalized == true, "Auction have yet finalized");
         Bid storage bid = auctionsBid[auctionId][msg.sender];
         require(bid.revealed, "Bid not revealed");
         require(msg.sender != auctions[auctionId].highestBidder, "Winner cannot withdraw");
         // Refund the user's bid amount
         uint256 refundAmount = bid.bidAmount;
-        bid.bidAmount = 0; // Prevent re-entrancy
-        payable(msg.sender).transfer(refundAmount);
+        auctionsBid[auctionId][msg.sender].bidAmount = 0; // Prevent re-entrancy
+        payable(msg.sender).transfer(refundAmount * 1 ether);
     }
 
     //Getters fuction
     function getAuction(uint256 auctionId) public view returns (AuctionData memory) {
         return auctions[auctionId];
     }
-
+    
     //Owner functions
 
     // Owner can withdraw the balance of the contract
