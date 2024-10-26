@@ -3,6 +3,7 @@ import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel'
 import { CoffeeCardProps } from '../types/types';
 import mockCoffeeData from '../data/mockCoffeeItems';
 
+// TODO: Remove this mock data and replace when intergrating with smart contract
 const coffeeAuctionItems: CoffeeCardProps[] = [];
 for (let i = 0; i < 6; i++) {
   coffeeAuctionItems.push(
