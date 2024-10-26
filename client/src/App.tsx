@@ -1,5 +1,6 @@
 // src/App.tsx
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import Footer from './components/Footer';
 import Navbar from './components/NavBar';
 import AuctionPage from './pages/AuctionPage';
 import HomePage from './pages/HomePage';
@@ -20,6 +21,7 @@ const App = () => {
           <Route path="/leaderboard" element={<LeaderBoardPage />} />
         </Routes>
       </div>
+      <Footer />
     </Router>
   );
 };
