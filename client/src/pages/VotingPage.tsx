@@ -1,4 +1,4 @@
-import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
+import CoffeeCardList from '../components/CoffeeCardList';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import TimerHero from '../components/TimerHero';
 import mockCoffeeData from '../data/mockCoffeeItems';
@@ -19,11 +19,7 @@ function VotingPage() {
           countdown={5}
         />
 
-        <CoffeeCarousel
-          items={coffeeVotingItems}
-          title="Vote Now"
-          subtitle="Voting"
-        />
+        <CoffeeCardList items={coffeeVotingItems} />
       </ResponsiveContainer>
     </div>
   );
