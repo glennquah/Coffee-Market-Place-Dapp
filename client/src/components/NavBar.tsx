@@ -26,6 +26,14 @@ function Navbar() {
           <ul className="hidden sm:flex gap-2">
             <li className="mr-8">
               <a
+                href="/auction"
+                className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+              >
+                AUCTION
+              </a>
+            </li>
+            <li className="mr-8">
+              <a
                 href="/marketplace"
                 className="text-xl uppercase hover:border-b-4 hover:border-red-300"
               >
@@ -34,18 +42,18 @@ function Navbar() {
             </li>
             <li className="mr-8">
               <a
-                href="/"
+                href="/voting"
                 className="text-xl uppercase hover:border-b-4 hover:border-red-300"
               >
-                About
+                VOTING
               </a>
             </li>
             <li className="mr-8">
               <a
-                href="/"
+                href="/leaderboard"
                 className="text-xl uppercase hover:border-b-4 hover:border-red-300"
               >
-                Contact
+                LEADERBOARD
               </a>
             </li>
           </ul>

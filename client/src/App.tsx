@@ -1,7 +1,11 @@
 // src/App.tsx
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Navbar from './components/NavBar';
-import Marketplace from './pages/MarketPlace';
+import AuctionPage from './pages/AuctionPage';
+import HomePage from './pages/HomePage';
+import LeaderBoardPage from './pages/LeaderboardPage';
+import MarketPlacePage from './pages/MarketPlacePage';
+import VotingPage from './pages/VotingPage';
 
 const App = () => {
   return (
@@ -9,8 +13,11 @@ const App = () => {
       <Navbar />
       <div className="pt-24">
         <Routes>
-          {/* <Route path="/" element={<HomePage />} /> */}
-          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/marketplace" element={<MarketPlacePage />} />
+          <Route path="/auction" element={<AuctionPage />} />
+          <Route path="/voting" element={<VotingPage />} />
+          <Route path="/leaderboard" element={<LeaderBoardPage />} />
         </Routes>
       </div>
     </Router>
