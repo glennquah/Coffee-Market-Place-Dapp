@@ -61,7 +61,10 @@ function Navbar() {
             </ul>
           </div>
           <div className="flex items-center">
-            <div onClick={handleNav} className="hidden sm:block cursor-pointer">
+            <div
+              // onClick={} TODO: Add onClick event handler here
+              className="hidden sm:block cursor-pointer"
+            >
               <FaShoppingCart size={25} />
             </div>
             <div onClick={handleNav} className="sm:hidden cursor-pointer">
