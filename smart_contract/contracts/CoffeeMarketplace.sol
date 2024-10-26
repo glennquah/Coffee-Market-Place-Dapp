@@ -83,20 +83,20 @@ contract CoffeeMarketplace is
 
     // Constructor for initializing ERC721 with a name and symbol, and setting the product contract address
     constructor(
-        address _productContractAddress
-        // address _leaderboardContractAddress
+        address _productContractAddress,
+        address _leaderboardContractAddress
     ) ERC721('CoffeeNFT', 'COFFEE') Ownable(msg.sender) {
         require(
             _productContractAddress != address(0),
             'Invalid Product contract address'
         );
-        // require(
-        //     _leaderboardContractAddress != address(0),
-        //     'Invalid Leaderboard contract address'
-        // );
+        require(
+            _leaderboardContractAddress != address(0),
+            'Invalid Leaderboard contract address'
+        );
 
         productContract = Product(_productContractAddress);
-        // leaderboardContract = Leaderboard(_leaderboardContractAddress);
+        leaderboardContract = Leaderboard(_leaderboardContractAddress);
         lastRewardTime = block.timestamp; // Initialize with contract deployment timestamp
     }
 

@@ -55,10 +55,15 @@ export async function deployContracts(): Promise<{
     productSeedData.roasters,
     productSeedData.names,
     productSeedData.descriptions,
-    productSeedData.ipfsHashes,
+    productSeedData.tokenURIs,
     productSeedData.prices,
     productSeedData.quantities,
-    productSeedData.nftIds
+    productSeedData.nftIds, 
+    productSeedData.origins,
+    productSeedData.roastLevels,
+    productSeedData.beanTypes,
+    productSeedData.processMethods,
+    productSeedData.roastDates
   );
   await product.waitForDeployment();
 

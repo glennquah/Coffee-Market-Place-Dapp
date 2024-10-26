@@ -3,13 +3,9 @@
 // import { ethers } from 'hardhat';
 // import {
 //   CoffeeMarketplace,
-//   CoffeeMarketplace__factory,
 //   Product,
-//   Product__factory,
 //   Leaderboard,
-//   Leaderboard__factory,
 //   Order,
-//   Order__factory
 // } from '../typechain-types';
 // import { deployContracts } from './test_setup/deployContract';
 // import { orderSeedData } from '../ignition/modules/seed_data/orderSeedData';
@@ -35,16 +31,12 @@
 
 //   const [customer1Order, customer2Order, customer3Order] = customerOrders;
 
-
-
 //   beforeEach(async function () {
-//     [owner, roaster, buyer, secondBuyer] = await ethers.getSigners();
-
-//     // const contracts = await deployContracts(); // Doesn't work well
-//     // coffeeMarketplace = contracts.coffeeMarketplace;
-//     // product = contracts.product;
-//     // order = contracts.order;
-//     // leaderboard = contracts.leaderboard;
+//     const contracts = await deployContracts(); 
+//     coffeeMarketplace = contracts.coffeeMarketplace;
+//     product = contracts.product;
+//     order = contracts.order;
+//     leaderboard = contracts.leaderboard;
 //   });
 
 //   async function createOrderFromData(orderData: {
@@ -56,87 +48,6 @@
 //     const { address, items, totalAmount, timestamp } = orderData;
 //     await order.createOrder(address, items, totalAmount, timestamp);
 //   }
-
-//   const roasters = [
-//     '0x1234567890abcdef1234567890abcdef12345678',
-//     '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-//     '0x9876543210abcdef9876543210abcdef98765432',
-//     '0xabcabcabcabcabcabcabcabcabcabcabcabcabc0',
-//     '0x1111111111111111111111111111111111111111'
-//   ];
-
-//   const names = [
-//     'Colombian Coffee',
-//     'Brazilian Santos',
-//     'Costa Rican Tarrazu',
-//     'Kenya AA',
-//     'Guatemala Antigua'
-//   ];
-
-//   const descriptions = [
-//     'Best Colombian Coffee',
-//     'A smooth coffee with mild acidity and balanced flavor.',
-//     'Rich body and flavor with notes of chocolate and citrus.',
-//     'Full-bodied coffee with wine-like acidity and berry flavors.',
-//     'Smooth and balanced with notes of cocoa and nuts.'
-//   ];
-
-//   const tokenURIs = [
-//     'https://example.com/columbian.png',
-//     'https://example.com/brazil.png',
-//     'https://example.com/costa_rica.png',
-//     'https://example.com/kenya.png',
-//     'https://example.com/guatemala.png'
-//   ];
-
-//   const prices = [
-//     ethers.parseEther('0.1'), // 0.1 ETH
-//     ethers.parseEther('0.03'), // 0.03 ETH
-//     ethers.parseEther('0.025'), // 0.025 ETH
-//     ethers.parseEther('0.04'), // 0.04 ETH
-//     ethers.parseEther('0.015') // 0.015 ETH
-//   ];
-
-//   const quantities = [5, 10, 15, 20, 30];
-
-//   const nftIds = [ // can be any number of elements in the arr since the main initialisation of nftIds is addRoasterListing() in CoffeeMarketplace.sol 
-//     [1, 2, 3],
-//     [4, 5, 6],
-//     [7, 8, 9],
-//     [10, 11, 12],
-//     [13, 14, 15]
-//   ];
-
-
-//   const origins = ['Colombia', 'Brazil', 'Costa Rica', 'Kenya', 'Guatemala'];
-//   const roastLevels = ['Medium', 'Light', 'Dark', 'Dark', 'Medium'];
-//   const beanTypes = ['Arabica', 'Robusta', 'Arabica', 'Robusta', 'Arabica'];
-//   const processMethods = ['Washed', 'Natural', 'Washed', 'Washed', 'Honey'];
-//   const roastDates = Array(5).fill(Math.floor(Date.now() / 1000));
-
-//   // Deploy Product contract
-//   const ProductFactory = await ethers.getContractFactory('Product');
-//   product = await ProductFactory.deploy(
-//     roasters,
-//     names,
-//     descriptions,
-//     tokenURIs,
-//     prices,
-//     quantities,
-//     nftIds,
-//     origins,
-//     roastLevels,
-//     beanTypes,
-//     processMethods,
-//     roastDates
-//   );
-
-//   // Deploy CoffeeMarketplace contract
-//   const CoffeeMarketplaceFactory = await ethers.getContractFactory('CoffeeMarketplace');
-//   coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
-//     product.getAddress()
-//   );
-//   await coffeeMarketplace.waitForDeployment();
 
 // });
 
