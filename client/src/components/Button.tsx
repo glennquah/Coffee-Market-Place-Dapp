@@ -1,12 +1,6 @@
 import React from 'react';
+import { ButtonProps } from '../types/types';
 
-interface ButtonProps {
-    onClick: () => void;
-    children: React.ReactNode;
-    className?: string;
-}
-
-// Reusable Button Component
 const Button: React.FC<ButtonProps> = ({ onClick, children, className }) => {
     return (
         <button

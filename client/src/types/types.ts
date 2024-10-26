@@ -1,7 +1,6 @@
 // Define the type of coffee card (listing, voting, auction)
 type CoffeeCardType = 'listing' | 'voting' | 'auction';
 
-// Define CoffeeCardProps type to be reused across components
 interface CoffeeCardProps {
   type: CoffeeCardType;
   imageUrl: string;
@@ -13,4 +12,21 @@ interface CoffeeCardProps {
   bidEndDate?: string;
 }
 
-export type { CoffeeCardProps, CoffeeCardType };
+interface ButtonProps {
+  onClick: () => void;
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface CoffeeCarouselProps {
+  items: CoffeeCardProps[];
+  title: string;
+  subtitle: string;
+}
+
+export type {
+  CoffeeCardProps,
+  CoffeeCardType,
+  ButtonProps,
+  CoffeeCarouselProps,
+};

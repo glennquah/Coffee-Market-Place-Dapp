@@ -9,6 +9,8 @@ module.exports = {
         'primary-green-hover': '#748762',
         'primary-red': '#dc2626',
         'ring-green': '#66BB6A',
+        'primary-white': '#FFFFFF',
+        'primary-white-hover': '#d1d5db',
       },
     },
   },

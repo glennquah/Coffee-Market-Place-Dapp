@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import CoffeeCard from '../CoffeeCard';
 import NavigationButtons from './NavigationButtons';
-import { CoffeeCardProps } from '../../types/types';
-
-interface CoffeeCarouselProps {
-  items: CoffeeCardProps[];
-  title: string;
-  subtitle: string;
-}
+import { CoffeeCarouselProps } from '../../types/types';
 
 const CoffeeCarousel: React.FC<CoffeeCarouselProps> = ({ items, title, subtitle }) => {
   const [currentIndex, setCurrentIndex] = useState(0);

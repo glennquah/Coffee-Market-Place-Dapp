@@ -12,13 +12,13 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({ onPrevious, onNex
   return (
     <div className="navigation-buttons flex gap-1">
       <button
-        className="nav-button bg-white text-black w-8 h-8 rounded-full hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-main-bg focus:ring-offset-2"
+        className=" bg-primary-white text-black w-8 h-8 rounded-full hover:bg-primary-white-hover focus:outline-none focus:ring-2 focus:ring-main-bg focus:ring-offset-2"
         onClick={onPrevious}
       >
         <ArrowBackIcon />
       </button>
       <button
-        className="nav-button bg-white text-black w-8 h-8 rounded-full hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-main-bg focus:ring-offset-2"
+        className=" bg-primary-white text-black w-8 h-8 rounded-full hover:bg-primary-white-hover focus:outline-none focus:ring-2 focus:ring-main-bg focus:ring-offset-2"
         onClick={onNext}
       >
         <ArrowForwardIcon />
