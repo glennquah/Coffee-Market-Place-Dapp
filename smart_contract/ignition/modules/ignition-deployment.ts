@@ -12,7 +12,7 @@ export default buildModule('TESTING_MODULES', (m) => {
       productSeedData.roasters,
       productSeedData.names,
       productSeedData.descriptions,
-      productSeedData.ipfsHashes,
+      productSeedData.tokenURIs,
       productSeedData.prices,
       productSeedData.quantities,
       productSeedData.nftIds,
