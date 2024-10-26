@@ -19,11 +19,7 @@ function VotingPage() {
           countdown={5}
         />
 
-        <CoffeeCardList
-          items={coffeeVotingItems}
-          title="Vote Now"
-          subtitle="Voting"
-        />
+        <CoffeeCardList items={coffeeVotingItems} />
       </ResponsiveContainer>
     </div>
   );

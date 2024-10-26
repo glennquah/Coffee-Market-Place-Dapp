@@ -1,8 +1,8 @@
 import React from 'react';
 import CoffeeCard from './CoffeeCard';
-import { CoffeeCarouselProps } from '../types/types';
+import { CoffeeCardListProps } from '../types/types';
 
-const CoffeeCardList: React.FC<CoffeeCarouselProps> = ({ items }) => {
+const CoffeeCardList: React.FC<CoffeeCardListProps> = ({ items }) => {
   const itemsPerPage = 4;
 
   return (

@@ -24,11 +24,7 @@ function AuctionPage() {
           ipsam repellendus, fuga dolor.
         </p>
 
-        <CoffeeCardList
-          items={coffeeAuctionItems}
-          title="Vote Now"
-          subtitle="Voting"
-        />
+        <CoffeeCardList items={coffeeAuctionItems}/>
       </ResponsiveContainer>
     </div>
   );
