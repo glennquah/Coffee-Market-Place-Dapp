@@ -16,7 +16,7 @@ function VotingPage() {
       <ResponsiveContainer>
         <TimerHero
           title={"Vote for your Brew! Next Week's Featured Coffee"}
-          countdown={12}
+          countdown={5}
         />
 
         <CoffeeCarousel
