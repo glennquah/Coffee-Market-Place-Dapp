@@ -1,30 +1,29 @@
-import ResponsiveContainer from '../components/ResponsiveContainer';
 import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
-import { CoffeeCardProps } from '../types/types';
+import ResponsiveContainer from '../components/ResponsiveContainer';
+import TimerHero from '../components/TimerHero';
 import mockCoffeeData from '../data/mockCoffeeItems';
+import { CoffeeCardProps } from '../types/types';
 
 // TODO: Remove this mock data and replace when intergrating with smart contract
 const coffeeVotingItems: CoffeeCardProps[] = [];
 for (let i = 0; i < 6; i++) {
-  coffeeVotingItems.push(
-    mockCoffeeData[2]
-  );
+  coffeeVotingItems.push(mockCoffeeData[2]);
 }
 
 function VotingPage() {
   return (
     <div className="py-8">
       <ResponsiveContainer>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque
-          voluptas nemo ea praesentium dolor rem explicabo omnis inventore
-          laborum deleniti velit unde, vitae quas quidem ab non, tempora officia
-          repellendus quia culpa. Architecto molestiae facere hic laboriosam
-          velit magni modi odio earum impedit distinctio inventore laborum,
-          ipsam repellendus, fuga dolor.
-        </p>
+        <TimerHero
+          title={"Vote for your Brew! Next Week's Featured Coffee"}
+          countdown={12}
+        />
 
-        <CoffeeCarousel items={coffeeVotingItems} title='Vote Now' subtitle='Voting' />
+        <CoffeeCarousel
+          items={coffeeVotingItems}
+          title="Vote Now"
+          subtitle="Voting"
+        />
       </ResponsiveContainer>
     </div>
   );
