@@ -29,7 +29,7 @@ function Navbar() {
               <li>
                 <a
                   href="/auction"
-                  className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+                  className="text-xl uppercase hover:border-b-4 hover:border-green-700"
                 >
                   AUCTION
                 </a>
@@ -37,7 +37,7 @@ function Navbar() {
               <li>
                 <a
                   href="/marketplace"
-                  className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+                  className="text-xl uppercase hover:border-b-4 hover:border-green-700"
                 >
                   MARKETPLACE
                 </a>
@@ -45,7 +45,7 @@ function Navbar() {
               <li>
                 <a
                   href="/voting"
-                  className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+                  className="text-xl uppercase hover:border-b-4 hover:border-green-700"
                 >
                   VOTING
                 </a>
@@ -53,7 +53,7 @@ function Navbar() {
               <li className="mr-8">
                 <a
                   href="/leaderboard"
-                  className="text-xl uppercase hover:border-b-4 hover:border-red-300"
+                  className="text-xl uppercase hover:border-b-4 hover:border-green-700"
                 >
                   LEADERBOARD
                 </a>
