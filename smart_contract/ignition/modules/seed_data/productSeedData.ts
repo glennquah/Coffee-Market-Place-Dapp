@@ -9,39 +9,39 @@ export const productSeedData = {
       '0x1111111111111111111111111111111111111111'
     ],
     names: [
-      'Ethiopian Yirgacheffe',
-      'Panama Geisha',
-      'Sumatra Mandheling',
-      'Hawaiian Kona',
-      'Mexican Altura'
+        'Colombian Coffee',
+        'Brazilian Santos',
+        'Costa Rican Tarrazu',
+        'Kenya AA',
+        'Guatemala Antigua',
     ],
     descriptions: [
-      'Floral notes with a bright, citrus acidity.',
-      'Delicate, jasmine-like aroma with hints of peach.',
-      'Full-bodied with an earthy and syrupy texture.',
-      'Rich and smooth with a hint of milk chocolate.',
-      'Mild flavor with light acidity and chocolate undertones.'
+        'Best Colombian Coffee',
+        'A smooth coffee with mild acidity and balanced flavor.',
+        'Rich body and flavor with notes of chocolate and citrus.',
+        'Full-bodied coffee with wine-like acidity and berry flavors.',
+        'Smooth and balanced with notes of cocoa and nuts.',
     ],
     ipfsHashes: [
-      'https://example.com/ethiopian.png',
-      'https://example.com/panama.png',
-      'https://example.com/sumatra_mandheling.png',
-      'https://example.com/kona.png',
-      'https://example.com/mexican.png'
+        'https://example.com/columbian.png',
+        'https://example.com/brazil.png',
+        'https://example.com/costa_rica.png',
+        'https://example.com/kenya.png',
+        'https://example.com/guatemala.png',
     ],
     prices: [
-      ethers.parseEther('0.12'),
-      ethers.parseEther('0.15'),
-      ethers.parseEther('0.08'),
-      ethers.parseEther('0.20'),
-      ethers.parseEther('0.05')
+        ethers.parseEther('0.1'), // 0.1 ETH
+        ethers.parseEther('0.03'), // 0.03 ETH
+        ethers.parseEther('0.025'), // 0.025 ETH
+        ethers.parseEther('0.04'), // 0.04 ETH
+        ethers.parseEther('0.015'), // 0.015 ETH
     ],
-    quantities: [10, 5, 20, 8, 25],
+    quantities: [5, 10, 15, 20, 30],
     nftIds: [
-      [16, 17, 18],
-      [19, 20, 21],
-      [22, 23, 24],
-      [25, 26, 27],
-      [28, 29, 30]
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9],
+        [10, 11, 12],
+        [13, 14, 15],
     ]
   };

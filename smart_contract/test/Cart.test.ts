@@ -10,7 +10,10 @@ import {
   Product__factory,
   Order,
   Order__factory,
+    Leaderboard,
+    Leaderboard__factory,
 } from '../typechain-types';
+import { deployContracts } from './test_setup/deployContract';
 
 const roasters = [
     '0x1234567890abcdef1234567890abcdef12345678',
@@ -69,54 +72,79 @@ describe('Cart', function () {
   let product: Product;
   let roaster: Signer;
   let customer: Signer;
+  let leaderboard: Leaderboard;
+
+//   beforeEach(async function () {
+//     const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
+//       (await ethers.getContractFactory(
+//         'CoffeeMarketplace',
+//       )) as CoffeeMarketplace__factory;
+//       const CartFactory: Cart__factory =
+//       (await ethers.getContractFactory(
+//         'Cart',
+//       )) as Cart__factory;
+//       const ProductFactory: Product__factory =
+//       (await ethers.getContractFactory(
+//         'Product',
+//       )) as Product__factory;
+//       const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
+//       const LeaderboardFactory: Leaderboard__factory =
+//       (await ethers.getContractFactory('Leaderboard')) as Leaderboard__factory;
+//     [roaster, customer] = await ethers.getSigners();
+    
+
+//     product = await ProductFactory.deploy(
+//         roasters,
+//         names,
+//         descriptions,
+//         ipfsHashes,
+//         prices,
+//         quantities,
+//         nftIds
+//       );
+//       order = await OrderFactory.deploy(
+//         [],
+//         [],
+//         [],
+//         []
+//       );
+//       await order.waitForDeployment();
+
+//     // Deploy Leaderboard contract
+//     leaderboard = await LeaderboardFactory.deploy(order);
+//     await leaderboard.waitForDeployment();
+
+//     await order.setLeaderboardContract(leaderboard.getAddress());
+
+//     coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(product, leaderboard);
+//     await coffeeMarketplace.waitForDeployment();
+
+//     for (let i = 0; i < roasters.length; i++) {
+//       await coffeeMarketplace.connect(roaster).addRoasterListing(
+//         names[i],
+//         descriptions[i],
+//         ipfsHashes[i],
+//         prices[i],
+//         quantities[i],
+//       );
+//     }
+
+//     order = await OrderFactory.deploy([], [], [], []);
+//     await order.waitForDeployment();
+
+//     cart = await CartFactory.deploy(coffeeMarketplace.getAddress(), order.getAddress());
+//     await cart.waitForDeployment();
+//   });
 
   beforeEach(async function () {
-    const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
-      (await ethers.getContractFactory(
-        'CoffeeMarketplace',
-      )) as CoffeeMarketplace__factory;
-      const CartFactory: Cart__factory =
-      (await ethers.getContractFactory(
-        'Cart',
-      )) as Cart__factory;
-      const ProductFactory: Product__factory =
-      (await ethers.getContractFactory(
-        'Product',
-      )) as Product__factory;
-      const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
-    [roaster, customer] = await ethers.getSigners();
-    
-
-    product = await ProductFactory.deploy(
-        roasters,
-        names,
-        descriptions,
-        ipfsHashes,
-        prices,
-        quantities,
-        nftIds
-      );
-    
-    coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
-        product
-    );
-    await coffeeMarketplace.waitForDeployment();
-
-    for (let i = 0; i < roasters.length; i++) {
-      await coffeeMarketplace.connect(roaster).addRoasterListing(
-        names[i],
-        descriptions[i],
-        ipfsHashes[i],
-        prices[i],
-        quantities[i],
-      );
-    }
-
-    order = await OrderFactory.deploy([], [], [], []);
-    await order.waitForDeployment();
-
-    cart = await CartFactory.deploy(coffeeMarketplace.getAddress(), order.getAddress());
-    await cart.waitForDeployment();
+    const contracts = await deployContracts();
+    coffeeMarketplace = contracts.coffeeMarketplace;
+    product = contracts.product;
+    order = contracts.order;
+    leaderboard = contracts.leaderboard;
+    roaster = contracts.roaster;
+    customer = contracts.customer1;
+    cart = contracts.cart;
   });
 
   describe('addToCart', function () {
@@ -295,14 +323,14 @@ describe('Cart', function () {
         // Emit CartCheckout event
         await expect(cart.connect(customer).checkout())
           .to.emit(cart, 'CartCheckout')
-          .withArgs(await customer.getAddress(), 1); // Order ID should be 1
+          .withArgs(await customer.getAddress(), 5); // Order ID should be 5, as 4 orders were created before
     });
 
     it('Should emit event and create an order on checkout', async function () {
         // Emit CartCheckout event
         await expect(cart.connect(customer).checkout())
           .to.emit(cart, 'CartCheckout')
-          .withArgs(await customer.getAddress(), 1); // Order ID should be 1
+          .withArgs(await customer.getAddress(), 5); // Order ID should be 5, as 4 orders were created before
     });
 
     it('Should allow when customer wants to clear all products from the cart after checkout', async function () {
@@ -323,54 +351,80 @@ describe('Cart with Multiple Customers', function () {
     let order: Order;
     let customer1: Signer;
     let customer2: Signer;
+    let leaderboard: Leaderboard;
+
+    // beforeEach(async function () {
+    //     const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
+    //         (await ethers.getContractFactory(
+    //         'CoffeeMarketplace',
+    //         )) as CoffeeMarketplace__factory;
+    //     const CartFactory: Cart__factory =
+    //         (await ethers.getContractFactory(
+    //         'Cart',
+    //         )) as Cart__factory;
+    //     [roaster, customer1, customer2] = await ethers.getSigners();
+    //     const ProductFactory: Product__factory =
+    //     (await ethers.getContractFactory(
+    //       'Product',
+    //     )) as Product__factory;
+    //     const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
+    //     const LeaderboardFactory: Leaderboard__factory =
+    //   (await ethers.getContractFactory('Leaderboard')) as Leaderboard__factory;
+
+    //     product = await ProductFactory.deploy(
+    //         roasters,
+    //         names,
+    //         descriptions,
+    //         ipfsHashes,
+    //         prices,
+    //         quantities,
+    //         nftIds
+    //       );
+
+    //       order = await OrderFactory.deploy(
+    //         [],
+    //         [],
+    //         [],
+    //         []
+    //       );
+    //       await order.waitForDeployment();
+        
+    //       leaderboard = await LeaderboardFactory.deploy(order);
+    //       await leaderboard.waitForDeployment();
+      
+    //       await order.setLeaderboardContract(leaderboard.getAddress());
+      
+    //       coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(product, leaderboard);
+    //       await coffeeMarketplace.waitForDeployment();
+
+    //     for (let i = 0; i < roasters.length; i++) {
+    //         await coffeeMarketplace.connect(roaster).addRoasterListing(
+    //         names[i],
+    //         descriptions[i],
+    //         ipfsHashes[i],
+    //         prices[i],
+    //         quantities[i],
+    //         );
+    //     }
+
+    //     order = await OrderFactory.deploy([], [], [], []);
+    //     await order.waitForDeployment();
+
+    //     cart = await CartFactory.deploy(coffeeMarketplace.getAddress(), order.getAddress());
+    //     await cart.waitForDeployment();
+    // });
 
     beforeEach(async function () {
-        const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
-            (await ethers.getContractFactory(
-            'CoffeeMarketplace',
-            )) as CoffeeMarketplace__factory;
-        const CartFactory: Cart__factory =
-            (await ethers.getContractFactory(
-            'Cart',
-            )) as Cart__factory;
-        [roaster, customer1, customer2] = await ethers.getSigners();
-        const ProductFactory: Product__factory =
-        (await ethers.getContractFactory(
-          'Product',
-        )) as Product__factory;
-        const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
-
-        product = await ProductFactory.deploy(
-            roasters,
-            names,
-            descriptions,
-            ipfsHashes,
-            prices,
-            quantities,
-            nftIds
-          );
-        
-          coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
-            product
-          );
-        await coffeeMarketplace.waitForDeployment();
-
-        for (let i = 0; i < roasters.length; i++) {
-            await coffeeMarketplace.connect(roaster).addRoasterListing(
-            names[i],
-            descriptions[i],
-            ipfsHashes[i],
-            prices[i],
-            quantities[i],
-            );
-        }
-
-        order = await OrderFactory.deploy([], [], [], []);
-        await order.waitForDeployment();
-
-        cart = await CartFactory.deploy(coffeeMarketplace.getAddress(), order.getAddress());
-        await cart.waitForDeployment();
-    });
+        const contracts = await deployContracts();
+        coffeeMarketplace = contracts.coffeeMarketplace;
+        product = contracts.product;
+        order = contracts.order;
+        leaderboard = contracts.leaderboard;
+        roaster = contracts.roaster;
+        cart = contracts.cart;
+        customer1 = contracts.customer1;
+        customer2 = contracts.customer2;
+      });
 
     describe('Multiple Customers with Different Carts', function () {
         const firstProductId = 1;

@@ -9,6 +9,7 @@ import {
   Voting,
   Voting__factory,
 } from '../typechain-types';
+import { deployContracts } from './test_setup/deployContract';
 
 describe('Coffee Voting E2E Test', function () {
   let coffeeMarketplace: CoffeeMarketplace;
@@ -67,75 +68,85 @@ describe('Coffee Voting E2E Test', function () {
     [13, 14, 15],
   ];
 
+  // beforeEach(async function () {
+  //   [owner, roaster, customer] = await ethers.getSigners();
+
+  //   product = await deployProduct();
+  //   coffeeMarketplace = await deployCoffeeMarketplace(product);
+  //   coffeeVoting = await deployVoting(coffeeMarketplace);
+  // });
+
+  // async function deployProduct() {
+  //   const ProductFactory: Product__factory = (await ethers.getContractFactory(
+  //     'Product',
+  //   )) as Product__factory;
+  //   return ProductFactory.deploy(
+  //     roasters,
+  //     names,
+  //     descriptions,
+  //     ipfsHashes,
+  //     prices,
+  //     quantities,
+  //     nftIds,
+  //   );
+  // }
+
+  // async function deployCoffeeMarketplace(product: Product) {
+  //   const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
+  //     (await ethers.getContractFactory(
+  //       'CoffeeMarketplace',
+  //     )) as CoffeeMarketplace__factory;
+  //   return CoffeeMarketplaceFactory.deploy(product);
+  // }
+
+  // async function deployVoting(marketplace: CoffeeMarketplace) {
+  //   const VotingFactory: Voting__factory = (await ethers.getContractFactory(
+  //     'Voting',
+  //   )) as Voting__factory;
+  //   const voting = await VotingFactory.deploy(
+  //     marketplace.getAddress(),
+  //     [
+  //       'Jamaica Blue Mountain',
+  //       'Colombia Narino Granos De Espreranza',
+  //       'Vietnam Da Lat',
+  //       'Sumatra Long Berry',
+  //     ],
+  //     [
+  //       'https://example.com/jamaica.png',
+  //       'https://example.com/colombia.png',
+  //       'https://example.com/vietnam.png',
+  //       'https://example.com/sumatra.png',
+  //     ],
+  //     [
+  //       'A smooth, mild coffee with floral and nutty undertones.',
+  //       'A bright, fruity coffee with hints of citrus and chocolate.',
+  //       'A bold coffee with nutty, chocolate flavors.',
+  //       'Earthy and spicy with notes of herbs and tobacco.',
+  //     ],
+  //     ['Jamaica', 'Colombia', 'Vietnam', 'Sumatra'],
+  //     ['Arabica', 'Arabica', 'Robusta', 'Arabica'],
+  //     ['Medium', 'Medium-Light', 'Dark', 'Dark'],
+  //     [
+  //       ethers.parseEther('0.1'),
+  //       ethers.parseEther('0.03'),
+  //       ethers.parseEther('0.025'),
+  //       ethers.parseEther('0.04'),
+  //     ],
+  //     90,
+  //   );
+  //   await voting.waitForDeployment();
+  //   return voting;
+  // }
+
   beforeEach(async function () {
-    [owner, roaster, customer] = await ethers.getSigners();
-
-    product = await deployProduct();
-    coffeeMarketplace = await deployCoffeeMarketplace(product);
-    coffeeVoting = await deployVoting(coffeeMarketplace);
+    const contracts = await deployContracts();
+    coffeeMarketplace = contracts.coffeeMarketplace;
+    coffeeVoting = contracts.coffeeVoting;
+    product = contracts.product;
+    owner = contracts.owner;
+    roaster = contracts.roaster;
+    customer = contracts.customer1;
   });
-
-  async function deployProduct() {
-    const ProductFactory: Product__factory = (await ethers.getContractFactory(
-      'Product',
-    )) as Product__factory;
-    return ProductFactory.deploy(
-      roasters,
-      names,
-      descriptions,
-      ipfsHashes,
-      prices,
-      quantities,
-      nftIds,
-    );
-  }
-
-  async function deployCoffeeMarketplace(product: Product) {
-    const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
-      (await ethers.getContractFactory(
-        'CoffeeMarketplace',
-      )) as CoffeeMarketplace__factory;
-    return CoffeeMarketplaceFactory.deploy(product);
-  }
-
-  async function deployVoting(marketplace: CoffeeMarketplace) {
-    const VotingFactory: Voting__factory = (await ethers.getContractFactory(
-      'Voting',
-    )) as Voting__factory;
-    const voting = await VotingFactory.deploy(
-      marketplace.getAddress(),
-      [
-        'Jamaica Blue Mountain',
-        'Colombia Narino Granos De Espreranza',
-        'Vietnam Da Lat',
-        'Sumatra Long Berry',
-      ],
-      [
-        'https://example.com/jamaica.png',
-        'https://example.com/colombia.png',
-        'https://example.com/vietnam.png',
-        'https://example.com/sumatra.png',
-      ],
-      [
-        'A smooth, mild coffee with floral and nutty undertones.',
-        'A bright, fruity coffee with hints of citrus and chocolate.',
-        'A bold coffee with nutty, chocolate flavors.',
-        'Earthy and spicy with notes of herbs and tobacco.',
-      ],
-      ['Jamaica', 'Colombia', 'Vietnam', 'Sumatra'],
-      ['Arabica', 'Arabica', 'Robusta', 'Arabica'],
-      ['Medium', 'Medium-Light', 'Dark', 'Dark'],
-      [
-        ethers.parseEther('0.1'),
-        ethers.parseEther('0.03'),
-        ethers.parseEther('0.025'),
-        ethers.parseEther('0.04'),
-      ],
-      90,
-    );
-    await voting.waitForDeployment();
-    return voting;
-  }
 
   it('Should have 4 initial coffee candidates', async function () {
     const candidates = await coffeeVoting.getAllVotesOfCoffeeCandiates();

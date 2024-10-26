@@ -2,37 +2,44 @@ import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import { Order, Order__factory } from '../typechain-types';
+import { deployContracts } from './test_setup/deployContract';
+import { orderSeedData } from '../ignition/modules/seed_data/orderSeedData';
 
 describe('Order Contract', function () {
   let order: Order;
-  let owner: Signer;
   let customer: Signer;
 
-  beforeEach(async function () {
-    const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
-    [owner, customer] = await ethers.getSigners();
+//   beforeEach(async function () {
+//     const OrderFactory: Order__factory = (await ethers.getContractFactory('Order')) as Order__factory;
+//     [customer] = await ethers.getSigners();
 
-    // Deploy Order contract
-    order = await OrderFactory.deploy(
-      [await customer.getAddress(), await customer.getAddress()],
-      [
-        [
-          { productId: 1, quantity: 2 },
-          { productId: 2, quantity: 3 },
-        ],
-        [
-          { productId: 4, quantity: 1 },
-          { productId: 5, quantity: 2 },
-        ],
-      ],
-      [ethers.parseEther('1.0'), ethers.parseEther('0.5')],
-      [Date.now(), Date.now()]
-    );
-    await order.waitForDeployment();
+//     // Deploy Order contract
+//     order = await OrderFactory.deploy(
+//       [await customer.getAddress(), await customer.getAddress()],
+//       [
+//         [
+//           { productId: 1, quantity: 2 },
+//           { productId: 2, quantity: 3 },
+//         ],
+//         [
+//           { productId: 4, quantity: 1 },
+//           { productId: 5, quantity: 2 },
+//         ],
+//       ],
+//       [ethers.parseEther('1.0'), ethers.parseEther('0.5')],
+//       [Date.now(), Date.now()]
+//     );
+//     await order.waitForDeployment();
+//   });
+
+  beforeEach(async function () {
+    const contracts = await deployContracts();
+    customer = contracts.customer1;
+    order = contracts.order;
   });
 
   it('Should create a new order successfully', async function () {
-    const orderId = 3; // Order ID will be 3, after two pre-existing orders
+    const orderId = 5; // Order ID will be 5, after four pre-existing orders
     const orderItems = [
       { productId: 6, quantity: 1 },
       { productId: 7, quantity: 2 },
@@ -41,9 +48,9 @@ describe('Order Contract', function () {
     const timestamp = Date.now();
 
     // Call the createOrder function
-    await expect(order.createOrder(await customer.getAddress(), orderItems, totalAmount, timestamp))
+    await expect(order.createOrder(customer, orderItems, totalAmount, timestamp))
       .to.emit(order, 'OrderCreated')
-      .withArgs(orderId, await customer.getAddress(), totalAmount, timestamp);
+      .withArgs(orderId, customer, totalAmount, timestamp);
 
     // Verify the order details
     const createdOrder = await order.getOrder(orderId);
@@ -105,6 +112,6 @@ describe('Order Contract', function () {
     const orderDetails = await order.getOrder(orderId);
     expect(orderDetails.orderId).to.equal(orderId);
     expect(orderDetails.orderItems.length).to.equal(2); // The order contains 2 items
-    expect(orderDetails.customer).to.equal(await customer.getAddress());
+    expect(orderDetails.customer).to.equal(orderSeedData.customerAddresses[0]);
   });
 });

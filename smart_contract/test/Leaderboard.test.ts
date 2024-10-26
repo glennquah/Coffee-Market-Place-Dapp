@@ -7,6 +7,7 @@ import {
   Leaderboard__factory,
 } from '../typechain-types';
 import { orderSeedData } from '../ignition/modules/seed_data/orderSeedData';
+import { deployContracts } from './test_setup/deployContract';
 
 describe('Leaderboard Contract', function () {
   let order: Order;
@@ -24,27 +25,33 @@ describe('Leaderboard Contract', function () {
   const [customer1Order, customer2Order, customer3Order, customer4Order] =
     customerOrders;
 
+//   beforeEach(async function () {
+//     const OrderFactory: Order__factory = (await ethers.getContractFactory(
+//       'Order'
+//     )) as Order__factory;
+//     const LeaderboardFactory: Leaderboard__factory =
+//       (await ethers.getContractFactory('Leaderboard')) as Leaderboard__factory;
+
+//     // Deploy Order contract with initial seed data
+//     order = await OrderFactory.deploy(
+//       orderSeedData.customerAddresses,
+//       orderSeedData.orderItems,
+//       orderSeedData.totalAmounts,
+//       orderSeedData.timestamps
+//     );
+//     await order.waitForDeployment();
+
+//     // Deploy Leaderboard contract with address of deployed Order contract
+//     leaderboard = await LeaderboardFactory.deploy(order.getAddress());
+//     await leaderboard.waitForDeployment();
+
+//     await order.setLeaderboardContract(leaderboard.getAddress());
+//   });
+
   beforeEach(async function () {
-    const OrderFactory: Order__factory = (await ethers.getContractFactory(
-      'Order'
-    )) as Order__factory;
-    const LeaderboardFactory: Leaderboard__factory =
-      (await ethers.getContractFactory('Leaderboard')) as Leaderboard__factory;
-
-    // Deploy Order contract with initial seed data
-    order = await OrderFactory.deploy(
-      orderSeedData.customerAddresses,
-      orderSeedData.orderItems,
-      orderSeedData.totalAmounts,
-      orderSeedData.timestamps
-    );
-    await order.waitForDeployment();
-
-    // Deploy Leaderboard contract with address of deployed Order contract
-    leaderboard = await LeaderboardFactory.deploy(order.getAddress());
-    await leaderboard.waitForDeployment();
-
-    await order.setLeaderboardContract(leaderboard.getAddress());
+    const contracts = await deployContracts();
+    order = contracts.order;
+    leaderboard = contracts.leaderboard;
   });
 
   async function createOrderFromData(orderData: {
