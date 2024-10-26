@@ -20,9 +20,26 @@ export default buildModule('TESTING_MODULES', (m) => {
     { from: deployer },
   );
 
+  const orderContract = m.contract(
+    'Order',
+    [
+      orderSeedData.customerAddresses,
+      orderSeedData.orderItems,
+      orderSeedData.totalAmounts,
+      orderSeedData.timestamps,
+    ],
+    { from: deployer },
+  );
+
+  const leaderboardContract = m.contract(
+    'Leaderboard',
+    [orderContract],
+    { from: deployer },
+  );
+
   const coffeeMarketplaceContract = m.contract(
     'CoffeeMarketplace',
-    [productContract],
+    [productContract, leaderboardContract],
     { from: deployer },
   );
 
@@ -42,26 +59,9 @@ export default buildModule('TESTING_MODULES', (m) => {
     { from: deployer },
   );
 
-  const orderContract = m.contract(
-    'Order',
-    [
-      orderSeedData.customerAddresses,
-      orderSeedData.orderItems,
-      orderSeedData.totalAmounts,
-      orderSeedData.timestamps,
-    ],
-    { from: deployer },
-  );
-
   const cartContract = m.contract(
     'Cart',
     [coffeeMarketplaceContract, orderContract],
-    { from: deployer },
-  );
-
-  const leaderboardContract = m.contract(
-    'Leaderboard',
-    [orderContract],
     { from: deployer },
   );
 
