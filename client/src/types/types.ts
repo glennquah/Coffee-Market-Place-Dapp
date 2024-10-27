@@ -11,7 +11,6 @@ interface CoffeeCardProps {
   onClickListing?: () => void;
   bidEndDate?: string;
 }
-interface CoffeeDialogProps {_shown:boolean}
 
 interface ButtonProps {
   onClick: () => void;
@@ -55,5 +54,4 @@ export type {
   CoffeeCarouselProps,
   HeroProps,
   TimerHeroProps,
-  CoffeeDialogProps,
 };

@@ -1,10 +1,10 @@
 
 import { useState } from 'react';
 import ImageNotFound from '../../assets/imageNotFound.png';
-import {CoffeeDialogProps} from '../../types/types';
+import '../../styles/Modal.css';
 
-const CoffeeDialog: React.FC<CoffeeDialogProps> = ({ _shown }) => {
-    const [shown, setShown] = useState(_shown);
+const CoffeeDialog = () => {
+    const [modal, setModal] = useState(false);
     const [name, setName] = useState("");
     const [origin, setOrigin] = useState("");
     const [roastLevel, setRoastLevel] = useState("");
@@ -30,10 +30,25 @@ const CoffeeDialog: React.FC<CoffeeDialogProps> = ({ _shown }) => {
         console.log(price);
         console.log('====================================');
     }
-    const value = shown ? "block" : "none";
+    const value = modal ? "block" : "none";
+    const toggleModal = () => {
+        setModal(!modal);
+    };
     return (
-        <div style={{width:"100%",height:"100%",justifyContent:"center",alignItems:"center",display:value}}>
-            <div style={{width:"80%",marginLeft:"10%",marginRight:"10%",paddingTop:50,paddingBottom:50,color:"white",background:"#5F6F52",borderRadius:5}}>
+        <>
+        <div style={{backgroundColor:"white",borderRadius:10,justifyContent:"center",padding:15}}>
+            <h1 style={{fontSize:30,fontWeight:"bold",textAlign:"center"}}>Wanna list your coffee?</h1>
+            <button onClick={toggleModal} className="btn-modal">
+                List my coffee
+            </button>
+        </div>
+        {modal && (
+        <div 
+            className="modal" 
+            style={{width:"100%",height:"100%",justifyContent:"center",alignItems:"center"}}
+        >
+            <div onClick={toggleModal} className="overlay"></div>
+            <div className="modal-content">
                 <div style={{width:"100%",justifyItems:"center"}}>
                     <h1 style={{fontSize:20,fontWeight:"bold"}}>Upload your coffee into an NFT ☕</h1>
                     <h1 style={{fontSize:20,fontWeight:"bold"}}>Let’s tokenise your coffee into NFTs!</h1>
@@ -94,7 +109,8 @@ const CoffeeDialog: React.FC<CoffeeDialogProps> = ({ _shown }) => {
                 </div>
                 
             </div>
-        </div>
+        </div>)}
+    </>
   );
 }
 
