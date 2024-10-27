@@ -16,6 +16,7 @@ function MarketPlacePage() {
           imageUrl={marketPlaceHero}
         />
         <CoffeeDialog
+        _shown = {true}
         />
       </ResponsiveContainer>
     </div>
