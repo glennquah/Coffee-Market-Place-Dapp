@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import { TimerHeroProps } from '../types/types';
 
-const TimerHero: FC<TimerHeroProps> = ({ title, endDateTime }) => {
+const TimerHero: FC<TimerHeroProps> = ({ title, subTitle, endDateTime }) => {
   const calculateTimeLeft = () => {
     const now = new Date().getTime();
     const endTime = new Date(endDateTime).getTime();
@@ -26,6 +26,7 @@ const TimerHero: FC<TimerHeroProps> = ({ title, endDateTime }) => {
   return (
     <div className="py-12">
       <h1 className="text-6xl font-bold text-center py-4">{title}</h1>
+      <h1 className="text-2xl text-center">{subTitle}</h1>
       {timeLeft > 0 ? (
         <div className="flex justify-center mt-8 gap-4">
           {formatTime(hours).map((digit, index) => (

@@ -15,7 +15,10 @@ function VotingPage() {
     <div className="py-8">
       <ResponsiveContainer>
         <TimerHero
-          title={"Vote for your Brew! Next Week's Featured Coffee"}
+          title={'Vote for Your Favorite Roast!'}
+          subTitle={
+            'Cast your vote and shape the next featured brew on our marketplace.'
+          }
           endDateTime={new Date('2024-10-27T23:59:59+08:00')}
         />
 

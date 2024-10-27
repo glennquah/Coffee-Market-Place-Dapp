@@ -30,12 +30,20 @@ interface CoffeeCardListProps {
 
 interface TimerHeroProps {
   title: string;
+  subTitle: string;
   endDateTime: Date;
 }
 
 interface HeroProps {
-  title: string;
-  imageUrl: string;
+  title?: string;
+  subTitle?: string;
+  imageUrl?: string;
+  variant: HeroVariant;
+}
+
+export enum HeroVariant {
+  V1 = 'V1',
+  V2 = 'V2',
 }
 
 export type {

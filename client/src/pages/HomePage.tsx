@@ -3,7 +3,7 @@ import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel'
 import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import mockCoffeeData from '../data/mockCoffeeItems';
-import { CoffeeCardProps } from '../types/types';
+import { CoffeeCardProps, HeroVariant } from '../types/types';
 
 // TODO: Remove this mock data and replace when intergrating with smart contract
 const coffeeListingItems: CoffeeCardProps[] = [];
@@ -19,7 +19,12 @@ function HomePage() {
   return (
     <div className="py-8">
       <ResponsiveContainer>
-        <Hero title="Welcome to NFTRoasters" imageUrl={homePagehero} />
+        <Hero
+          title="Welcome to NFTRoasters"
+          subTitle="Buy and Sell your Coffee NFTs here at NFT Roasters"
+          imageUrl={homePagehero}
+          variant={HeroVariant.V1}
+        />
         <CoffeeCarousel
           items={coffeeListingItems}
           title="Our Coffee For You"
