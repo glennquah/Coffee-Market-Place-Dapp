@@ -6,6 +6,7 @@ import '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 import {AutomationCompatibleInterface} from '@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol';
 import './Product.sol';
 import './Leaderboard.sol';
+import './CoffeeNFT.sol';
 
 contract CoffeeMarketplace is
     ERC721URIStorage,
@@ -13,29 +14,11 @@ contract CoffeeMarketplace is
     IERC721Receiver,
     AutomationCompatibleInterface
 {
-    using Strings for uint256;
     uint256 public tokenCounter = 0; // Counter for NFT IDs
     Product public productContract;
     Leaderboard public leaderboardContract;
+    CoffeeNFT public nftContract;
     uint256 public lastRewardTime; // Timestamp of the last reward distribution
-
-    struct NFTMetadata {
-        uint256 tokenId;
-        string name;
-        string description;
-        string tokenURI;
-        uint256 productId;
-        uint256 price;
-        bool isActive;
-        string origin;
-        string roastLevel;
-        string beanType;
-        string processMethod;
-        uint256 roastDate;
-    }
-
-    // Mapping from tokenId to NFTMetadata
-    mapping(uint256 => NFTMetadata) public tokenMetadata;
 
     // Mapping from productId to array of tokenIds
     mapping(uint256 => uint256[]) public productTokens;
@@ -56,15 +39,6 @@ contract CoffeeMarketplace is
         uint256 quantity
     );
 
-    event MetadataUpdated(
-        uint256 indexed tokenId,
-        string name,
-        string description,
-        string tokenURI,
-        string origin,
-        string roastLevel
-    );
-
     event NFTPurchased(
         uint256 indexed productId,
         uint256 indexed tokenId,
@@ -78,13 +52,14 @@ contract CoffeeMarketplace is
         address indexed to,
         uint256 price
     );
-    
+
     event MonthlyRewardDistributed(address customer, uint256 tokenId);
 
     // Constructor for initializing ERC721 with a name and symbol, and setting the product contract address
     constructor(
         address _productContractAddress,
-        address _leaderboardContractAddress
+        address _leaderboardContractAddress,
+        address _nftContractAddress
     ) ERC721('CoffeeNFT', 'COFFEE') Ownable(msg.sender) {
         require(
             _productContractAddress != address(0),
@@ -94,9 +69,14 @@ contract CoffeeMarketplace is
             _leaderboardContractAddress != address(0),
             'Invalid Leaderboard contract address'
         );
+        require(
+            _nftContractAddress != address(0),
+            'Invalid NFT contract address'
+        );
 
         productContract = Product(_productContractAddress);
         leaderboardContract = Leaderboard(_leaderboardContractAddress);
+        nftContract = CoffeeNFT(_nftContractAddress);
         lastRewardTime = block.timestamp; // Initialize with contract deployment timestamp
     }
 
@@ -122,34 +102,23 @@ contract CoffeeMarketplace is
         // Get the product ID before minting
         uint256 newProductId = productContract.productCounter() + 1;
 
-        // Mint NFTs for each unit of the product and store their IDs
+        // Mint NFTs through the NFT contract
         for (uint256 i = 0; i < _quantity; i++) {
-            tokenCounter++;
-            uint256 tokenId = tokenCounter;
-
-            // Create metadata for this token
-            tokenMetadata[tokenId] = NFTMetadata({
-                tokenId: tokenId,
-                name: _name,
-                description: _description,
-                tokenURI: _tokenURI,
-                productId: newProductId,
-                price: _price,
-                isActive: true,
-                origin: _origin,
-                roastLevel: _roastLevel,
-                beanType: _beanType,
-                processMethod: _processMethod,
-                roastDate: block.timestamp
-            });
-
-            _safeMint(address(this), tokenId); // Assign NFT to the smart contract itself
-            _setTokenURI(tokenId, _tokenURI); // IPFS hash as the token URI (metadata link)
+            uint256 tokenId = nftContract.mint(
+                address(this),
+                _name,
+                _description,
+                _tokenURI,
+                newProductId,
+                _price,
+                _origin,
+                _roastLevel,
+                _beanType,
+                _processMethod
+            );
 
             nftIds[i] = tokenId;
             productTokens[newProductId].push(tokenId);
-
-            emit NFTMinted(tokenId, address(this), _name, _tokenURI, _price);
         }
 
         // Add product to the Product contract
@@ -193,36 +162,6 @@ contract CoffeeMarketplace is
         return productContract.getProduct(_productId);
     }
 
-    // Distribute rewards to customers every month
-    function distributeMonthlyReward() public {
-        // Ensure at least 30 days have passed since the last reward distribution
-        require(
-            block.timestamp >= lastRewardTime + 30 days,
-            'Reward distribution is not available yet'
-        );
-
-        // Retrieve the top 3 customers from the leaderboard to reward them
-        Leaderboard.LeaderboardEntry[10]
-            memory leaderboardEntries = leaderboardContract.viewLeaderboard();
-        for (uint256 i = 0; i < 3; i++) {
-            address topCustomer = leaderboardEntries[i].customer;
-
-            if (topCustomer != address(0)) {
-                // ! When NFT is completed to finish this logic
-                // TODO: Assume the product to be rewarded has already been listed and to transfer to the top customer?
-                tokenCounter++;
-                uint256 tokenId = tokenCounter;
-                _safeMint(topCustomer, tokenId);
-                _setTokenURI(tokenId, 'ipfs://reward_metadata'); // Placeholder IPFS URI
-
-                emit MonthlyRewardDistributed(topCustomer, tokenId);
-            }
-        }
-
-        // Update last reward time
-        lastRewardTime = block.timestamp;
-    }
-
     // Implement the onERC721Received function to accept NFTs
     function onERC721Received(
         address,
@@ -233,117 +172,18 @@ contract CoffeeMarketplace is
         return this.onERC721Received.selector;
     }
 
-    // Get NFT metadata
-    function getNFTMetadata(
-        uint256 tokenId
-    )
-        public
-        view
-        returns (
-            string memory name,
-            string memory description,
-            string memory tokenURI,
-            uint256 productId,
-            uint256 price,
-            bool isActive,
-            string memory origin,
-            string memory roastLevel,
-            string memory beanType,
-            string memory processMethod,
-            uint256 roastDate
-        )
-    {
-        // This will revert if token doesn't exist
-        ownerOf(tokenId); // This inherently checks if token exists
-        NFTMetadata memory metadata = tokenMetadata[tokenId];
-
-        return (
-            metadata.name,
-            metadata.description,
-            metadata.tokenURI,
-            metadata.productId,
-            metadata.price,
-            metadata.isActive,
-            metadata.origin,
-            metadata.roastLevel,
-            metadata.beanType,
-            metadata.processMethod,
-            metadata.roastDate
-        );
-    }
-
-    // Get all NFTs owned by an address with their metadata
-    function getNFTsByOwner(
-        address owner
-    )
-        public
-        view
-        returns (uint256[] memory tokenIds, NFTMetadata[] memory metadataArray)
-    {
-        uint256 balance = balanceOf(owner);
-        tokenIds = new uint256[](balance);
-        metadataArray = new NFTMetadata[](balance);
-        uint256 index = 0;
-
-        for (uint256 i = 1; i <= tokenCounter; i++) {
-            if (ownerOf(i) == owner) {
-                tokenIds[index] = i;
-                metadataArray[index] = tokenMetadata[i];
-                index++;
-            }
-        }
-    }
-
-    // Update NFT metadata (only by owner or product roaster)
-    function updateNFTMetadata(
-        uint256 tokenId,
-        string memory newName,
-        string memory newDescription,
-        string memory newTokenURI,
-        string memory newOrigin,
-        string memory newRoastLevel,
-        string memory newBeanType,
-        string memory newProcessMethod
-    ) public {
-        ownerOf(tokenId); // This inherently checks if token exists
-        uint256 productId = tokenMetadata[tokenId].productId;
-        address roaster = productContract.getProductRoaster(productId);
-        require(
-            msg.sender == owner() || msg.sender == roaster,
-            'Not authorized to update metadata'
-        );
-
-        NFTMetadata storage metadata = tokenMetadata[tokenId];
-        metadata.name = newName;
-        metadata.description = newDescription;
-        metadata.tokenURI = newTokenURI;
-        metadata.origin = newOrigin;
-        metadata.roastLevel = newRoastLevel;
-        metadata.beanType = newBeanType;
-        metadata.processMethod = newProcessMethod;
-
-        emit MetadataUpdated(
-            tokenId,
-            newName,
-            newDescription,
-            newTokenURI,
-            newOrigin,
-            newRoastLevel
-        );
-    }
-
     // Contract-to-user transfer (purchase from marketplace)
     function purchaseNFT(uint256 productId, uint256 tokenId) public payable {
         require(
-            ownerOf(tokenId) == address(this),
+            nftContract.ownerOf(tokenId) == address(this),
             'NFT not owned by marketplace'
         );
 
-        // Get product details and validate
-        NFTMetadata memory metadata = tokenMetadata[tokenId];
-        require(metadata.isActive, 'NFT not active for sale');
-        require(metadata.productId == productId, 'NFT not from this product');
-        require(msg.value >= metadata.price, 'Insufficient payment');
+        // Get NFT metadata
+        (, , , , uint256 price, bool isActive, , , , , ) = nftContract
+            .getNFTMetadata(tokenId);
+        require(isActive, 'NFT not active for sale');
+        require(msg.value >= price, 'Insufficient payment');
 
         // Get roaster address and transfer payment
         address roaster = productContract.getProductRoaster(productId);
@@ -354,7 +194,7 @@ contract CoffeeMarketplace is
         require(sent, 'Failed to send payment');
 
         // Transfer NFT
-        _safeTransfer(address(this), msg.sender, tokenId, '');
+        nftContract.safeTransferFrom(address(this), msg.sender, tokenId);
 
         // Update product state
         productContract.updateQuantityAfterTransfer(productId);
@@ -369,7 +209,7 @@ contract CoffeeMarketplace is
         uint256 price
     ) public payable {
         // Get the current owner of the NFT (seller)
-        address seller = ownerOf(tokenId);
+        address seller = nftContract.ownerOf(tokenId);
         require(
             to != address(0) && to != address(this),
             'Invalid recipient address'
@@ -386,7 +226,7 @@ contract CoffeeMarketplace is
         }
 
         // Transfer NFT
-        _safeTransfer(seller, msg.sender, tokenId, '');
+        nftContract.safeTransferFrom(seller, msg.sender, tokenId);
         emit NFTTransferred(tokenId, seller, msg.sender, price);
     }
 
@@ -404,18 +244,15 @@ contract CoffeeMarketplace is
         // Calculate total price and validate tokens
         for (uint256 i = 0; i < tokenIds.length; i++) {
             require(
-                ownerOf(tokenIds[i]) == address(this),
+                nftContract.ownerOf(tokenIds[i]) == address(this),
                 'NFT not owned by marketplace'
             );
 
-            NFTMetadata memory metadata = tokenMetadata[tokenIds[i]];
-            require(metadata.isActive, 'NFT not active for sale');
-            require(
-                metadata.productId == productId,
-                'NFT not from this product'
-            );
+            (, , , , uint256 price, bool isActive, , , , , ) = nftContract
+                .getNFTMetadata(tokenIds[i]);
+            require(isActive, 'NFT not active for sale');
 
-            totalPrice += metadata.price;
+            totalPrice += price;
         }
 
         require(msg.value >= totalPrice, 'Insufficient payment');
@@ -426,13 +263,15 @@ contract CoffeeMarketplace is
 
         // Transfer NFTs
         for (uint256 i = 0; i < tokenIds.length; i++) {
-            _safeTransfer(address(this), msg.sender, tokenIds[i], '');
-            emit NFTPurchased(
-                productId,
-                tokenIds[i],
+            nftContract.safeTransferFrom(
+                address(this),
                 msg.sender,
-                tokenMetadata[tokenIds[i]].price
+                tokenIds[i]
             );
+            (, , , , uint256 price, , , , , , ) = nftContract.getNFTMetadata(
+                tokenIds[i]
+            );
+            emit NFTPurchased(productId, tokenIds[i], msg.sender, price);
         }
 
         // Update product quantity
@@ -443,20 +282,27 @@ contract CoffeeMarketplace is
     function isNFTAvailableForPurchase(
         uint256 tokenId
     ) public view returns (bool) {
-        if (ownerOf(tokenId) != address(this)) {
+        try nftContract.ownerOf(tokenId) returns (address owner) {
+            if (owner != address(this)) {
+                return false;
+            }
+            (, , , , uint256 price, bool isActive, , , , , ) = nftContract
+                .getNFTMetadata(tokenId);
+            return isActive && price > 0;
+        } catch {
             return false;
         }
-
-        NFTMetadata memory metadata = tokenMetadata[tokenId];
-        return metadata.isActive;
     }
 
     function getNFTPrice(uint256 tokenId) public view returns (uint256) {
         require(
-            ownerOf(tokenId) == address(this),
+            nftContract.ownerOf(tokenId) == address(this),
             'NFT not owned by marketplace'
         );
-        return tokenMetadata[tokenId].price;
+        (, , , , uint256 price, , , , , ,) = nftContract.getNFTMetadata(
+            tokenId
+        );
+        return price;
     }
 
     // Chainlink Keeper-compatible checkUpkeep function to check if upkeep is needed
@@ -473,5 +319,64 @@ contract CoffeeMarketplace is
             'Reward distribution is not available yet'
         );
         distributeMonthlyReward();
+    }
+
+    // Distribute rewards to customers every month
+    function distributeMonthlyReward() public {
+        // Ensure at least 30 days have passed since the last reward distribution
+        require(
+            block.timestamp >= lastRewardTime + 30 days,
+            'Reward distribution is not available yet'
+        );
+
+        // Retrieve the top 3 customers from the leaderboard to reward them
+        Leaderboard.LeaderboardEntry[10]
+            memory leaderboardEntries = leaderboardContract.viewLeaderboard();
+
+        // Get first available product for rewards
+        uint256 latestProductId = productContract.productCounter();
+        require(latestProductId > 0, 'No products available for rewards');
+
+        // Get product details for the reward NFT
+        (
+            string memory name,
+            string memory description,
+            string memory tokenURI,
+            uint256 price,
+            ,
+            ,
+            ,
+            string memory origin,
+            string memory roastLevel,
+            string memory beanType,
+            string memory processMethod,
+
+        ) = productContract.getProduct(latestProductId);
+
+        for (uint256 i = 0; i < 3; i++) {
+            address topCustomer = leaderboardEntries[i].customer;
+
+            if (topCustomer != address(0)) {
+                // ! When NFT is completed to finish this logic
+                // TODO: Assume the product to be rewarded has already been listed and to transfer to the top customer?
+                uint256 tokenId = nftContract.mint(
+                    topCustomer,
+                    name,
+                    string.concat(description, ' (Reward NFT)'),
+                    'ipfs://reward_metadata',
+                    latestProductId,
+                    0, // Free for reward
+                    origin,
+                    roastLevel,
+                    beanType,
+                    processMethod
+                );
+
+                emit MonthlyRewardDistributed(topCustomer, tokenId);
+            }
+        }
+
+        // Update last reward time
+        lastRewardTime = block.timestamp;
     }
 }
