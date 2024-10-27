@@ -18,7 +18,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="fixed w-full h-24 shadow-xl use-main-bg">
+    <nav className="fixed w-full h-24 shadow-xl use-main-bg z-10">
       <ResponsiveContainer>
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-12">

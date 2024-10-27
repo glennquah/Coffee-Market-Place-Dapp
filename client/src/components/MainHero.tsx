@@ -12,7 +12,7 @@ const Hero: FC<HeroProps> = ({ title, imageUrl, subTitle, variant }) => {
         </div>
       ) : (
         imageUrl && (
-          <div className="relative w-full">
+          <div className="relative w-full z-0">
             <img src={imageUrl} alt="hero" className="w-full opacity-40" />
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-12">
               {title && (
