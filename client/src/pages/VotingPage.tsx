@@ -16,7 +16,7 @@ function VotingPage() {
       <ResponsiveContainer>
         <TimerHero
           title={"Vote for your Brew! Next Week's Featured Coffee"}
-          countdown={5}
+          endDateTime={new Date('2024-10-27T23:59:59+08:00')}
         />
 
         <CoffeeCardList items={coffeeVotingItems} />

@@ -30,13 +30,13 @@ interface CoffeeCardListProps {
 
 interface TimerHeroProps {
   title: string;
-  countdown: number;
+  endDateTime: Date;
 }
 
 export type {
   ButtonProps,
-  CoffeeCardProps,
   CoffeeCardListProps,
+  CoffeeCardProps,
   CoffeeCardType,
   CoffeeCarouselProps,
   TimerHeroProps,

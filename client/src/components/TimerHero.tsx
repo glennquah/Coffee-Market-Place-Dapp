@@ -1,17 +1,22 @@
 import { FC, useEffect, useState } from 'react';
 import { TimerHeroProps } from '../types/types';
 
-const TimerHero: FC<TimerHeroProps> = ({ title, countdown }) => {
-  // SHOULD USE THIS BUT FOR TESTING WISE, COMMENT IT OUT
-  // const [timeLeft, setTimeLeft] = useState(countdown * 3600);
-  const [timeLeft, setTimeLeft] = useState(countdown * 1);
+const TimerHero: FC<TimerHeroProps> = ({ title, endDateTime }) => {
+  const calculateTimeLeft = () => {
+    const now = new Date().getTime();
+    const endTime = new Date(endDateTime).getTime();
+    return Math.max(Math.floor((endTime - now) / 1000), 0);
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+      setTimeLeft(calculateTimeLeft());
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [endDateTime]);
 
   const formatTime = (time: number) => String(time).padStart(2, '0').split('');
   const hours = Math.floor(timeLeft / 3600);
