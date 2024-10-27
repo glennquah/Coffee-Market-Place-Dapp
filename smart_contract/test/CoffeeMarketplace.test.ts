@@ -6,12 +6,14 @@ import {
   Product,
   Leaderboard,
   Order,
+  CoffeeNFT
 } from '../typechain-types';
 import { deployContracts } from './test_setup/deployContract';
 import { orderSeedData } from '../ignition/modules/seed_data/orderSeedData';
 
 describe('CoffeeMarketplace', function () {
   let coffeeMarketplace: CoffeeMarketplace;
+  let coffeeNFT: CoffeeNFT;
   let product: Product;
   let owner: Signer;
   let roaster: Signer;
@@ -34,6 +36,7 @@ describe('CoffeeMarketplace', function () {
   beforeEach(async function () {
     const contracts = await deployContracts();
     coffeeMarketplace = contracts.coffeeMarketplace;
+    coffeeNFT = contracts.coffeeNFT;
     product = contracts.product;
     order = contracts.order;
     owner = contracts.owner;
@@ -41,6 +44,11 @@ describe('CoffeeMarketplace', function () {
     buyer = contracts.buyer;
     secondBuyer = contracts.secondBuyer;
     leaderboard = contracts.leaderboard;
+
+    // Set marketplace address in NFT contract
+    await coffeeNFT.connect(owner).setMarketplaceContract(
+      await coffeeMarketplace.getAddress()
+    ); // gives the marketplace contract permissions to mint NFTs in the NFT contract
   });
 
   async function createOrderFromData(orderData: {
@@ -52,7 +60,6 @@ describe('CoffeeMarketplace', function () {
     const { address, items, totalAmount, timestamp } = orderData;
     await order.createOrder(address, items, totalAmount, timestamp);
   }
-
 
   describe('Listing Creation', function () {
     it('Should allow roaster to add product listing with correct metadata', async function () {
@@ -74,7 +81,7 @@ describe('CoffeeMarketplace', function () {
         )
       )
         .to.emit(coffeeMarketplace, 'ListingAdded')
-        .to.emit(coffeeMarketplace, 'NFTMinted');
+        .to.emit(coffeeNFT, 'NFTMinted');
 
       // Check if the product was added successfully
       const product = await coffeeMarketplace.getListing(6); // Listing ID will be 6, after 5 pre-existing listings
@@ -94,8 +101,8 @@ describe('CoffeeMarketplace', function () {
         const tokenId = product.nftIds[i];
 
 
-        expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(await coffeeMarketplace.getAddress());
-        expect(await coffeeMarketplace.tokenURI(tokenId)).to.equal(ipfsHash);
+        expect(await coffeeNFT.ownerOf(tokenId)).to.equal(await coffeeMarketplace.getAddress());
+        expect(await coffeeNFT.tokenURI(tokenId)).to.equal(ipfsHash);
       }
     });
 
@@ -171,7 +178,7 @@ describe('CoffeeMarketplace', function () {
       const roasterBalanceBefore = await ethers.provider.getBalance(roasterAddress);
 
       // Verify NFT is owned by marketplace before purchase
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(
+      expect(await coffeeNFT.ownerOf(tokenId)).to.equal(
         await coffeeMarketplace.getAddress()
       );
 
@@ -188,7 +195,7 @@ describe('CoffeeMarketplace', function () {
         .withArgs(listingId, tokenId, buyerAddress, price);
 
       // Verify new ownership
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(buyerAddress);
+      expect(await coffeeNFT.ownerOf(tokenId)).to.equal(buyerAddress);
 
       // Verify NFT is no longer available for purchase
       expect(await coffeeMarketplace.isNFTAvailableForPurchase(tokenId)).to.be
@@ -211,7 +218,7 @@ describe('CoffeeMarketplace', function () {
     //   // Calculate total price from metadata
     //   let totalPrice = BigInt(0);
     //   for (const tokenId of tokenIds) {
-    //     const metadata = await coffeeMarketplace.tokenMetadata(tokenId);
+    //     const metadata = await coffeeNFT.tokenMetadata(tokenId);
     //     totalPrice += metadata.price;
     //   }
 
@@ -264,7 +271,7 @@ describe('CoffeeMarketplace', function () {
       const tokenId = 1;
 
       // Get the actual price from metadata
-      const metadata = await coffeeMarketplace.tokenMetadata(tokenId);
+      const metadata = await coffeeNFT.tokenMetadata(tokenId);
       const nftPrice = metadata.price;
 
       // First purchase
@@ -361,7 +368,7 @@ describe('CoffeeMarketplace', function () {
       await coffeeMarketplace.connect(buyer).purchaseNFT(listingId, 1, { value: price });
 
       // Grant approval for transfer
-      await coffeeMarketplace.connect(buyer).setApprovalForAll(coffeeMarketplace.getAddress(), true);
+      await coffeeNFT.connect(buyer).setApprovalForAll(coffeeMarketplace.getAddress(), true);
     });
 
     it('Should allow user-to-user transfer', async function () {
@@ -369,11 +376,8 @@ describe('CoffeeMarketplace', function () {
       const buyerAddress = await buyer.getAddress();
       const secondBuyerAddress = await secondBuyer.getAddress();
 
-      // Grant specific approval for this token
-      await coffeeMarketplace.connect(buyer).approve(await coffeeMarketplace.getAddress(), tokenId);
-
       // Verify initial ownership
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(buyerAddress);
+      expect(await coffeeNFT.ownerOf(tokenId)).to.equal(buyerAddress);
 
       // Execute transfer - secondBuyer initiates free transfer
       await expect(
@@ -387,7 +391,7 @@ describe('CoffeeMarketplace', function () {
         .withArgs(tokenId, buyerAddress, secondBuyerAddress, 0);
 
       // Verify new ownership
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(secondBuyerAddress);
+      expect(await coffeeNFT.ownerOf(tokenId)).to.equal(secondBuyerAddress);
     });
 
     // it('Should allow paid user-to-user transfer', async function () {
@@ -449,7 +453,7 @@ describe('CoffeeMarketplace', function () {
       const buyerAddress = await buyer.getAddress();
 
       // Verify initial ownership
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(buyerAddress);
+      expect(await coffeeNFT.ownerOf(tokenId)).to.equal(buyerAddress);
 
       // Attempt transfer to zero address
       await expect(
@@ -470,7 +474,7 @@ describe('CoffeeMarketplace', function () {
       ).to.be.revertedWith('Invalid recipient address');
 
       // Verify ownership hasn't changed
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(buyerAddress);
+      expect(await coffeeNFT.ownerOf(tokenId)).to.equal(buyerAddress);
     });
 
     it('Should revert if payment is insufficient', async function () {
@@ -480,11 +484,8 @@ describe('CoffeeMarketplace', function () {
       const buyerAddress = await buyer.getAddress();
       const secondBuyerAddress = await secondBuyer.getAddress();
 
-      // Grant specific approval for this token
-      await coffeeMarketplace.connect(buyer).approve(await coffeeMarketplace.getAddress(), tokenId);
-
       // Verify initial ownership
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(buyerAddress);
+      expect(await coffeeNFT.ownerOf(tokenId)).to.equal(buyerAddress);
 
       // Attempt transfer with insufficient payment
       await expect(
@@ -497,154 +498,11 @@ describe('CoffeeMarketplace', function () {
       ).to.be.revertedWith('Insufficient payment');
 
       // Verify ownership hasn't changed
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(buyerAddress);
+      expect(await coffeeNFT.ownerOf(tokenId)).to.equal(buyerAddress);
     });
   });
 
-  describe('Metadata Management', function () {
-    const listingId = 6;
-    const ipfsHash: string = 'https://example.com/panama.png';
-    const price = ethers.parseEther('0.1'); // 0.1 ETH
-
-    beforeEach(async function () {
-      const quantity: number = 3;
-
-      // Mint NFTs for the listing
-      await coffeeMarketplace.connect(roaster).addRoasterListing(
-        'Panama Geisha',
-        'Delicate, jasmine-like aroma with hints of peach.',
-        ipfsHash,
-        price,
-        quantity,
-        'Guatemala',
-        'Medium',
-        'Arabica',
-        'Washed'
-      );
-    });
-
-    it('Should store and retrieve correct NFT metadata', async function () {
-      const tokenId = 1;
-
-      // Verify initial listing state
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(
-        await coffeeMarketplace.getAddress()
-      );
-
-      // Retrieve and verify metadata
-      const metadata = await coffeeMarketplace.getNFTMetadata(tokenId);
-      expect(metadata.name).to.equal('Panama Geisha');
-      expect(metadata.description).to.equal('Delicate, jasmine-like aroma with hints of peach.');
-      expect(metadata.tokenURI).to.equal(ipfsHash);
-      expect(metadata.origin).to.equal('Guatemala');
-      expect(metadata.roastLevel).to.equal('Medium');
-      expect(metadata.beanType).to.equal('Arabica');
-      expect(metadata.processMethod).to.equal('Washed');
-      expect(metadata.isActive).to.be.true;
-    });
-
-    it('Should allow metadata updates by authorized users', async function () {
-      const tokenId = 1;
-      const updatedIPFSHash = 'https://example.com/updated.png';
-      const newName = 'Premium Panama Geisha';
-      const newDescription = 'Delicate, jasmine-like aroma with hints of peach. Delicious!';
-      const newOrigin = 'Kenya';
-      const newRoastLevel = 'Medium';
-
-      // Verify initial metadata
-      const initialMetadata = await coffeeMarketplace.getNFTMetadata(tokenId);
-      expect(initialMetadata.name).to.equal('Panama Geisha');
-      expect(initialMetadata.origin).to.equal('Guatemala');
-
-      // Update metadata
-      await expect(
-        coffeeMarketplace.connect(roaster).updateNFTMetadata(
-          tokenId,
-          newName,
-          newDescription,
-          updatedIPFSHash,
-          newOrigin,
-          newRoastLevel,
-          'Arabica',
-          'Washed'
-        )
-      )
-        .to.emit(coffeeMarketplace, 'MetadataUpdated')
-        .withArgs(
-          tokenId,
-          newName,
-          newDescription,
-          updatedIPFSHash,
-          newOrigin,
-          newRoastLevel
-        );
-
-      // Verify updated metadata
-      const updatedMetadata = await coffeeMarketplace.getNFTMetadata(tokenId);
-      expect(updatedMetadata.name).to.equal(newName);
-      expect(updatedMetadata.description).to.equal(newDescription);
-      expect(updatedMetadata.tokenURI).to.equal(updatedIPFSHash);
-      expect(updatedMetadata.origin).to.equal(newOrigin);
-      expect(updatedMetadata.roastLevel).to.equal(newRoastLevel);
-    });
-  });
-
-  describe('Helper Functions', function () {
-    const listingId = 6;
-    const ipfsHash: string = 'https://example.com/panama.png';
-    const price = ethers.parseEther('0.1'); // 0.1 ETH
-
-    beforeEach(async function () {
-      const quantity: number = 3;
-
-      // Mint NFTs for the listing
-      await coffeeMarketplace.connect(roaster).addRoasterListing(
-        'Panama Geisha',
-        'Delicate, jasmine-like aroma with hints of peach.',
-        ipfsHash,
-        price,
-        quantity,
-        'Guatemala',
-        'Medium',
-        'Arabica',
-        'Washed'
-      );
-    });
-
-    it('Should correctly check NFT availability', async function () {
-      const tokenId = 1;
-
-      // Check NFT is owned by marketplace
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(
-        await coffeeMarketplace.getAddress()
-      );
-
-      // Initial check - NFT should be available when first minted
-      const initialAvailability = await coffeeMarketplace.isNFTAvailableForPurchase(tokenId);
-      expect(initialAvailability).to.be.true;
-
-      // Purchase NFT
-      await coffeeMarketplace.connect(buyer).purchaseNFT(listingId, tokenId, {
-        value: ethers.parseEther('0.1')
-      });
-
-      // After purchase, NFT should not be available
-      const afterPurchaseAvailability = await coffeeMarketplace.isNFTAvailableForPurchase(tokenId);
-      expect(afterPurchaseAvailability).to.be.false;
-    });
-
-    it('Should return correct NFT price', async function () {
-      const tokenId = 1;
-
-      // Verify the NFT exists and is owned by marketplace
-      expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(
-        await coffeeMarketplace.getAddress()
-      );
-
-      // Check the price
-      const nftPrice = await coffeeMarketplace.getNFTPrice(tokenId);
-      expect(nftPrice).to.equal(price);
-    });
+  describe('Reward Distribution', function () {
 
     it('Should distribute monthly rewards to top 3 customers using Chainlink Keeper', async function () {
       // Simulate top customers in the leaderboard

@@ -13,6 +13,8 @@ import {
   Voting__factory,
   Cart,
   Cart__factory,
+  CoffeeNFT, 
+  CoffeeNFT__factory
 } from '../../typechain-types';
 import { votingSeedData } from '../../ignition/modules/seed_data/votingSeedData';
 import { orderSeedData } from '../../ignition/modules/seed_data/orderSeedData';
@@ -25,12 +27,14 @@ export async function deployContracts(): Promise<{
   leaderboard: Leaderboard;
   coffeeVoting: Voting;
   cart: Cart;
+  coffeeNFT: CoffeeNFT;
   owner: Signer;
   roaster: Signer;
   buyer: Signer;
   secondBuyer: Signer;
   customer1: Signer;
   customer2: Signer;
+  marketplaceOperator: Signer;
 }> {
   const ProductFactory: Product__factory = (await ethers.getContractFactory(
     'Product'
@@ -50,8 +54,11 @@ export async function deployContracts(): Promise<{
   const CartFactory: Cart__factory = (await ethers.getContractFactory(
     'Cart'
   )) as Cart__factory;
+  const CoffeeNFTFactory: CoffeeNFT__factory = (await ethers.getContractFactory(
+    'CoffeeNFT'
+  )) as CoffeeNFT__factory;
 
-  const [owner, roaster, buyer, secondBuyer, customer1, customer2] = await ethers.getSigners();
+  const [owner, roaster, buyer, secondBuyer, customer1, customer2, marketplaceOperator] = await ethers.getSigners();
 
   const product = await ProductFactory.deploy(
     productSeedData.roasters,
@@ -82,9 +89,13 @@ export async function deployContracts(): Promise<{
 
   await order.setLeaderboardContract(leaderboard.getAddress());
 
+  const coffeeNFT = await CoffeeNFTFactory.deploy();
+  await leaderboard.waitForDeployment();
+
   const coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
     product,
-    leaderboard
+    leaderboard,
+    coffeeNFT
   );
   await coffeeMarketplace.waitForDeployment();
 
@@ -114,11 +125,13 @@ export async function deployContracts(): Promise<{
     leaderboard,
     coffeeVoting: voting,
     cart,
+    coffeeNFT,
     owner,
     roaster,
     buyer,
     secondBuyer,
     customer1,
     customer2,
+    marketplaceOperator
   };
 }
