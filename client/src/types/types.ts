@@ -11,7 +11,16 @@ interface CoffeeCardProps {
   onClickListing?: () => void;
   bidEndDate?: string;
 }
-
+interface CoffeeNFTProps {
+  _image: HTMLInputElement;
+  _name: string;
+  _origin: string;
+  _roastLevel: string;
+  _beanType: string;
+  _description: string;
+  _quantity: number;
+  _price: number;
+}
 interface ButtonProps {
   onClick: () => void;
   children: React.ReactNode;
@@ -54,4 +63,5 @@ export type {
   CoffeeCarouselProps,
   HeroProps,
   TimerHeroProps,
+  CoffeeNFTProps,
 };

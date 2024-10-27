@@ -1,7 +1,7 @@
 import Truck from '../assets/truck.png';
 import Shield from '../assets/shield.png';
 import Headset from '../assets/headset.png';
-function CoffeeDialog() {
+function CustomerService() {
   return (
     <div style={{width:"80%",marginLeft:"10%",marginRight:"10%",paddingTop:50,paddingBottom:50,display:"flex",justifyContent:"space-around"}}>
         <div style={{width:"auto",justifyItems:"center"}}>
@@ -24,4 +24,4 @@ function CoffeeDialog() {
   );
 }
 
-export default CoffeeDialog;
+export default CustomerService;
