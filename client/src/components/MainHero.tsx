@@ -6,7 +6,7 @@ const Hero: FC<HeroProps> = ({ title, imageUrl, subTitle, variant }) => {
     <div className="py-12 flex flex-col gap-8">
       {variant === HeroVariant.V1 ? (
         <div className="flex flex-col gap-4">
-          {title && <h1 className="text-6xl font-bold text-center">{title}</h1>}
+          {title && <h1 className="text-5xl font-bold text-center">{title}</h1>}
           {subTitle && <h1 className="text-2xl text-center">{subTitle}</h1>}
           {imageUrl && <img src={imageUrl} alt="hero" className="w-full" />}
         </div>
