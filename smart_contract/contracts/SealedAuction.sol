@@ -17,7 +17,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 contract SealedAuction {
     address public NFTAddress;
     uint256 public auctionCounter = 0;
-    address owner;
+    address public  owner;
     uint256 public minimumAuctionFee;
     uint256 private withdrawableFund = 0;
     bool private test = false;
@@ -132,7 +132,7 @@ contract SealedAuction {
 
         // Verify the hash matches the one submitted during the commit phase
         require(calculatedHash == bid.commitHash, "Hash mismatch. Incorrect bid or nonce");
-        require(_bidAmount * 1E18 == msg.value, "Incorrect bid amount");
+        require(_bidAmount * 1 ether == msg.value, "Incorrect bid amount");
         auctionsBid[auctionId][msg.sender].revealed = true;
         auctionsBid[auctionId][msg.sender].bidAmount = _bidAmount;
 
@@ -202,11 +202,13 @@ contract SealedAuction {
     }
     
     //Owner functions
-
+    function getWithdrawableFund() public view onlyOwner returns (uint256) {
+        return withdrawableFund;
+    }
     // Owner can withdraw the balance of the contract
     function ownerWithdraw() public onlyOwner {
         require(withdrawableFund > 0, "No funds to withdraw");
-        payable(owner).transfer(withdrawableFund * 1 ether);
+        payable(owner).transfer(withdrawableFund);
         withdrawableFund = 0;
         emit OwnerWithdraw(withdrawableFund);
     }

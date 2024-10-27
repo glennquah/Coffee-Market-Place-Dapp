@@ -212,7 +212,7 @@ describe('Coffee Auction E2E Test', function () {
           {from:customer1.getAddress(),value:bidAmount1}
         )
     ).to.emit(coffeeAuction,'BidRevealed');
-    
+
     await expect(
       coffeeAuction
         .connect(customer2)
@@ -306,6 +306,83 @@ describe('Coffee Auction E2E Test', function () {
         .connect(customer1)
         .withdrawRefund(1) 
     ).to.emit(coffeeAuction,'RefundWithdrawn');
+  });
+
+  it("should allow owner to withdraw funds", async function() {
+    // Auctioneer create a new auction
+    await expect(
+      coffeeAuction
+      .connect(roaster)
+      .createAuction(
+        1,
+        1,
+        2,
+        {from:roaster.getAddress(),value:auctionFee}
+      )
+    ).to.emit(coffeeAuction, 'AuctionCreated');
+    
+    // Bidders commit bids
+    const hashValue1 = await hash.hash(1,123);
+    const hashValue2 = await hash.hash(12,123);
+    await expect(
+      coffeeAuction
+        .connect(customer1)
+        .commitBid(
+          1, 
+          hashValue1
+        )
+    ).to.emit(coffeeAuction, 'BidCommitted');
+
+    await expect(
+      coffeeAuction
+        .connect(customer2)
+        .commitBid(
+          1, 
+          hashValue2
+        )
+    ).to.emit(coffeeAuction, 'BidCommitted');
+
+    // Bidders reveal bids
+    await expect(
+      coffeeAuction
+        .connect(customer1)
+        .revealBid(
+          1,
+          1,
+          123,
+          {from:customer1.getAddress(),value:bidAmount1}
+        )
+    ).to.emit(coffeeAuction,'BidRevealed');
+
+    await expect(
+      coffeeAuction
+        .connect(customer2)
+        .revealBid(
+          1,
+          12,
+          123,
+          {from:customer2.getAddress(),value:bidAmount2}
+        )
+    ).to.emit(coffeeAuction,'BidRevealed');
+
+    // Auctioneer finalize auction
+    await expect(
+      coffeeAuction
+        .connect(roaster)
+        .finalizeAuction(1)
+    ).to.emit(coffeeAuction,'AuctionFinalized')
+    .to.emit(coffeeAuction,"NFTTransferred")
+    .to.emit(coffeeAuction,"HighestBidTransferred");
+    
+    let balanceBefore = await ethers.provider.getBalance(owner.getAddress());
+    await expect(
+      coffeeAuction
+      .connect(owner)
+      .ownerWithdraw()
+    ).to.emit(coffeeAuction,'OwnerWithdraw');
+    let balanceAfter = await ethers.provider.getBalance(owner.getAddress());
+    expect(balanceAfter).to.be.gt(balanceBefore);
+    
   });
 
 });
