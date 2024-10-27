@@ -1,4 +1,4 @@
-import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
+import CoffeeCardList from '../components/CoffeeCardList';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import TimerHero from '../components/TimerHero';
 import mockCoffeeData from '../data/mockCoffeeItems';
@@ -15,15 +15,14 @@ function VotingPage() {
     <div className="py-8">
       <ResponsiveContainer>
         <TimerHero
-          title={"Vote for your Brew! Next Week's Featured Coffee"}
-          countdown={5}
+          title={'Vote for Your Favorite Roast!'}
+          subTitle={
+            'Cast your vote and shape the next featured brew on our marketplace.'
+          }
+          endDateTime={new Date('2024-10-27T23:59:59+08:00')}
         />
 
-        <CoffeeCarousel
-          items={coffeeVotingItems}
-          title="Vote Now"
-          subtitle="Voting"
-        />
+        <CoffeeCardList items={coffeeVotingItems} />
       </ResponsiveContainer>
     </div>
   );

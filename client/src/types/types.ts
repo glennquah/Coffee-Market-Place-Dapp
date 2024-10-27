@@ -24,15 +24,34 @@ interface CoffeeCarouselProps {
   subtitle: string;
 }
 
+interface CoffeeCardListProps {
+  items: CoffeeCardProps[];
+}
+
 interface TimerHeroProps {
   title: string;
-  countdown: number;
+  subTitle: string;
+  endDateTime: Date;
+}
+
+interface HeroProps {
+  title?: string;
+  subTitle?: string;
+  imageUrl?: string;
+  variant: HeroVariant;
+}
+
+export enum HeroVariant {
+  V1 = 'V1',
+  V2 = 'V2',
 }
 
 export type {
   ButtonProps,
+  CoffeeCardListProps,
   CoffeeCardProps,
   CoffeeCardType,
   CoffeeCarouselProps,
+  HeroProps,
   TimerHeroProps,
 };
