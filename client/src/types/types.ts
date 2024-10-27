@@ -33,11 +33,17 @@ interface TimerHeroProps {
   endDateTime: Date;
 }
 
+interface HeroProps {
+  title: string;
+  imageUrl: string;
+}
+
 export type {
   ButtonProps,
   CoffeeCardListProps,
   CoffeeCardProps,
   CoffeeCardType,
   CoffeeCarouselProps,
+  HeroProps,
   TimerHeroProps,
 };
