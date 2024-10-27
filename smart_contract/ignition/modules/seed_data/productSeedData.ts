@@ -24,7 +24,7 @@ export const productSeedData = {
         'Smooth and balanced with notes of cocoa and nuts.'
     ],
 
-    tokenURIs: [
+    ipfsHashes: [
         'https://example.com/columbian.png',
         'https://example.com/brazil.png',
         'https://example.com/costa_rica.png',

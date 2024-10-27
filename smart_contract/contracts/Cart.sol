@@ -12,7 +12,7 @@ contract Cart {
         uint256 productId;
         uint256 quantity;
         string name;
-        string tokenURI;
+        string ipfsHash;
         uint256 price;
         string origin;
         string roastLevel;
@@ -83,7 +83,7 @@ contract Cart {
     function addToCart(uint256 _productId, uint256 _reqQuantity) public {
         (string memory name,
             string memory description,
-            string memory tokenURI,
+            string memory ipfsHash,
             uint256 price,
             uint256 quantity,
             uint256[] memory nftIds,
@@ -122,7 +122,7 @@ contract Cart {
     function updateCart(uint256 _productId, uint256 _newQuantity) public {
         (string memory name,
             string memory description,
-            string memory tokenURI,
+            string memory ipfsHash,
             uint256 price,
             uint256 quantity,
             uint256[] memory nftIds,
@@ -191,7 +191,7 @@ contract Cart {
         for (uint256 i = 0; i < customerCart.length; i++) {
             (string memory name,
             string memory description,
-            string memory tokenURI,
+            string memory ipfsHash,
             uint256 price,
             uint256 quantity,
             uint256[] memory nftIds,

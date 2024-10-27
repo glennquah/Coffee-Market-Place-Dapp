@@ -87,7 +87,7 @@ describe('CoffeeMarketplace', function () {
       const product = await coffeeMarketplace.getListing(6); // Listing ID will be 6, after 5 pre-existing listings
       expect(product.name).to.equal('Panama Geisha');
       expect(product.description).to.equal('Delicate, jasmine-like aroma with hints of peach.');
-      expect(product.tokenURI).to.equal(ipfsHash);
+      expect(product.ipfsHash).to.equal(ipfsHash);
       expect(product.price).to.equal(price);
       expect(product.quantity).to.equal(quantity);
       expect(product.origin).to.equal('Guatemala');

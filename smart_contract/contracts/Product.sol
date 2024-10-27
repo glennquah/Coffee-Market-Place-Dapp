@@ -10,7 +10,7 @@ contract Product {
         address roaster;
         string name;
         string description;
-        string imageURI; // IPFS hash for product image/metadata
+        string ipfsHash; // IPFS hash for product image/metadata
         uint256 price; // Price in Wei (Ether)
         uint256 quantity;
         uint256[] nftIds; // Array of NFT IDs for this product
@@ -50,14 +50,14 @@ contract Product {
         uint256 indexed productId,
         string name,
         string description,
-        string imageURI
+        string ipfsHash
     );
 
     constructor(
         address[] memory _roasters,
         string[] memory _names,
         string[] memory _descriptions,
-        string[] memory _imageURIs,
+        string[] memory _ipfsHashes,
         uint256[] memory _prices,
         uint256[] memory _quantities,
         uint256[][] memory _nftIds,
@@ -71,8 +71,8 @@ contract Product {
         require(
             _roasters.length == _names.length &&
                 _names.length == _descriptions.length &&
-                _descriptions.length == _imageURIs.length &&
-                _imageURIs.length == _prices.length &&
+                _descriptions.length == _ipfsHashes.length &&
+                _ipfsHashes.length == _prices.length &&
                 _prices.length == _quantities.length &&
                 _quantities.length == _nftIds.length &&
                 _nftIds.length == _origins.length &&
@@ -90,7 +90,7 @@ contract Product {
                 roaster: _roasters[i],
                 name: _names[i],
                 description: _descriptions[i],
-                imageURI: _imageURIs[i],
+                ipfsHash: _ipfsHashes[i],
                 price: _prices[i],
                 quantity: _quantities[i],
                 nftIds: _nftIds[i],
@@ -115,7 +115,7 @@ contract Product {
         address _roaster,
         string memory _name,
         string memory _description,
-        string memory _imageURI,
+        string memory _ipfsHash,
         uint256 _price,
         uint256 _quantity,
         uint256[] memory _nftIds,
@@ -127,7 +127,7 @@ contract Product {
         require(_price > 0, 'Price must be greater than zero');
         require(_quantity > 0, 'Quantity must be greater than zero');
         require(bytes(_name).length > 0, 'Name cannot be empty');
-        require(bytes(_imageURI).length > 0, 'Image URI cannot be empty');
+        require(bytes(_ipfsHash).length > 0, 'Image URI cannot be empty');
 
         productCounter++;
 
@@ -136,7 +136,7 @@ contract Product {
             roaster: _roaster,
             name: _name,
             description: _description,
-            imageURI: _imageURI,
+            ipfsHash: _ipfsHash,
             price: _price,
             quantity: _quantity,
             nftIds: _nftIds,
@@ -175,7 +175,7 @@ contract Product {
         returns (
             string memory name,
             string memory description,
-            string memory imageURI,
+            string memory ipfsHash,
             uint256 price,
             uint256 quantity,
             uint256[] memory nftIds,
@@ -193,7 +193,7 @@ contract Product {
         return (
             product.name,
             product.description,
-            product.imageURI,
+            product.ipfsHash,
             product.price,
             product.quantity,
             product.nftIds,
@@ -250,7 +250,7 @@ contract Product {
         uint256 _productId,
         string memory _name,
         string memory _description,
-        string memory _imageURI,
+        string memory _ipfsHash,
         string memory _origin,
         string memory _roastLevel,
         string memory _beanType,
@@ -265,12 +265,12 @@ contract Product {
         ProductDetails storage product = products[_productId];
         product.name = _name;
         product.description = _description;
-        product.imageURI = _imageURI;
+        product.ipfsHash = _ipfsHash;
         product.origin = _origin;
         product.roastLevel = _roastLevel;
         product.beanType = _beanType;
         product.processMethod = _processMethod;
 
-        emit ProductMetadataUpdated(_productId, _name, _description, _imageURI);
+        emit ProductMetadataUpdated(_productId, _name, _description, _ipfsHash);
     }
 }

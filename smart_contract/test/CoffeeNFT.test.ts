@@ -14,7 +14,7 @@ describe('CoffeeNFT', function () {
     const sampleNFT = {
         name: 'Panama Geisha',
         description: 'Delicate, jasmine-like aroma with hints of peach.',
-        tokenURI: 'https://example.com/panama.png',
+        ipfsHash: 'https://example.com/panama.png',
         price: ethers.parseEther('0.1'),
         origin: 'Guatemala',
         roastLevel: 'Medium',
@@ -54,7 +54,7 @@ describe('CoffeeNFT', function () {
                 await buyer.getAddress(),
                 sampleNFT.name,
                 sampleNFT.description,
-                sampleNFT.tokenURI,
+                sampleNFT.ipfsHash,
                 1, // productId
                 sampleNFT.price,
                 sampleNFT.origin,
@@ -72,7 +72,7 @@ describe('CoffeeNFT', function () {
             const metadata = await coffeeNFT.getNFTMetadata(tokenId);
             expect(metadata.name).to.equal(sampleNFT.name);
             expect(metadata.description).to.equal(sampleNFT.description);
-            expect(metadata.tokenURI).to.equal(sampleNFT.tokenURI);
+            expect(metadata.ipfsHash).to.equal(sampleNFT.ipfsHash);
             expect(metadata.origin).to.equal(sampleNFT.origin);
             expect(metadata.roastLevel).to.equal(sampleNFT.roastLevel);
             expect(metadata.beanType).to.equal(sampleNFT.beanType);
@@ -85,7 +85,7 @@ describe('CoffeeNFT', function () {
                     await buyer.getAddress(),
                     sampleNFT.name,
                     sampleNFT.description,
-                    sampleNFT.tokenURI,
+                    sampleNFT.ipfsHash,
                     1,
                     sampleNFT.price,
                     sampleNFT.origin,
@@ -102,7 +102,7 @@ describe('CoffeeNFT', function () {
         const updatedNFT = {
             name: 'Premium Panama Geisha',
             description: 'Delicate, jasmine-like aroma with hints of peach. Delicious!',
-            tokenURI: 'https://example.com/updated.png',
+            ipfsHash: 'https://example.com/updated.png',
             origin: 'Kenya',
             roastLevel: 'Medium',
             beanType: 'Arabica',
@@ -115,7 +115,7 @@ describe('CoffeeNFT', function () {
                 await buyer.getAddress(),
                 sampleNFT.name,
                 sampleNFT.description,
-                sampleNFT.tokenURI,
+                sampleNFT.ipfsHash,
                 1,
                 sampleNFT.price,
                 sampleNFT.origin,
@@ -133,7 +133,7 @@ describe('CoffeeNFT', function () {
                     tokenId,
                     updatedNFT.name,
                     updatedNFT.description,
-                    updatedNFT.tokenURI,
+                    updatedNFT.ipfsHash,
                     updatedNFT.origin,
                     updatedNFT.roastLevel,
                     updatedNFT.beanType,
@@ -144,7 +144,7 @@ describe('CoffeeNFT', function () {
             const metadata = await coffeeNFT.getNFTMetadata(tokenId);
             expect(metadata.name).to.equal(updatedNFT.name);
             expect(metadata.description).to.equal(updatedNFT.description);
-            expect(metadata.tokenURI).to.equal(updatedNFT.tokenURI);
+            expect(metadata.ipfsHash).to.equal(updatedNFT.ipfsHash);
             expect(metadata.origin).to.equal(updatedNFT.origin);
             expect(metadata.roastLevel).to.equal(updatedNFT.roastLevel);
             expect(metadata.beanType).to.equal(updatedNFT.beanType);
@@ -157,7 +157,7 @@ describe('CoffeeNFT', function () {
                     tokenId,
                     updatedNFT.name,
                     updatedNFT.description,
-                    updatedNFT.tokenURI,
+                    updatedNFT.ipfsHash,
                     updatedNFT.origin,
                     updatedNFT.roastLevel,
                     updatedNFT.beanType,
@@ -171,7 +171,7 @@ describe('CoffeeNFT', function () {
 
             expect(metadata.name).to.equal(sampleNFT.name);
             expect(metadata.description).to.equal(sampleNFT.description);
-            expect(metadata.tokenURI).to.equal(sampleNFT.tokenURI);
+            expect(metadata.ipfsHash).to.equal(sampleNFT.ipfsHash);
             expect(metadata.origin).to.equal(sampleNFT.origin);
             expect(metadata.roastLevel).to.equal(sampleNFT.roastLevel);
             expect(metadata.beanType).to.equal(sampleNFT.beanType);
@@ -194,7 +194,7 @@ describe('CoffeeNFT', function () {
                 await buyer.getAddress(),
                 sampleNFT.name,
                 sampleNFT.description,
-                sampleNFT.tokenURI,
+                sampleNFT.ipfsHash,
                 1,
                 sampleNFT.price,
                 sampleNFT.origin,

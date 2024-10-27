@@ -64,7 +64,7 @@ export async function deployContracts(): Promise<{
     productSeedData.roasters,
     productSeedData.names,
     productSeedData.descriptions,
-    productSeedData.tokenURIs,
+    productSeedData.ipfsHashes,
     productSeedData.prices,
     productSeedData.quantities,
     productSeedData.nftIds, 

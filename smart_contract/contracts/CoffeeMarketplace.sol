@@ -27,7 +27,7 @@ contract CoffeeMarketplace is
         uint256 indexed tokenId,
         address indexed owner,
         string name,
-        string tokenURI,
+        string ipfsHash,
         uint256 price
     );
 
@@ -84,7 +84,7 @@ contract CoffeeMarketplace is
     function addRoasterListing(
         string memory _name,
         string memory _description,
-        string memory _tokenURI,
+        string memory _ipfsHash,
         uint256 _price,
         uint256 _quantity,
         string memory _origin,
@@ -95,7 +95,7 @@ contract CoffeeMarketplace is
         require(_price > 0, 'Price must be greater than zero.');
         require(_quantity > 0, 'Quantity must be greater than zero.');
         require(bytes(_name).length > 0, 'Name cannot be empty');
-        require(bytes(_tokenURI).length > 0, 'Image URI cannot be empty');
+        require(bytes(_ipfsHash).length > 0, 'Image URI cannot be empty');
 
         uint256[] memory nftIds = new uint256[](_quantity);
 
@@ -108,7 +108,7 @@ contract CoffeeMarketplace is
                 address(this),
                 _name,
                 _description,
-                _tokenURI,
+                _ipfsHash,
                 newProductId,
                 _price,
                 _origin,
@@ -126,7 +126,7 @@ contract CoffeeMarketplace is
             msg.sender,
             _name,
             _description,
-            _tokenURI,
+            _ipfsHash,
             _price,
             _quantity,
             nftIds,
@@ -147,7 +147,7 @@ contract CoffeeMarketplace is
         returns (
             string memory name,
             string memory description,
-            string memory tokenURI,
+            string memory ipfsHash,
             uint256 price,
             uint256 quantity,
             uint256[] memory nftIds,
@@ -341,7 +341,7 @@ contract CoffeeMarketplace is
         (
             string memory name,
             string memory description,
-            string memory tokenURI,
+            string memory ipfsHash,
             uint256 price,
             ,
             ,

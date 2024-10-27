@@ -12,7 +12,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         uint256 tokenId;
         string name;
         string description;
-        string tokenURI;
+        string ipfsHash;
         uint256 productId;
         uint256 price;
         bool isActive;
@@ -30,7 +30,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         uint256 indexed tokenId,
         address indexed owner,
         string name,
-        string tokenURI,
+        string ipfsHash,
         uint256 price
     );
 
@@ -38,7 +38,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         uint256 indexed tokenId,
         string name,
         string description,
-        string tokenURI,
+        string ipfsHash,
         string origin,
         string roastLevel
     );
@@ -67,7 +67,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         address to,
         string memory name,
         string memory description,
-        string memory tokenURI,
+        string memory ipfsHash,
         uint256 productId,
         uint256 price,
         string memory origin,
@@ -83,7 +83,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
             tokenId: tokenId,
             name: name,
             description: description,
-            tokenURI: tokenURI,
+            ipfsHash: ipfsHash,
             productId: productId,
             price: price,
             isActive: true,
@@ -95,9 +95,9 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         });
 
         _safeMint(to, tokenId); // Assign NFT to the smart contract itself
-        _setTokenURI(tokenId, tokenURI); // IPFS hash as the token URI (metadata link)
+        _setTokenURI(tokenId, ipfsHash); // IPFS hash as the token URI (metadata link)
 
-        emit NFTMinted(tokenId, to, name, tokenURI, price);
+        emit NFTMinted(tokenId, to, name, ipfsHash, price);
 
         return tokenId;
     }
@@ -107,7 +107,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         uint256 tokenId,
         string memory newName,
         string memory newDescription,
-        string memory newTokenURI,
+        string memory newipfsHash,
         string memory newOrigin,
         string memory newRoastLevel,
         string memory newBeanType,
@@ -118,7 +118,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         NFTMetadata storage metadata = tokenMetadata[tokenId];
         metadata.name = newName;
         metadata.description = newDescription;
-        metadata.tokenURI = newTokenURI;
+        metadata.ipfsHash = newipfsHash;
         metadata.origin = newOrigin;
         metadata.roastLevel = newRoastLevel;
         metadata.beanType = newBeanType;
@@ -128,7 +128,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
             tokenId,
             newName,
             newDescription,
-            newTokenURI,
+            newipfsHash,
             newOrigin,
             newRoastLevel
         );
@@ -143,7 +143,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         returns (
             string memory name,
             string memory description,
-            string memory tokenURI,
+            string memory ipfsHash,
             uint256 productId,
             uint256 price,
             bool isActive,
@@ -160,7 +160,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         return (
             metadata.name,
             metadata.description,
-            metadata.tokenURI,
+            metadata.ipfsHash,
             metadata.productId,
             metadata.price,
             metadata.isActive,
