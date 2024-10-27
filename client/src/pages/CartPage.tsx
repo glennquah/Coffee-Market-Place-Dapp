@@ -2,20 +2,18 @@ import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import { HeroVariant } from '../types/types';
 
-function LeaderBoardPage() {
+function CartPage() {
   return (
     <div className="py-8">
       <ResponsiveContainer>
         <Hero
           variant={HeroVariant.V1}
-          title={'Leaderboard'}
-          subTitle={
-            'Rise to the top 10 spenders of the players to gain premium coffee discounts. Resets every month!'
-          }
+          title={'Shopping Cart'}
+          subTitle={'Review your items and proceed to checkout.'}
         />
       </ResponsiveContainer>
     </div>
   );
 }
 
-export default LeaderBoardPage;
+export default CartPage;
