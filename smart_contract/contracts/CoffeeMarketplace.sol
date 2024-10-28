@@ -14,7 +14,6 @@ contract CoffeeMarketplace is
     IERC721Receiver,
     AutomationCompatibleInterface
 {
-    uint256 public tokenCounter = 0; // Counter for NFT IDs
     Product public productContract;
     Leaderboard public leaderboardContract;
     CoffeeNFT public nftContract;

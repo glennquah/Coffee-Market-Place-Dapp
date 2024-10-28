@@ -214,4 +214,8 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         require(ownerOf(tokenId) != address(0), 'Token does not exist');
         tokenMetadata[tokenId].isActive = isActive;
     }
+
+    function getOwnerOfToken(uint256 tokenId) external view returns (address) {
+        return ownerOf(tokenId);
+    }
 }
