@@ -66,17 +66,17 @@ contract SealedAuction {
     }
 
     modifier withinCommitPhase(uint256 auctionId) {
-        require(block.timestamp < auctions[auctionId].auctionCommitEndTime || test, "Commit phase has ended");
+        require(block.timestamp < auctions[auctionId].auctionCommitEndTime , "Commit phase has ended");
         _;
     }
 
     modifier withinRevealPhase(uint256 auctionId) {
-        require((block.timestamp >= auctions[auctionId].auctionCommitEndTime && block.timestamp < auctions[auctionId].auctionRevealEndTime) || test, "Not within reveal phase");
+        require((block.timestamp >= auctions[auctionId].auctionCommitEndTime && block.timestamp < auctions[auctionId].auctionRevealEndTime), "Not within reveal phase");
         _;
     }
 
     modifier afterRevealPhase(uint256 auctionId) {
-        require(block.timestamp >= auctions[auctionId].auctionRevealEndTime || test, "Reveal phase still ongoing");
+        require(block.timestamp >= auctions[auctionId].auctionRevealEndTime , "Reveal phase still ongoing");
         _;
     }
 
@@ -84,7 +84,10 @@ contract SealedAuction {
         require(msg.value >=  minimumAuctionFee, "Minimum auction fee is needed");
         _;
     }
-
+    modifier auctionExists(uint256 auctionId) {
+        require(auctions[auctionId].auctionId != 0, "Auction does not exist");
+        _;
+    }
     //Events
     event AuctionCreated(uint256 auctionId, address seller, uint256 tokenId);
     event BidCommitted(uint256 auctionId, address bidder, bytes32 commitHash);
@@ -100,7 +103,7 @@ contract SealedAuction {
 
     // Create a new auction
     function createAuction(uint256 _NFTId, uint256 _auctionCommitEndTimeInHour, uint256 _auctionRevealEndTimeInHour) public payable _minimumAuctionFee {
-        require(_auctionRevealEndTimeInHour > _auctionCommitEndTimeInHour, "Timing is wrong");
+        require(_auctionRevealEndTimeInHour > _auctionCommitEndTimeInHour, "End time should be greater than start time");
         withdrawableFund += minimumAuctionFee; 
         if(!test) {
             IERC721(NFTAddress).transferFrom(msg.sender, address(this), _NFTId);
@@ -111,8 +114,9 @@ contract SealedAuction {
     }
 
     // Commit phase: users submit their hashed bid
-    function commitBid(uint256 auctionId, bytes32 _commitHash) public  withinCommitPhase(auctionId) {
+    function commitBid(uint256 auctionId, bytes32 _commitHash) public auctionExists(auctionId) withinCommitPhase(auctionId) {
         require(auctionsBid[auctionId][msg.sender].commitHash == 0, "Already committed");
+        require(auctions[auctionId].auctionId != 0, "Auction does not exist");
         
         // Record the commit hash and bid value (value is held in the contract)
         auctionsBid[auctionId][msg.sender] = Bid(_commitHash, 0, false);
@@ -120,8 +124,8 @@ contract SealedAuction {
     }
 
     // Reveal phase: users reveal their bid by submitting the original bid and nonce
-    function revealBid(uint256 auctionId, uint256 _bidAmount, uint256 _nonce) public payable withinRevealPhase(auctionId) {
-
+    function revealBid(uint256 auctionId, uint256 _bidAmount, uint256 _nonce) public payable auctionExists(auctionId) withinRevealPhase(auctionId) {
+        require(auctions[auctionId].auctionId != 0, "Auction does not exist");
         Bid storage bid = auctionsBid[auctionId][msg.sender];
         require(bid.commitHash != 0, "No bid to reveal");
         
@@ -156,7 +160,7 @@ contract SealedAuction {
 
     // End auction and transfer funds to the winner
     // Owner can also finalize the auction if no bids were placed or if the seller is inactive
-    function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId) afterRevealPhase(auctionId) {
+    function finalizeAuction(uint256 auctionId) public onlySellerOrOwner(auctionId) auctionExists(auctionId) afterRevealPhase(auctionId) {
         require(auctions[auctionId].finalized == false, "Auction already finalized");
         auctions[auctionId].finalized = true;
         
@@ -184,7 +188,7 @@ contract SealedAuction {
     }
 
     // Withdraw refunds for non-winning bids
-    function withdrawRefund(uint256 auctionId) public afterRevealPhase(auctionId) {
+    function withdrawRefund(uint256 auctionId) public auctionExists(auctionId) afterRevealPhase(auctionId) {
         require(auctions[auctionId].finalized == true, "Auction have yet finalized");
         Bid storage bid = auctionsBid[auctionId][msg.sender];
         require(bid.revealed, "Bid not revealed");
@@ -197,7 +201,7 @@ contract SealedAuction {
     }
 
     //Getters fuction
-    function getAuction(uint256 auctionId) public view returns (AuctionData memory) {
+    function getAuction(uint256 auctionId) public view auctionExists(auctionId) returns (AuctionData memory)  {
         return auctions[auctionId];
     }
     
