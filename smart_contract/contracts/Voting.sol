@@ -12,6 +12,7 @@ contract Voting {
         string coffeeOrigin;
         string beanType;
         string roastLevel;
+        string processingMethod;
         uint256 price;
         uint256 voteCount;
     }
@@ -35,6 +36,7 @@ constructor(
             string[] memory _coffeeOrigins,
             string[] memory _beanTypes,
             string[] memory _roastLevels,
+            string[] memory _processingMethods,
             uint256[] memory _prices,
             uint256 _durationInMinutes) {
     coffeeMarketplace = CoffeeMarketplace(_marketplaceContractAddress);
@@ -47,6 +49,7 @@ constructor(
                         coffeeOrigin: _coffeeOrigins[i],
                         beanType: _beanTypes[i],
                         roastLevel: _roastLevels[i],
+                        processingMethod: _processingMethods[i],
                         price: _prices[i],
                         voteCount: 0
         }));
@@ -68,6 +71,7 @@ constructor(
                                 string memory _coffeeOrigin,
                                 string memory _beanType,
                                 string memory _roastLevel,
+                                string memory _processingMethod,
                                 uint256 _price) public onlyOwner {
         coffee_vote_candidates.push(CoffeeVoteCandidate({
                 candidateId: candidateCounter++,
@@ -77,6 +81,7 @@ constructor(
                 coffeeOrigin: _coffeeOrigin,
                 beanType: _beanType,
                 roastLevel: _roastLevel,
+                processingMethod: _processingMethod,
                 price: _price,
                 voteCount: 0
         }));
@@ -164,7 +169,7 @@ constructor(
             winner.coffeeOrigin,
             winner.roastLevel,
             winner.beanType,
-            'Washed' // IMPT: CHANGE the rest of the contract accordingly
+            winner.processingMethod
         );
         emit VotingFinalized(winner.coffeeName, winner.imageUrl, winner.description, winner.coffeeOrigin, winner.beanType, winner.roastLevel, winner.price);
     }

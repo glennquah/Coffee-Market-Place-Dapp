@@ -22,6 +22,7 @@ export const votingSeedData = {
   origins: ['Jamaica', 'Colombia', 'Vietnam', 'Sumatra'],
   types: ['Arabica', 'Arabica', 'Robusta', 'Arabica'],
   roastLevels: ['Medium', 'Medium-Light', 'Dark', 'Dark'],
+  processingMethods: ['Washed', 'Natural', 'Washed', 'Washed'],
   prices: [
     ethers.parseEther('0.12'),
     ethers.parseEther('0.15'),

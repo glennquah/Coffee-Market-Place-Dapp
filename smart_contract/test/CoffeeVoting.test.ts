@@ -1,11 +1,7 @@
 import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import {
-  CoffeeMarketplace,
-  Product,
-  Voting,
-} from '../typechain-types';
+import { CoffeeMarketplace, Product, Voting } from '../typechain-types';
 import { deployContracts } from './test_setup/deployContract';
 
 describe('Coffee Voting E2E Test', function () {
@@ -43,6 +39,7 @@ describe('Coffee Voting E2E Test', function () {
           'Ethiopia',
           'Arabica',
           'Medium-Light',
+          'Washed',
           ethers.parseEther('0.05'),
         ),
     ).to.emit(coffeeVoting, 'CoffeeCandidateAdded');
@@ -59,6 +56,7 @@ describe('Coffee Voting E2E Test', function () {
     expect(CoffeeCandidateAdded.coffeeOrigin).to.equal('Ethiopia');
     expect(CoffeeCandidateAdded.beanType).to.equal('Arabica');
     expect(CoffeeCandidateAdded.roastLevel).to.equal('Medium-Light');
+    expect(CoffeeCandidateAdded.processingMethod).to.equal('Washed');
   });
 
   it('Should allow customer to vote for a coffee candidate', async function () {
