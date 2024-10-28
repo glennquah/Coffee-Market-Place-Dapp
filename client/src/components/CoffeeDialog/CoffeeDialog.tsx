@@ -53,8 +53,8 @@ const CoffeeDialog = () => {
                     <h1 style={{fontSize:20,fontWeight:"bold"}}>Upload your coffee into an NFT ☕</h1>
                     <h1 style={{fontSize:20,fontWeight:"bold"}}>Let’s tokenise your coffee into NFTs!</h1>
                 </div>
-                <div style={{width:"90%",margin:"5%",height:300,justifyContent:"space-around", display:"flex"}}>
-                    <div style={{}}>
+                <div className="container">
+                    <div className='inner-container'>
                         <div style={{width:300,height:300}}>
                             <img src={image} style={{width:300,height:300}}/>
                         </div>
@@ -64,7 +64,7 @@ const CoffeeDialog = () => {
                             accept="application/png" onChange={onImageChange}></input>
                         </div>
                     </div>
-                    <div style={{width:"40%"}}>
+                    <div className='inner-container'>
                         <div style={{width:"100%",display:"flex",justifyContent:"space-between",marginTop:10,marginBottom:10}}>
                             <label style={{fontSize:20}}>Coffee Name:</label>
                             <input type="text" style={{width:250,borderRadius:5,color:"black",padding:5}} 

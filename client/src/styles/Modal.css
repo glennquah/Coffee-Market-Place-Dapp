@@ -30,11 +30,10 @@ body.active-modal {
 }
 
 .modal-content {
-    margin-left: 25%;
-    margin-right: 25%;
+    margin: auto;
     padding: 30px;
-    width: 50%;
-    height: 50%;
+    width: 1000px;
+    height: 600px;
     z-index: 10;
     transform: translate(0, 0);
     margin-top: 10%;
@@ -50,4 +49,20 @@ body.active-modal {
     top: 10px;
     right: 10px;
     padding: 5px 7px;
+}
+.container {
+    width: 100%;
+    padding: 30px;
+    height:300;
+    justify-Content:space-around; 
+    display:flex;
+}
+.inner-container {
+    width: 50%;
+    justify-items: center;
+}
+.input-div {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0;
 }
