@@ -20,6 +20,15 @@ export default buildModule('TESTING_MODULES', (m) => {
     { from: deployer },
   );
 
+  // @WAYNE ADD DEPLOYMENT HERE
+  
+  const roasters = [
+    '0x1234567890abcdef1234567890abcdef12345678',
+    '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+    '0x9876543210abcdef9876543210abcdef98765432',
+    '0xabcabcabcabcabcabcabcabcabcabcabcabcabc0',
+    '0x1111111111111111111111111111111111111111'
+  ];
   const orderContract = m.contract(
     'Order',
     [
@@ -43,6 +52,16 @@ export default buildModule('TESTING_MODULES', (m) => {
     { from: deployer },
   );
 
+  const auctionContract = m.contract(
+    'Auction',
+    [
+      productContract,
+      0.001,
+    ],
+    { from: deployer },
+  );
+  
+ 
   const votingContract = m.contract(
     'Voting',
     [
@@ -64,14 +83,13 @@ export default buildModule('TESTING_MODULES', (m) => {
     [coffeeMarketplaceContract, orderContract],
     { from: deployer },
   );
-
-
   return {
     votingContract,
     coffeeMarketplaceContract,
     productContract,
     orderContract,
     cartContract,
+    auctionContract,
     leaderboardContract
   };
 });

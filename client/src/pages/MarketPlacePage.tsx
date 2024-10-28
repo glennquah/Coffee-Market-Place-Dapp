@@ -1,17 +1,21 @@
+import marketPlaceHero from '../assets/marketplaceHero.png';
+import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
-
+import { HeroVariant } from '../types/types';
+import CoffeeDialog from '../components/CoffeeDialog/CoffeeDialog';
 function MarketPlacePage() {
   return (
     <div className="py-8">
       <ResponsiveContainer>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque
-          voluptas nemo ea praesentium dolor rem explicabo omnis inventore
-          laborum deleniti velit unde, vitae quas quidem ab non, tempora officia
-          repellendus quia culpa. Architecto molestiae facere hic laboriosam
-          velit magni modi odio earum impedit distinctio inventore laborum,
-          ipsam repellendus, fuga dolor.
-        </p>
+        <Hero
+          variant={HeroVariant.V2}
+          title={'Explore, Collect, and Trade Coffee NFTs'}
+          subTitle={
+            'Browse a curated marketplace of unique coffee-themed NFTs from top roasters.'
+          }
+          imageUrl={marketPlaceHero}
+        />
+        <CoffeeDialog/>
       </ResponsiveContainer>
     </div>
   );
