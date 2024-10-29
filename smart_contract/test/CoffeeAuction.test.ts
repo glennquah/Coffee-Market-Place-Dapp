@@ -27,6 +27,7 @@ describe('Coffee Auction E2E Test', function () {
     description: 'Delicate, jasmine-like aroma with hints of peach.',
     ipfsHash: 'https://example.com/panama.png',
     price: ethers.parseEther('0.1'),
+    productId: 1,
     origin: 'Guatemala',
     roastLevel: 'Medium',
     beanType: 'Arabica',
@@ -46,30 +47,14 @@ describe('Coffee Auction E2E Test', function () {
     const ipfsHash: string = 'https://example.com/panama.png'; // Dummy IPFS hash
     const price = ethers.parseEther('0.1'); // 0.1 ETH
     const quantity: number = 5; // Mint 5 NFTs
-    await expect(
-      coffeeNFT
-    )
-    await expect(
-      coffeeNFT
-        .connect(roaster)
-        .mint(
-          await roaster.getAddress(),
-          sampleNFT.name,
-          sampleNFT.description,
-          sampleNFT.ipfsHash,
-          1, // productId
-          sampleNFT.price,
-          sampleNFT.origin,
-          sampleNFT.roastLevel,
-          sampleNFT.beanType,
-          sampleNFT.processMethod,
-         )).to.emit(coffeeNFT, 'NFTMinted');
-    await expect(
-      coffeeNFT
-        .connect(roaster)
-        .approve(coffeeAuction.getAddress(),productID)
-    ).to.emit(coffeeNFT, 'Approval');
-
+    await coffeeNFT
+      .connect(owner)
+      .setAuctionContract(await coffeeAuction.getAddress());
+    await coffeeAuction
+    .connect(owner)
+    .addAuctioneer(await roaster.getAddress());
+    expect(await coffeeAuction.auctioneers(await roaster.getAddress())).to.equal(true);
+    expect(await coffeeAuction.auctioneers(await customer1.getAddress())).to.equal(false);
   });
   
   it("should have get minimum fee", async function() {
@@ -78,35 +63,44 @@ describe('Coffee Auction E2E Test', function () {
   });
 
   it("should allow auctioneer to auction a product", async function() {
-    
-    // Add a product from the roaster's address
-    // await expect(
-    //   coffeeMarketplace
-    //     .connect(roaster)
-    //     .addRoasterListing(
-    //       'Panama Geisha',
-    //       'Delicate, jasmine-like aroma with hints of peach.',
-    //       ipfsHash,
-    //       price,
-    //       quantity
-    //     )
-    // ).to.emit(coffeeMarketplace, 'ListingAdded');
-
-
-    // // Approve the auction contract to transfer the product
-    // // Currently having an error here where NFT is not under the roaster's address
-    // (await coffeeMarketplace.connect(roaster).approve(coffeeAuction.getAddress(),productID));
-    // for the testing of the contract, the product is not an NFT
     await expect(
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        productID,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
       )
     ).to.emit(coffeeAuction, 'AuctionCreated');
+  });
+  it("should revert if non-auctioneer to auction a product", async function() {
+    await expect(
+      coffeeAuction
+      .connect(customer1)
+      .createAuction(
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
+        1,
+        2,
+        {from:customer1.getAddress(),value:auctionFee}
+      )
+    ).to.revertedWith('Only auctioneer can call this');
   });
 
   it("should allow bidder to commit a bid", async function() {
@@ -115,7 +109,15 @@ describe('Coffee Auction E2E Test', function () {
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
@@ -149,7 +151,15 @@ describe('Coffee Auction E2E Test', function () {
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
@@ -173,7 +183,15 @@ describe('Coffee Auction E2E Test', function () {
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
@@ -199,7 +217,15 @@ describe('Coffee Auction E2E Test', function () {
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
@@ -259,7 +285,15 @@ describe('Coffee Auction E2E Test', function () {
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
@@ -294,7 +328,15 @@ describe('Coffee Auction E2E Test', function () {
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
@@ -331,13 +373,20 @@ describe('Coffee Auction E2E Test', function () {
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
       )
     ).to.emit(coffeeAuction, 'AuctionCreated');
-    
     // Bidders commit bids
     const hashValue1 = await hash.hash(1,123);
     const hashValue2 = await hash.hash(12,123);
@@ -402,13 +451,20 @@ describe('Coffee Auction E2E Test', function () {
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
       )
     ).to.emit(coffeeAuction, 'AuctionCreated');
-    
     // Bidders commit bids
     const hashValue1 = await hash.hash(1,123);
     const hashValue2 = await hash.hash(12,123);
@@ -467,17 +523,24 @@ describe('Coffee Auction E2E Test', function () {
 
   it("should revert if auctioneer finalizes auction with invalid auction ID", async function() {
     // Auctioneer create a new auction
-    await expect(
+   await expect(
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
       )
     ).to.emit(coffeeAuction, 'AuctionCreated');
-    
     // Bidders commit bids
     const hashValue1 = await hash.hash(1,123);
     const hashValue2 = await hash.hash(12,123);
@@ -540,13 +603,20 @@ describe('Coffee Auction E2E Test', function () {
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
       )
     ).to.emit(coffeeAuction, 'AuctionCreated');
-    
     // Bidders commit bids
     const hashValue1 = await hash.hash(1,123);
     const hashValue2 = await hash.hash(12,123);
@@ -607,13 +677,20 @@ describe('Coffee Auction E2E Test', function () {
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
       )
     ).to.emit(coffeeAuction, 'AuctionCreated');
-    
     // Bidders commit bids
     const hashValue1 = await hash.hash(1,123);
     const hashValue2 = await hash.hash(12,123);
@@ -681,17 +758,24 @@ describe('Coffee Auction E2E Test', function () {
 
   it("should allow owner to withdraw funds", async function() {
     // Auctioneer create a new auction
-    await expect(
+   await expect(
       coffeeAuction
       .connect(roaster)
       .createAuction(
-        1,
+        sampleNFT.name,
+        sampleNFT.description,
+        sampleNFT.ipfsHash,
+        sampleNFT.productId,
+        sampleNFT.price,
+        sampleNFT.origin,
+        sampleNFT.roastLevel,
+        sampleNFT.beanType,
+        sampleNFT.processMethod,
         1,
         2,
         {from:roaster.getAddress(),value:auctionFee}
       )
     ).to.emit(coffeeAuction, 'AuctionCreated');
-    
     // Bidders commit bids
     const hashValue1 = await hash.hash(1,123);
     const hashValue2 = await hash.hash(12,123);
