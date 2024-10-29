@@ -82,17 +82,17 @@ contract Cart {
     // public
     function addToCart(uint256 _productId, uint256 _reqQuantity) public {
         (string memory name,
-            string memory description,
+            ,
             string memory ipfsHash,
             uint256 price,
             uint256 quantity,
-            uint256[] memory nftIds,
+            ,
             bool available,
             string memory origin,
             string memory roastLevel,
             string memory beanType,
             string memory processMethod,
-            uint256 roastDate) = coffeeMarketplace.getListing(_productId);
+            ) = coffeeMarketplace.getListing(_productId);
         require(available, "Product is not available.");
         require(quantity >= _reqQuantity, "Not enough stock available.");
 
@@ -107,9 +107,17 @@ contract Cart {
             }
         }
 
-        // if (!ProductFound) {
-        //     customerCart.push(CartProduct(_productId, _reqQuantity));
-        // }
+        if (!ProductFound) {
+            customerCart.push(CartProduct(_productId, 
+            _reqQuantity,
+            name,
+            ipfsHash,
+            price,
+            origin,
+            roastLevel,
+            beanType,
+            processMethod));
+        }
 
         emit ProductAddedToCart(msg.sender, _productId, _reqQuantity);
     }
@@ -120,18 +128,17 @@ contract Cart {
 
     // update quantity
     function updateCart(uint256 _productId, uint256 _newQuantity) public {
-        (string memory name,
-            string memory description,
-            string memory ipfsHash,
-            uint256 price,
+        (,
+            ,
+            ,
+            ,
             uint256 quantity,
-            uint256[] memory nftIds,
+            ,
             bool available,
-            string memory origin,
-            string memory roastLevel,
-            string memory beanType,
-            string memory processMethod,
-            uint256 roastDate
+            ,
+            ,
+            ,
+            ,
         ) = coffeeMarketplace.getListing(_productId);
         require(available, 'Product is not available.');
         require(quantity >= _newQuantity, "Not enough stock available.");
@@ -189,18 +196,18 @@ contract Cart {
 
         // Calculate the total amount
         for (uint256 i = 0; i < customerCart.length; i++) {
-            (string memory name,
-            string memory description,
-            string memory ipfsHash,
+            (,
+            ,
+            ,
             uint256 price,
-            uint256 quantity,
-            uint256[] memory nftIds,
-            bool available,
-            string memory origin,
-            string memory roastLevel,
-            string memory beanType,
-            string memory processMethod,
-            uint256 roastDate) = coffeeMarketplace.getListing(
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ,
+            ) = coffeeMarketplace.getListing(
                 customerCart[i].productId
             );
             totalAmount += price * customerCart[i].quantity;
@@ -231,13 +238,4 @@ contract Cart {
         // Emit a checkout event
         emit CartCheckout(msg.sender, orderId);
     }
-
-    // function getCheckout(address customer, uint256 finalisedCartId) public view returns (CartProduct[] memory) {
-    //     require(customerCheckouts[customer][finalisedCartId].length > 0, "Order does not exist");
-    //     return customerCheckouts[customer][finalisedCartId];
-    // }
-
-    // function getcustomerCheckoutIds(address customer) public view returns (uint256[] memory) {
-    //     return customerFinalisedCartIds[customer];
-    // }
 }
