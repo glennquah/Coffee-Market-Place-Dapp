@@ -14,7 +14,6 @@ contract CoffeeMarketplace is
     IERC721Receiver,
     AutomationCompatibleInterface
 {
-    uint256 public tokenCounter = 0; // Counter for NFT IDs
     Product public productContract;
     Leaderboard public leaderboardContract;
     CoffeeNFT public nftContract;
@@ -310,6 +309,7 @@ contract CoffeeMarketplace is
         bytes calldata
     ) external view override returns (bool upkeepNeeded, bytes memory) {
         upkeepNeeded = (block.timestamp >= lastRewardTime + 30 days);
+        return (upkeepNeeded, "");
     }
 
     // Chainlink Keeper-compatible performUpkeep function to perform upkeep (distribute reward)
@@ -341,8 +341,8 @@ contract CoffeeMarketplace is
         (
             string memory name,
             string memory description,
-            string memory ipfsHash,
-            uint256 price,
+            ,
+            ,
             ,
             ,
             ,

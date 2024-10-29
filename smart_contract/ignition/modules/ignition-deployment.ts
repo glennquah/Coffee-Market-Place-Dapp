@@ -17,18 +17,9 @@ export default buildModule('TESTING_MODULES', (m) => {
       productSeedData.quantities,
       productSeedData.nftIds,
     ],
-    { from: deployer },
+    { from: deployer }
   );
 
-  // @WAYNE ADD DEPLOYMENT HERE
-  
-  const roasters = [
-    '0x1234567890abcdef1234567890abcdef12345678',
-    '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-    '0x9876543210abcdef9876543210abcdef98765432',
-    '0xabcabcabcabcabcabcabcabcabcabcabcabcabc0',
-    '0x1111111111111111111111111111111111111111'
-  ];
   const orderContract = m.contract(
     'Order',
     [
@@ -37,31 +28,23 @@ export default buildModule('TESTING_MODULES', (m) => {
       orderSeedData.totalAmounts,
       orderSeedData.timestamps,
     ],
-    { from: deployer },
+    { from: deployer }
   );
 
-  const leaderboardContract = m.contract(
-    'Leaderboard',
-    [orderContract],
-    { from: deployer },
-  );
+  const leaderboardContract = m.contract('Leaderboard', [orderContract], {
+    from: deployer,
+  });
 
   const coffeeMarketplaceContract = m.contract(
     'CoffeeMarketplace',
     [productContract, leaderboardContract],
-    { from: deployer },
+    { from: deployer }
   );
 
-  const auctionContract = m.contract(
-    'Auction',
-    [
-      productContract,
-      0.001,
-    ],
-    { from: deployer },
-  );
-  
- 
+  const auctionContract = m.contract('Auction', [productContract, 0.001], {
+    from: deployer,
+  });
+
   const votingContract = m.contract(
     'Voting',
     [
@@ -75,13 +58,13 @@ export default buildModule('TESTING_MODULES', (m) => {
       votingSeedData.prices,
       votingSeedData.duration,
     ],
-    { from: deployer },
+    { from: deployer }
   );
 
   const cartContract = m.contract(
     'Cart',
     [coffeeMarketplaceContract, orderContract],
-    { from: deployer },
+    { from: deployer }
   );
   return {
     votingContract,
@@ -90,6 +73,6 @@ export default buildModule('TESTING_MODULES', (m) => {
     orderContract,
     cartContract,
     auctionContract,
-    leaderboardContract
+    leaderboardContract,
   };
 });

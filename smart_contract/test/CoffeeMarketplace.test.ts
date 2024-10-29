@@ -1,15 +1,15 @@
 import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
+import { orderSeedData } from '../ignition/modules/seed_data/orderSeedData';
 import {
   CoffeeMarketplace,
-  Product,
+  CoffeeNFT,
   Leaderboard,
   Order,
-  CoffeeNFT
+  Product,
 } from '../typechain-types';
 import { deployContracts } from './test_setup/deployContract';
-import { orderSeedData } from '../ignition/modules/seed_data/orderSeedData';
 
 describe('CoffeeMarketplace', function () {
   let coffeeMarketplace: CoffeeMarketplace;
@@ -46,9 +46,9 @@ describe('CoffeeMarketplace', function () {
     leaderboard = contracts.leaderboard;
 
     // Set marketplace address in NFT contract
-    await coffeeNFT.connect(owner).setMarketplaceContract(
-      await coffeeMarketplace.getAddress()
-    ); // gives the marketplace contract permissions to mint NFTs in the NFT contract
+    await coffeeNFT
+      .connect(owner)
+      .setMarketplaceContract(await coffeeMarketplace.getAddress()); // gives the marketplace contract permissions to mint NFTs in the NFT contract
   });
 
   async function createOrderFromData(orderData: {
@@ -68,17 +68,19 @@ describe('CoffeeMarketplace', function () {
       const quantity: number = 5; // Mint 5 NFTs
       // Add a product from the roaster's address
       await expect(
-        coffeeMarketplace.connect(roaster).addRoasterListing(
-          'Panama Geisha',
-          'Delicate, jasmine-like aroma with hints of peach.',
-          ipfsHash,
-          price,
-          quantity,
-          'Guatemala',
-          'Medium',
-          'Arabica',
-          'Washed'
-        )
+        coffeeMarketplace
+          .connect(roaster)
+          .addRoasterListing(
+            'Panama Geisha',
+            'Delicate, jasmine-like aroma with hints of peach.',
+            ipfsHash,
+            price,
+            quantity,
+            'Guatemala',
+            'Medium',
+            'Arabica',
+            'Washed'
+          )
       )
         .to.emit(coffeeMarketplace, 'ListingAdded')
         .to.emit(coffeeNFT, 'NFTMinted');
@@ -86,7 +88,9 @@ describe('CoffeeMarketplace', function () {
       // Check if the product was added successfully
       const product = await coffeeMarketplace.getListing(6); // Listing ID will be 6, after 5 pre-existing listings
       expect(product.name).to.equal('Panama Geisha');
-      expect(product.description).to.equal('Delicate, jasmine-like aroma with hints of peach.');
+      expect(product.description).to.equal(
+        'Delicate, jasmine-like aroma with hints of peach.'
+      );
       expect(product.ipfsHash).to.equal(ipfsHash);
       expect(product.price).to.equal(price);
       expect(product.quantity).to.equal(quantity);
@@ -100,8 +104,9 @@ describe('CoffeeMarketplace', function () {
       for (let i = 0; i < product.nftIds.length; i++) {
         const tokenId = product.nftIds[i];
 
-
-        expect(await coffeeNFT.ownerOf(tokenId)).to.equal(await coffeeMarketplace.getAddress());
+        expect(await coffeeNFT.ownerOf(tokenId)).to.equal(
+          await coffeeMarketplace.getAddress()
+        );
         expect(await coffeeNFT.tokenURI(tokenId)).to.equal(ipfsHash);
       }
     });
@@ -112,17 +117,19 @@ describe('CoffeeMarketplace', function () {
       const zeroQuantity: number = 0; // Invalid quantity
 
       await expect(
-        coffeeMarketplace.connect(roaster).addRoasterListing(
-          'Panama Geisha',
-          'Delicate, jasmine-like aroma with hints of peach.',
-          ipfsHash,
-          zeroPrice,
-          5,
-          'Guatemala',
-          'Medium',
-          'Arabica',
-          'Washed'
-        )
+        coffeeMarketplace
+          .connect(roaster)
+          .addRoasterListing(
+            'Panama Geisha',
+            'Delicate, jasmine-like aroma with hints of peach.',
+            ipfsHash,
+            zeroPrice,
+            5,
+            'Guatemala',
+            'Medium',
+            'Arabica',
+            'Washed'
+          )
       ).to.be.revertedWith('Price must be greater than zero.');
 
       await expect(
@@ -138,9 +145,9 @@ describe('CoffeeMarketplace', function () {
             'Medium',
             'Arabica',
             'Washed'
-          ),
+          )
       ).to.be.revertedWith('Quantity must be greater than zero.');
-    })
+    });
   });
 
   describe('NFT Purchases', function () {
@@ -152,30 +159,34 @@ describe('CoffeeMarketplace', function () {
       const quantity: number = 3;
 
       // Mint NFTs for the listing
-      await coffeeMarketplace.connect(roaster).addRoasterListing(
-        'Panama Geisha',
-        'Delicate, jasmine-like aroma with hints of peach.',
-        ipfsHash,
-        price,
-        quantity,
-        'Guatemala',
-        'Medium',
-        'Arabica',
-        'Washed'
-      );
+      await coffeeMarketplace
+        .connect(roaster)
+        .addRoasterListing(
+          'Panama Geisha',
+          'Delicate, jasmine-like aroma with hints of peach.',
+          ipfsHash,
+          price,
+          quantity,
+          'Guatemala',
+          'Medium',
+          'Arabica',
+          'Washed'
+        );
     });
 
     it('Should allow single NFT purchase', async function () {
       // Get the NFT IDs for listing 6
       const listing = await coffeeMarketplace.getListing(listingId);
-      const tokenId = listing.nftIds[0];  // Get first NFT ID from the listing
+      const tokenId = listing.nftIds[0]; // Get first NFT ID from the listing
 
       const buyerAddress = await buyer.getAddress();
       const roasterAddress = await roaster.getAddress();
 
       // Get initial balances
       const buyerBalanceBefore = await ethers.provider.getBalance(buyerAddress);
-      const roasterBalanceBefore = await ethers.provider.getBalance(roasterAddress);
+      const roasterBalanceBefore = await ethers.provider.getBalance(
+        roasterAddress
+      );
 
       // Verify NFT is owned by marketplace before purchase
       expect(await coffeeNFT.ownerOf(tokenId)).to.equal(
@@ -183,7 +194,8 @@ describe('CoffeeMarketplace', function () {
       );
 
       // Verify NFT is available for purchase
-      expect(await coffeeMarketplace.isNFTAvailableForPurchase(tokenId)).to.be.true;
+      expect(await coffeeMarketplace.isNFTAvailableForPurchase(tokenId)).to.be
+        .true;
 
       // Purchase NFT
       await expect(
@@ -202,7 +214,9 @@ describe('CoffeeMarketplace', function () {
         .false;
 
       // Verify balances have been updated correctly
-      const roasterBalanceAfter = await ethers.provider.getBalance(roasterAddress);
+      const roasterBalanceAfter = await ethers.provider.getBalance(
+        roasterAddress
+      );
       expect(roasterBalanceAfter - roasterBalanceBefore).to.equal(price);
 
       // Get listing details and verify quantity updated
@@ -303,15 +317,19 @@ describe('CoffeeMarketplace', function () {
       const totalPrice = price * BigInt(tokenIds.length);
 
       // Purchase first NFT individually
-      await coffeeMarketplace.connect(buyer).purchaseNFT(listingId, tokenIds[0], {
-        value: price,
-      });
+      await coffeeMarketplace
+        .connect(buyer)
+        .purchaseNFT(listingId, tokenIds[0], {
+          value: price,
+        });
 
       // Attempt bulk purchase including the already purchased NFT
       await expect(
-        coffeeMarketplace.connect(secondBuyer).bulkPurchaseNFTs(listingId, tokenIds, {
-          value: totalPrice,
-        })
+        coffeeMarketplace
+          .connect(secondBuyer)
+          .bulkPurchaseNFTs(listingId, tokenIds, {
+            value: totalPrice,
+          })
       ).to.be.revertedWith('NFT not owned by marketplace');
     });
 
@@ -352,23 +370,29 @@ describe('CoffeeMarketplace', function () {
       const quantity: number = 3;
 
       // Mint NFTs for the first listing
-      await coffeeMarketplace.connect(roaster).addRoasterListing(
-        'Panama Geisha',
-        'Delicate, jasmine-like aroma with hints of peach.',
-        ipfsHash,
-        price,
-        quantity,
-        'Guatemala',
-        'Medium',
-        'Arabica',
-        'Washed'
-      );
+      await coffeeMarketplace
+        .connect(roaster)
+        .addRoasterListing(
+          'Panama Geisha',
+          'Delicate, jasmine-like aroma with hints of peach.',
+          ipfsHash,
+          price,
+          quantity,
+          'Guatemala',
+          'Medium',
+          'Arabica',
+          'Washed'
+        );
 
       // Purchase NFT for transfer tests
-      await coffeeMarketplace.connect(buyer).purchaseNFT(listingId, 1, { value: price });
+      await coffeeMarketplace
+        .connect(buyer)
+        .purchaseNFT(listingId, 1, { value: price });
 
       // Grant approval for transfer
-      await coffeeNFT.connect(buyer).setApprovalForAll(coffeeMarketplace.getAddress(), true);
+      await coffeeNFT
+        .connect(buyer)
+        .setApprovalForAll(coffeeMarketplace.getAddress(), true);
     });
 
     it('Should allow user-to-user transfer', async function () {
@@ -457,20 +481,16 @@ describe('CoffeeMarketplace', function () {
 
       // Attempt transfer to zero address
       await expect(
-        coffeeMarketplace.connect(buyer).transferNFT(
-          tokenId,
-          ethers.ZeroAddress,
-          0
-        )
+        coffeeMarketplace
+          .connect(buyer)
+          .transferNFT(tokenId, ethers.ZeroAddress, 0)
       ).to.be.revertedWith('Invalid recipient address');
 
       // Attempt transfer to marketplace address
       await expect(
-        coffeeMarketplace.connect(buyer).transferNFT(
-          tokenId,
-          await coffeeMarketplace.getAddress(),
-          0
-        )
+        coffeeMarketplace
+          .connect(buyer)
+          .transferNFT(tokenId, await coffeeMarketplace.getAddress(), 0)
       ).to.be.revertedWith('Invalid recipient address');
 
       // Verify ownership hasn't changed
@@ -489,12 +509,11 @@ describe('CoffeeMarketplace', function () {
 
       // Attempt transfer with insufficient payment
       await expect(
-        coffeeMarketplace.connect(secondBuyer).transferNFT(
-          tokenId,
-          secondBuyerAddress,
-          transferPrice,
-          { value: insufficientPrice }
-        )
+        coffeeMarketplace
+          .connect(secondBuyer)
+          .transferNFT(tokenId, secondBuyerAddress, transferPrice, {
+            value: insufficientPrice,
+          })
       ).to.be.revertedWith('Insufficient payment');
 
       // Verify ownership hasn't changed
@@ -503,12 +522,11 @@ describe('CoffeeMarketplace', function () {
   });
 
   describe('Reward Distribution', function () {
-
     it('Should distribute monthly rewards to top 3 customers using Chainlink Keeper', async function () {
       // Simulate top customers in the leaderboard
-      await createOrderFromData(customer1Order);
-      await createOrderFromData(customer2Order);
-      await createOrderFromData(customer3Order);
+      await createOrderFromData(customer1Order); // customer1 acquires 5 NFTs
+      await createOrderFromData(customer2Order); // customer2 acquires 3 NFTs
+      await createOrderFromData(customer3Order); // customer3 acquires 6 NFTs
 
       // Fast forward time by 31 days
       await ethers.provider.send('evm_increaseTime', [31 * 24 * 60 * 60]); // Advance 31 days
@@ -518,14 +536,13 @@ describe('CoffeeMarketplace', function () {
       await coffeeMarketplace.performUpkeep('0x');
 
       // Verify that reward NFTs were distributed to top 3 customers
-      const tokenCounter = await coffeeMarketplace.tokenCounter();
-      expect(await coffeeMarketplace.ownerOf(Number(tokenCounter) - 2)).to.equal(
+      expect(await coffeeNFT.getOwnerOfToken(1)).to.equal(
         customer3Order.address
       );
-      expect(await coffeeMarketplace.ownerOf(Number(tokenCounter) - 1)).to.equal(
+      expect(await coffeeNFT.getOwnerOfToken(2)).to.equal(
         customer1Order.address
       );
-      expect(await coffeeMarketplace.ownerOf(tokenCounter)).to.equal(
+      expect(await coffeeNFT.getOwnerOfToken(3)).to.equal(
         customer2Order.address
       );
     });
