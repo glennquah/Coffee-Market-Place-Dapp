@@ -247,6 +247,8 @@ describe('Multiple Customers with Different Carts', function () {
         product = contracts.product;
         order = contracts.order;
         cart = contracts.cart;
+        customer1 = contracts.customer1;
+        customer2 = contracts.customer2;
     });
 
     const firstProductId = 1;

@@ -1,28 +1,28 @@
-import { ethers } from 'hardhat';
 import { Signer } from 'ethers';
-import {
-  CoffeeMarketplace,
-  CoffeeMarketplace__factory,
-  Product,
-  Product__factory,
-  Order,
-  Order__factory,
-  Leaderboard,
-  Leaderboard__factory,
-  Voting,
-  Voting__factory,
-  Cart,
-  Cart__factory,
-  CoffeeNFT, 
-  CoffeeNFT__factory,
-  SealedAuction,
-  SealedAuction__factory,
-  Hash,
-  Hash__factory
-} from '../../typechain-types';
-import { votingSeedData } from '../../ignition/modules/seed_data/votingSeedData';
+import { ethers } from 'hardhat';
 import { orderSeedData } from '../../ignition/modules/seed_data/orderSeedData';
 import { productSeedData } from '../../ignition/modules/seed_data/productSeedData';
+import { votingSeedData } from '../../ignition/modules/seed_data/votingSeedData';
+import {
+  Cart,
+  Cart__factory,
+  CoffeeMarketplace,
+  CoffeeMarketplace__factory,
+  CoffeeNFT,
+  CoffeeNFT__factory,
+  Hash,
+  Hash__factory,
+  Leaderboard,
+  Leaderboard__factory,
+  Order,
+  Order__factory,
+  Product,
+  Product__factory,
+  SealedAuction,
+  SealedAuction__factory,
+  Voting,
+  Voting__factory,
+} from '../../typechain-types';
 
 export async function deployContracts(): Promise<{
   coffeeMarketplace: CoffeeMarketplace;
@@ -43,34 +43,43 @@ export async function deployContracts(): Promise<{
   hash: Hash;
 }> {
   const ProductFactory: Product__factory = (await ethers.getContractFactory(
-    'Product'
+    'Product',
   )) as Product__factory;
   const OrderFactory: Order__factory = (await ethers.getContractFactory(
-    'Order'
+    'Order',
   )) as Order__factory;
   const CoffeeMarketplaceFactory: CoffeeMarketplace__factory =
     (await ethers.getContractFactory(
-      'CoffeeMarketplace'
+      'CoffeeMarketplace',
     )) as CoffeeMarketplace__factory;
   const LeaderboardFactory: Leaderboard__factory =
     (await ethers.getContractFactory('Leaderboard')) as Leaderboard__factory;
   const VotingFactory: Voting__factory = (await ethers.getContractFactory(
-    'Voting'
+    'Voting',
   )) as Voting__factory;
   const CartFactory: Cart__factory = (await ethers.getContractFactory(
-    'Cart'
+    'Cart',
   )) as Cart__factory;
   const CoffeeNFTFactory: CoffeeNFT__factory = (await ethers.getContractFactory(
-    'CoffeeNFT'
+    'CoffeeNFT',
   )) as CoffeeNFT__factory;
-  const SealedAuction: SealedAuction__factory = (await ethers.getContractFactory(
-    'SealedAuction'
-  )) as SealedAuction__factory;
+  const SealedAuction: SealedAuction__factory =
+    (await ethers.getContractFactory(
+      'SealedAuction',
+    )) as SealedAuction__factory;
   const HashFactory: Hash__factory = (await ethers.getContractFactory(
-    'Hash'
+    'Hash',
   )) as Hash__factory;
 
-  const [owner, roaster, buyer, secondBuyer, customer1, customer2, marketplaceOperator] = await ethers.getSigners();
+  const [
+    owner,
+    roaster,
+    buyer,
+    secondBuyer,
+    customer1,
+    customer2,
+    marketplaceOperator,
+  ] = await ethers.getSigners();
 
   const product = await ProductFactory.deploy(
     productSeedData.roasters,
@@ -79,12 +88,12 @@ export async function deployContracts(): Promise<{
     productSeedData.ipfsHashes,
     productSeedData.prices,
     productSeedData.quantities,
-    productSeedData.nftIds, 
+    productSeedData.nftIds,
     productSeedData.origins,
     productSeedData.roastLevels,
     productSeedData.beanTypes,
     productSeedData.processMethods,
-    productSeedData.roastDates
+    productSeedData.roastDates,
   );
   await product.waitForDeployment();
 
@@ -107,7 +116,7 @@ export async function deployContracts(): Promise<{
   const coffeeMarketplace = await CoffeeMarketplaceFactory.deploy(
     product,
     leaderboard,
-    coffeeNFT
+    coffeeNFT,
   );
   await coffeeMarketplace.waitForDeployment();
 
@@ -119,6 +128,7 @@ export async function deployContracts(): Promise<{
     votingSeedData.origins,
     votingSeedData.types,
     votingSeedData.roastLevels,
+    votingSeedData.processMethods,
     votingSeedData.prices,
     votingSeedData.duration,
   );
@@ -126,14 +136,14 @@ export async function deployContracts(): Promise<{
 
   const cart = await CartFactory.deploy(
     coffeeMarketplace.getAddress(),
-    order.getAddress()
+    order.getAddress(),
   );
   await cart.waitForDeployment();
 
   const coffeeAuction = await SealedAuction.deploy(
     coffeeMarketplace.getAddress(),
     ethers.parseEther('0.01'),
-    true
+    true,
   );
   await coffeeAuction.waitForDeployment();
 
