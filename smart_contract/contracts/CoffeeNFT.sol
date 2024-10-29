@@ -74,7 +74,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         string memory roastLevel,
         string memory beanType,
         string memory processMethod
-    ) external onlyMarketplace returns (uint256) {
+    ) public returns (uint256) {
         tokenCounter++;
         uint256 tokenId = tokenCounter;
 

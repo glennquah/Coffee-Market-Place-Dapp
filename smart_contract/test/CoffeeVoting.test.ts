@@ -3,6 +3,7 @@ import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import {
   CoffeeMarketplace,
+  CoffeeNFT,
   Product,
   Voting,
 } from '../typechain-types';
@@ -11,6 +12,7 @@ import { deployContracts } from './test_setup/deployContract';
 describe('Coffee Voting E2E Test', function () {
   let coffeeMarketplace: CoffeeMarketplace;
   let coffeeVoting: Voting;
+  let coffeeNFT: CoffeeNFT;
   let product: Product;
   let owner: Signer;
   let roaster: Signer;
@@ -19,6 +21,7 @@ describe('Coffee Voting E2E Test', function () {
   beforeEach(async function () {
     const contracts = await deployContracts();
     coffeeMarketplace = contracts.coffeeMarketplace;
+    coffeeNFT = contracts.coffeeNFT;
     coffeeVoting = contracts.coffeeVoting;
     product = contracts.product;
     owner = contracts.owner;
@@ -43,6 +46,7 @@ describe('Coffee Voting E2E Test', function () {
           'Ethiopia',
           'Arabica',
           'Medium-Light',
+          'Washed',
           ethers.parseEther('0.05'),
         ),
     ).to.emit(coffeeVoting, 'CoffeeCandidateAdded');
@@ -125,7 +129,7 @@ describe('Coffee Voting E2E Test', function () {
     expect(winner.voteCount).to.equal(1);
   });
 
-  it('Should Get Winner and Mint 100 NFTs when voting has ended', async function () {
+  it('Should Get Winner and Mint 50 NFTs when voting has ended', async function () {
     await coffeeVoting.connect(customer).vote(1);
     await ethers.provider.send('evm_increaseTime', [90 * 60]);
     await ethers.provider.send('evm_mine');
