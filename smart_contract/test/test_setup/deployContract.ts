@@ -141,9 +141,8 @@ export async function deployContracts(): Promise<{
   await cart.waitForDeployment();
 
   const coffeeAuction = await SealedAuction.deploy(
-    coffeeMarketplace.getAddress(),
+    coffeeNFT.getAddress(),
     ethers.parseEther('0.01'),
-    true,
   );
   await coffeeAuction.waitForDeployment();
 

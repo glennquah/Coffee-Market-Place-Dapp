@@ -20,7 +20,6 @@ contract SealedAuction {
     address public  owner;
     uint256 public minimumAuctionFee;
     uint256 private withdrawableFund = 0;
-    bool private test = false;
 
     struct AuctionData {
         uint256 auctionId;
@@ -43,12 +42,11 @@ contract SealedAuction {
     mapping(uint256 => AuctionData) public auctions;
     mapping(uint256 => mapping(address => Bid)) public auctionsBid;
     
-    constructor(address _NFTAddress, uint256 __minimumAuctionFee, bool _test) {
+    constructor(address _NFTAddress, uint256 __minimumAuctionFee) {
         // Initialize the contract with the address of the NFT contract
         NFTAddress = _NFTAddress;
         minimumAuctionFee = __minimumAuctionFee;
         owner = msg.sender;
-        test = _test;
     }
     modifier onlyOwner() {
         require(msg.sender == owner, "Only owner can call this");
@@ -105,9 +103,9 @@ contract SealedAuction {
     function createAuction(uint256 _NFTId, uint256 _auctionCommitEndTimeInHour, uint256 _auctionRevealEndTimeInHour) public payable _minimumAuctionFee {
         require(_auctionRevealEndTimeInHour > _auctionCommitEndTimeInHour, "End time should be greater than start time");
         withdrawableFund += minimumAuctionFee; 
-        if(!test) {
+        // if(!test) {
             IERC721(NFTAddress).transferFrom(msg.sender, address(this), _NFTId);
-        }
+        // }
         auctionCounter++;
         auctions[auctionCounter] = AuctionData(auctionCounter, payable(msg.sender), 0, address(0), block.timestamp, block.timestamp + _auctionCommitEndTimeInHour * 1 hours, block.timestamp + _auctionRevealEndTimeInHour * 1 hours, false, false,false, _NFTId);
         emit AuctionCreated(auctionCounter, msg.sender, _NFTId);
@@ -168,9 +166,9 @@ contract SealedAuction {
         if (auctions[auctionId].highestBidder != address(0)) { // If there are bids
             // Transfer the NFT to the winner
             // Comment the below line to test the contract
-            if(!test) {
+            // if(!test) {
                 IERC721(NFTAddress).transferFrom(address(this), auctions[auctionId].highestBidder, auctions[auctionId].tokenId);
-            }
+            // }
             emit NFTTransferred(auctionId, auctions[auctionId].highestBidder);
             // Transfer the highest bid amount to the owner (auctioneer)
             payable(auctions[auctionId].seller).transfer(auctions[auctionId].highestBid * 1 ether);
@@ -179,9 +177,9 @@ contract SealedAuction {
             auctions[auctionId].withdrawnBySeller = true;
             // Transfer the NFT back to the seller
             // Comment the below line to test the contract
-            if(!test) {
+            // if(!test) {
                 IERC721(NFTAddress).transferFrom(address(this), auctions[auctionId].seller, auctions[auctionId].tokenId);
-            }
+            // }
             emit NoBidder(auctionId);
         }
         emit AuctionFinalized(auctionId, auctions[auctionId].highestBidder, auctions[auctionId].highestBid);

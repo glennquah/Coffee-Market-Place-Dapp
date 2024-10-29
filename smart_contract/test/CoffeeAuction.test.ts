@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
 import { 
-  CoffeeMarketplace,
+  CoffeeNFT,
   Product,
   SealedAuction,
   Hash
@@ -11,7 +11,7 @@ import { deployContracts } from './test_setup/deployContract';
 
 describe('Coffee Auction E2E Test', function () {
   let coffeeAuction: SealedAuction;
-  let coffeeMarketplace: CoffeeMarketplace;
+  let coffeeNFT: CoffeeNFT;
   let product: Product;
   let owner: Signer;
   let roaster: Signer;
@@ -22,10 +22,20 @@ describe('Coffee Auction E2E Test', function () {
   const auctionFee = ethers.parseEther('0.01');
   const bidAmount1 = ethers.parseEther('1');
   const bidAmount2 = ethers.parseEther('12');
-  
+  const sampleNFT = {
+    name: 'Panama Geisha',
+    description: 'Delicate, jasmine-like aroma with hints of peach.',
+    ipfsHash: 'https://example.com/panama.png',
+    price: ethers.parseEther('0.1'),
+    origin: 'Guatemala',
+    roastLevel: 'Medium',
+    beanType: 'Arabica',
+    processMethod: 'Washed',
+  };
+
   beforeEach(async function () {
     const contracts = await deployContracts();
-    coffeeMarketplace = contracts.coffeeMarketplace;
+    coffeeNFT = contracts.coffeeNFT;
     product = contracts.product;
     owner = contracts.owner;
     roaster = contracts.roaster;
@@ -33,6 +43,33 @@ describe('Coffee Auction E2E Test', function () {
     customer2 = contracts.customer2;
     coffeeAuction = contracts.coffeeAuction;
     hash = contracts.hash;
+    const ipfsHash: string = 'https://example.com/panama.png'; // Dummy IPFS hash
+    const price = ethers.parseEther('0.1'); // 0.1 ETH
+    const quantity: number = 5; // Mint 5 NFTs
+    await expect(
+      coffeeNFT
+    )
+    await expect(
+      coffeeNFT
+        .connect(roaster)
+        .mint(
+          await roaster.getAddress(),
+          sampleNFT.name,
+          sampleNFT.description,
+          sampleNFT.ipfsHash,
+          1, // productId
+          sampleNFT.price,
+          sampleNFT.origin,
+          sampleNFT.roastLevel,
+          sampleNFT.beanType,
+          sampleNFT.processMethod,
+         )).to.emit(coffeeNFT, 'NFTMinted');
+    await expect(
+      coffeeNFT
+        .connect(roaster)
+        .approve(coffeeAuction.getAddress(),productID)
+    ).to.emit(coffeeNFT, 'Approval');
+
   });
   
   it("should have get minimum fee", async function() {
@@ -43,9 +80,6 @@ describe('Coffee Auction E2E Test', function () {
   it("should allow auctioneer to auction a product", async function() {
     
     // Add a product from the roaster's address
-    // const ipfsHash: string = 'https://example.com/panama.png'; // Dummy IPFS hash
-    // const price = ethers.parseEther('0.1'); // 0.1 ETH
-    // const quantity: number = 5; // Mint 5 NFTs
     // await expect(
     //   coffeeMarketplace
     //     .connect(roaster)
