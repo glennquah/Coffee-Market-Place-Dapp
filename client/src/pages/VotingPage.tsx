@@ -19,7 +19,7 @@ function VotingPage() {
           subTitle={
             'Cast your vote and shape the next featured brew on our marketplace.'
           }
-          endDateTime={new Date('2024-10-27T23:59:59+08:00')}
+          endDateTime={new Date('2024-10-30T23:59:59+08:00')}
         />
 
         <CoffeeCardList items={coffeeVotingItems} />

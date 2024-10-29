@@ -84,23 +84,24 @@ describe('CoffeeNFT', function () {
       expect(metadata.processMethod).to.equal(sampleNFT.processMethod);
     });
 
-    // TODO: REMOVE??
-    // it('Should not allow non-marketplace addresses to mint', async function () {
-    //     await expect(
-    //         coffeeNFT.connect(buyer).mint(
-    //             await buyer.getAddress(),
-    //             sampleNFT.name,
-    //             sampleNFT.description,
-    //             sampleNFT.ipfsHash,
-    //             1,
-    //             sampleNFT.price,
-    //             sampleNFT.origin,
-    //             sampleNFT.roastLevel,
-    //             sampleNFT.beanType,
-    //             sampleNFT.processMethod
-    //         )
-    //     ).to.be.revertedWith('Only marketplace can call this function');
-    // });
+    it('Should not allow non-administrator addresses to mint', async function () {
+      await expect(
+        coffeeNFT
+          .connect(buyer)
+          .mint(
+            await buyer.getAddress(),
+            sampleNFT.name,
+            sampleNFT.description,
+            sampleNFT.ipfsHash,
+            1,
+            sampleNFT.price,
+            sampleNFT.origin,
+            sampleNFT.roastLevel,
+            sampleNFT.beanType,
+            sampleNFT.processMethod,
+          ),
+      ).to.be.revertedWith('Only administrators can call this function');
+    });
   });
 
   describe('Metadata Management', function () {
@@ -162,7 +163,7 @@ describe('CoffeeNFT', function () {
       expect(metadata.processMethod).to.equal(updatedNFT.processMethod);
     });
 
-    it('Should not allow non-marketplace addresses to update metadata', async function () {
+    it('Should not allow non-administrator addresses to update metadata', async function () {
       await expect(
         coffeeNFT
           .connect(buyer)
@@ -176,7 +177,7 @@ describe('CoffeeNFT', function () {
             updatedNFT.beanType,
             updatedNFT.processMethod,
           ),
-      ).to.be.revertedWith('Only marketplace can call this function');
+      ).to.be.revertedWith('Only administrators can call this function');
     });
 
     it('Should retrieve correct NFT metadata', async function () {
