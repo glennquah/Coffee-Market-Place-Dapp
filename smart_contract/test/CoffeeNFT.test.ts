@@ -1,13 +1,14 @@
 import { expect } from 'chai';
 import { Signer } from 'ethers';
 import { ethers } from 'hardhat';
-import { CoffeeNFT } from '../typechain-types';
+import { CoffeeNFT,SealedAuction } from '../typechain-types';
 import { deployContracts } from './test_setup/deployContract';
 
 describe('CoffeeNFT', function () {
   let coffeeNFT: CoffeeNFT;
   let owner: Signer;
   let marketplaceOperator: Signer; // regular signer acting as marketplace
+  let auctionContract: SealedAuction; // regular signer acting as auction
   let roaster: Signer;
   let buyer: Signer;
 
@@ -29,11 +30,16 @@ describe('CoffeeNFT', function () {
     roaster = contracts.roaster;
     buyer = contracts.buyer;
     marketplaceOperator = contracts.marketplaceOperator; // Get a signer to act as marketplace
+    auctionContract = contracts.coffeeAuction; 
 
     // Set marketplace operator address as the authorized marketplace
     await coffeeNFT
       .connect(owner)
       .setMarketplaceContract(await marketplaceOperator.getAddress());
+    // Set auction contract address as the authorized marketplace
+    await coffeeNFT
+      .connect(owner)
+      .setAuctionContract(await auctionContract.getAddress());
   });
 
   describe('Setup', function () {
@@ -48,6 +54,19 @@ describe('CoffeeNFT', function () {
       await expect(
         coffeeNFT.connect(owner).setMarketplaceContract(ethers.ZeroAddress),
       ).to.be.revertedWith('Invalid marketplace address');
+    });
+
+    it('Should set the auction address correctly', async function () {
+      const auctionContractAddress = await auctionContract.getAddress();
+      expect(await coffeeNFT.auctionContract()).to.equal(
+        auctionContractAddress,
+      );
+    });
+
+    it('Should not allow setting zero address as auction', async function () {
+      await expect(
+        coffeeNFT.connect(owner).setAuctionContract(ethers.ZeroAddress),
+      ).to.be.revertedWith('Invalid auction address');
     });
   });
 

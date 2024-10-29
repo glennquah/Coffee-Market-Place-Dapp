@@ -7,6 +7,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
     using Strings for uint256;
     uint256 public tokenCounter = 0; // Counter for NFT IDs
     address public marketplaceContract;
+    address public auctionContract;
 
     struct NFTMetadata {
         uint256 tokenId;
@@ -45,7 +46,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
 
     modifier onlyAdministrators() {
         require(
-            tx.origin == owner() || msg.sender == marketplaceContract || msg.sender == owner(),
+            tx.origin == owner() || msg.sender == marketplaceContract || msg.sender == auctionContract,
             'Only administrators can call this function'
         );
         _;
@@ -69,6 +70,16 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
             'Invalid marketplace address'
         );
         marketplaceContract = _marketplaceContract;
+    }
+
+    function setAuctionContract(
+        address _auctionContract
+    ) external onlyOwner {
+        require(
+            _auctionContract != address(0),
+            'Invalid auction address'
+        );
+        auctionContract = _auctionContract;
     }
 
     function mint(
