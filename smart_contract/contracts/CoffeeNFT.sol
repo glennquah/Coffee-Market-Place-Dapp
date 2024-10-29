@@ -43,6 +43,14 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         string roastLevel
     );
 
+    modifier onlyAdministrators() {
+        require(
+            tx.origin == owner() || msg.sender == marketplaceContract || msg.sender == owner(),
+            'Only administrators can call this function'
+        );
+        _;
+    }
+
     modifier onlyMarketplace() {
         require(
             msg.sender == marketplaceContract,
@@ -74,7 +82,8 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         string memory roastLevel,
         string memory beanType,
         string memory processMethod
-    ) public returns (uint256) {
+
+    ) external onlyAdministrators returns (uint256) {
         tokenCounter++;
         uint256 tokenId = tokenCounter;
 
@@ -112,7 +121,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
         string memory newRoastLevel,
         string memory newBeanType,
         string memory newProcessMethod
-    ) external onlyMarketplace {
+    ) external onlyAdministrators {
         ownerOf(tokenId); // This inherently checks if token exists
 
         NFTMetadata storage metadata = tokenMetadata[tokenId];
