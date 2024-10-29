@@ -12,6 +12,7 @@ contract Voting {
         string coffeeOrigin;
         string beanType;
         string roastLevel;
+        string processMethod;
         uint256 price;
         uint256 voteCount;
     }
@@ -35,6 +36,7 @@ constructor(
             string[] memory _coffeeOrigins,
             string[] memory _beanTypes,
             string[] memory _roastLevels,
+            string[] memory _processMethods,
             uint256[] memory _prices,
             uint256 _durationInMinutes) {
     coffeeMarketplace = CoffeeMarketplace(_marketplaceContractAddress);
@@ -47,6 +49,7 @@ constructor(
                         coffeeOrigin: _coffeeOrigins[i],
                         beanType: _beanTypes[i],
                         roastLevel: _roastLevels[i],
+                        processMethod: _processMethods[i],
                         price: _prices[i],
                         voteCount: 0
         }));
@@ -68,6 +71,7 @@ constructor(
                                 string memory _coffeeOrigin,
                                 string memory _beanType,
                                 string memory _roastLevel,
+                                string memory _processMethod,
                                 uint256 _price) public onlyOwner {
         coffee_vote_candidates.push(CoffeeVoteCandidate({
                 candidateId: candidateCounter++,
@@ -77,6 +81,7 @@ constructor(
                 coffeeOrigin: _coffeeOrigin,
                 beanType: _beanType,
                 roastLevel: _roastLevel,
+                processMethod: _processMethod,
                 price: _price,
                 voteCount: 0
         }));
@@ -154,13 +159,17 @@ constructor(
     function finalizeVotingAndMintNFTs() public onlyOwner() {
         CoffeeVoteCandidate memory winner = getWinner();
 
-        // Mint 100 NFTs using the CoffeeMarketplace's addRoasterListing function
+        // Mint 50 NFTs using the CoffeeMarketplace's addRoasterListing function
         coffeeMarketplace.addRoasterListing(
             winner.coffeeName,
             winner.description,
             winner.imageUrl,
             winner.price,
-            100
+            50,
+            winner.coffeeOrigin,
+            winner.roastLevel,
+            winner.beanType,
+            winner.processMethod
         );
         emit VotingFinalized(winner.coffeeName, winner.imageUrl, winner.description, winner.coffeeOrigin, winner.beanType, winner.roastLevel, winner.price);
     }

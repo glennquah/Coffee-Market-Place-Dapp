@@ -4,7 +4,7 @@ import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import mockCoffeeData from '../data/mockCoffeeItems';
 import { CoffeeCardProps, HeroVariant } from '../types/types';
-
+import CustomerService from '../components/CustomerService';
 // TODO: Remove this mock data and replace when intergrating with smart contract
 const coffeeListingItems: CoffeeCardProps[] = [];
 for (let i = 0; i < 3; i++) {
@@ -30,6 +30,7 @@ function HomePage() {
           title="Our Coffee For You"
           subtitle="NFTRoasters Coffee"
         />
+        <CustomerService/>
       </ResponsiveContainer>
     </div>
   );
