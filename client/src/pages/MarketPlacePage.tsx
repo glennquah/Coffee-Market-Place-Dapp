@@ -2,7 +2,7 @@ import marketPlaceHero from '../assets/marketplaceHero.png';
 import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import { HeroVariant } from '../types/types';
-import CoffeeDialog from '../components/CoffeeDialog/CoffeeDialog';
+import CoffeeDialog from '../components/Dialog/CoffeeDialog';
 function MarketPlacePage() {
   return (
     <div className="py-8">
