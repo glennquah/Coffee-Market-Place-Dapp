@@ -4,11 +4,12 @@ import {
   AiOutlineInstagram,
   AiOutlineTwitter,
 } from 'react-icons/ai';
-import { FaBars, FaShoppingCart } from 'react-icons/fa';
+import { FaBars } from 'react-icons/fa';
 import Logo from '../assets/NFTRoasterLogo.svg';
 
 import { useState } from 'react';
 import ResponsiveContainer from './ResponsiveContainer';
+import CartDialog from '../components/Dialog/CartDialog';
 
 function Navbar() {
   const [nav, setNav] = useState(false);
@@ -62,9 +63,7 @@ function Navbar() {
           </div>
           <div className="flex items-center">
             <div className="hidden sm:block cursor-pointer">
-              <a href="/cart">
-                <FaShoppingCart size={25} />
-              </a>
+              <CartDialog/>
             </div>
             <div onClick={handleNav} className="sm:hidden cursor-pointer">
               <FaBars size={25} />

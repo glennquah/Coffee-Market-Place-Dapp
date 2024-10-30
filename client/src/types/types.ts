@@ -1,5 +1,5 @@
 // Define the type of coffee card (listing, voting, auction)
-type CoffeeCardType = 'listing' | 'voting' | 'auction';
+type CoffeeCardType = 'listing' | 'voting' | 'auction' | 'cart';
 
 interface CoffeeCardProps {
   type: CoffeeCardType;
@@ -10,6 +10,8 @@ interface CoffeeCardProps {
   onBid?: () => void;
   onClickListing?: () => void;
   bidEndDate?: string;
+  numberOfNFT?: number; // cart
+  id?: number; //  cart
 }
 
 interface ButtonProps {
@@ -41,6 +43,14 @@ interface HeroProps {
   variant: HeroVariant;
 }
 
+interface ConfirmationDialogProps { // resuable customised dialog component 
+  open: boolean;
+  title: string;
+  message: string;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
 export enum HeroVariant {
   V1 = 'V1',
   V2 = 'V2',
@@ -54,4 +64,5 @@ export type {
   CoffeeCarouselProps,
   HeroProps,
   TimerHeroProps,
+  ConfirmationDialogProps
 };
