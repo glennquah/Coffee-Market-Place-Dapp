@@ -48,6 +48,7 @@ const mockCoffeeData: CoffeeCardProps[] = [
     price: '0.005634',
     numberOfNFT: 10,
     id: 0,
+    qty: 10,
   },
   {
     type: 'cart',
@@ -56,6 +57,7 @@ const mockCoffeeData: CoffeeCardProps[] = [
     price: '0.005334',
     numberOfNFT: 9,
     id: 1,
+    qty: 10,
   },
   {
     type: 'cart',
@@ -64,6 +66,7 @@ const mockCoffeeData: CoffeeCardProps[] = [
     price: '0.005234',
     numberOfNFT: 8,
     id: 2,
+    qty: 10,
   },
   {
     type: 'cart',
@@ -72,6 +75,7 @@ const mockCoffeeData: CoffeeCardProps[] = [
     price: '0.005134',
     numberOfNFT: 7,
     id: 3,
+    qty: 10,
   },
   /* end of cart */
 ];

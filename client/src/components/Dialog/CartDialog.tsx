@@ -2,12 +2,17 @@ import { FaShoppingCart, FaTrash } from 'react-icons/fa';
 import { useState } from 'react';
 import mockCoffeeData from '../../data/mockCoffeeItems';
 import { CoffeeCardProps } from '../../types/types';
-import ConfirmationDialog from '../../components/ConfirmationDialog/ConfirmationDialog';
+
+import ConfirmationDialog from '../DialogComponents/ConfirmationDialog';
+import EditQuantityDialog from '../DialogComponents/EditQuantityDialog';
 
 const CartDialog = () => {
     const [cartItems, setCartItems] = useState<CoffeeCardProps[]>(mockCoffeeData.filter((item): item is CoffeeCardProps => item.type === 'cart')); // TODO: Edit to call the `viewCart()` from smart contract
-    const [itemToDelete, setItemToDelete] = useState<CoffeeCardProps | null>(null);
     const [modal, setModal] = useState(false);
+    const [updatedItem, setUpdatedItem] = useState<CoffeeCardProps | null>(null);
+
+    const defaultQty = 1;
+    const numberRegex = /^\d*$/;
 
     const [dialogConfig, setDialogConfig] = useState<{
         open: boolean;
@@ -18,7 +23,17 @@ const CartDialog = () => {
         open: false,
         title: '',
         message: '',
-        onConfirm: () => {},
+        onConfirm: () => { },
+    });
+
+    const [editQtyDialog, setEditQtyDialog] = useState<{
+        open: boolean;
+        item: CoffeeCardProps | null;
+        Qty: number;
+    }>({
+        open: false,
+        item: null,
+        Qty: -1
     });
 
     // title
@@ -31,18 +46,16 @@ const CartDialog = () => {
 
     const handleCloseDialog = (): void => {
         setDialogConfig(prev => ({ ...prev, open: false }));
-        setItemToDelete(null);
     };
 
     const handleDeleteClick = (item: CoffeeCardProps): void => {
-        setItemToDelete(item);
         setDialogConfig({
             open: true,
             title: 'Are you sure?',
             message: 'Are you sure you want to delete this item from your cart?',
             onConfirm: () => {
                 // TODO: Edit to call the `removeFromCart()` from smart contract
-                setCartItems(prevItems => 
+                setCartItems(prevItems =>
                     prevItems.filter(cartItem => cartItem.id !== item.id)
                 );
                 handleCloseDialog();
@@ -76,19 +89,24 @@ const CartDialog = () => {
 
         return cartItems
             .map((item, index) => (
-                <div 
-                    key={item.id || index} 
+                <div
+                    key={item.id || index}
                     className="grid grid-cols-5 gap-4 px-6 py-4 items-center border-t border-green-600 text-white"
                 >
                     <div>
-                        <img 
-                            src={item.imageUrl} 
-                            alt={item.name} 
-                            className="w-20 h-20 rounded" 
+                        <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="w-20 h-20 rounded"
                         />
                     </div>
                     <span>{item.name}</span>
-                    <span className="text-center">{item.numberOfNFT}</span>
+                    <button
+                        onClick={() => handleQtyClick(item)}
+                        className="text-center hover:bg-[#6b8e23] rounded px-2 py-1 transition-colors"
+                    >
+                        {item.numberOfNFT}
+                    </button>
                     <span className="text-right">{item.price} ETH</span>
                     <div className="flex justify-end">
                         <button
@@ -112,6 +130,61 @@ const CartDialog = () => {
         }
     };
 
+    const handleQtyClick = (item: CoffeeCardProps): void => {
+        setEditQtyDialog({
+            open: true,
+            item: item,
+            Qty: item.numberOfNFT || 0
+        });
+        setUpdatedItem(item);
+    };
+
+    const handleQtyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const value = event.target.value;
+        if (numberRegex.test(value)) {
+            setEditQtyDialog(prev => ({
+                ...prev,
+                Qty: Number(value)
+            }));
+        }
+    };
+
+    const handleQtyClose = () => {
+        setEditQtyDialog({
+            open: false,
+            item: null,
+            Qty: 0
+        });
+    };
+
+    const handleQtySave = () => {
+        if (editQtyDialog.item && editQtyDialog.Qty) {
+            const newQty = editQtyDialog.Qty;
+
+            if (newQty > (updatedItem?.qty || 1)) {
+                alert(`Current quantity cannot exceed ${updatedItem?.qty}`);
+                return;
+            }
+
+            if (newQty > 0) {
+                setCartItems(prevItems =>
+                    prevItems.map(item =>
+                        item.id === editQtyDialog.item?.id
+                            ? {
+                                ...item,
+                                numberOfNFT: newQty,
+                                price: (
+                                    parseFloat(item.price || '1') / (item.numberOfNFT || defaultQty) * newQty
+                                ).toFixed(6)
+                            }
+                            : item
+                    )
+                );
+            }
+        }
+        handleQtyClose();
+    };
+
     return (
         <>
             <a onClick={toggleModal} className="cursor-pointer">
@@ -119,7 +192,7 @@ const CartDialog = () => {
             </a>
             {modal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" onClick={toggleModal}>
-                    <div 
+                    <div
                         className="bg-[#5F6F52] rounded-lg w-full max-w-2xl shadow-xl"
                         onClick={(e) => e.stopPropagation()}
                     >
@@ -130,7 +203,7 @@ const CartDialog = () => {
 
                         {cartItems.length > 0 && (
                             <div className="px-6 pb-3 flex justify-end">
-                                <button 
+                                <button
                                     onClick={handleClearClick}
                                     className="text-white py-2 px-4 rounded bg-red-600 hover:bg-red-700 transition-colors"
                                 >
@@ -152,7 +225,7 @@ const CartDialog = () => {
                         </div>
 
                         <div className="p-6 mt-auto border-t border-green-600 flex justify-end">
-                            <button 
+                            <button
                                 className="bg-[#a0522d] text-white py-2 px-4 rounded hover:bg-[#8b4513]"
                                 onClick={checkout}
                             >
@@ -166,6 +239,15 @@ const CartDialog = () => {
                             message={dialogConfig.message}
                             onClose={handleCloseDialog}
                             onConfirm={dialogConfig.onConfirm}
+                        />
+
+                        <EditQuantityDialog
+                            open={editQtyDialog.open}
+                            item={editQtyDialog.item}
+                            quantity={editQtyDialog.Qty}
+                            onClose={handleQtyClose}
+                            onQuantityChange={handleQtyChange}
+                            onSave={handleQtySave}
                         />
                     </div>
                 </div>
