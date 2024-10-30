@@ -1,5 +1,5 @@
 // Define the type of coffee card (listing, voting, auction)
-type CoffeeCardType = 'listing' | 'voting' | 'auction';
+type CoffeeCardType = 'listing' | 'voting' | 'auction' | 'cart';
 
 interface CoffeeCardProps {
   type: CoffeeCardType;
@@ -10,6 +10,8 @@ interface CoffeeCardProps {
   onBid?: () => void;
   onClickListing?: () => void;
   bidEndDate?: string;
+  numberOfNFT?: number; // cart
+  id?: number; //  cart
 }
 
 interface ButtonProps {

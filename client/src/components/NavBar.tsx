@@ -63,9 +63,6 @@ function Navbar() {
           </div>
           <div className="flex items-center">
             <div className="hidden sm:block cursor-pointer">
-              {/* <a href="/cart">
-                <FaShoppingCart size={25} />
-              </a> */}
               <CartDialog/>
             </div>
             <div onClick={handleNav} className="sm:hidden cursor-pointer">
