@@ -8,8 +8,9 @@ import EditQuantityDialog from '../DialogComponents/EditQuantityDialog';
 
 const CartDialog = () => {
     const [cartItems, setCartItems] = useState<CoffeeCardProps[]>(mockCoffeeData.filter((item): item is CoffeeCardProps => item.type === 'cart')); // TODO: Edit to call the `viewCart()` from smart contract
-    const [, setItemToDelete] = useState<CoffeeCardProps | null>(null);
     const [modal, setModal] = useState(false);
+    const [updatedItem, setUpdatedItem] = useState<CoffeeCardProps | null>(null);
+
     const defaultQty = 1;
     const numberRegex = /^\d*$/;
 
@@ -45,11 +46,9 @@ const CartDialog = () => {
 
     const handleCloseDialog = (): void => {
         setDialogConfig(prev => ({ ...prev, open: false }));
-        setItemToDelete(null);
     };
 
     const handleDeleteClick = (item: CoffeeCardProps): void => {
-        setItemToDelete(item);
         setDialogConfig({
             open: true,
             title: 'Are you sure?',
@@ -137,6 +136,7 @@ const CartDialog = () => {
             item: item,
             Qty: item.numberOfNFT || 0
         });
+        setUpdatedItem(item);
     };
 
     const handleQtyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,6 +160,12 @@ const CartDialog = () => {
     const handleQtySave = () => {
         if (editQtyDialog.item && editQtyDialog.Qty) {
             const newQty = editQtyDialog.Qty;
+
+            if (newQty > (updatedItem?.qty || 1)) {
+                alert(`Current quantity cannot exceed ${updatedItem?.qty}`);
+                return;
+            }
+
             if (newQty > 0) {
                 setCartItems(prevItems =>
                     prevItems.map(item =>

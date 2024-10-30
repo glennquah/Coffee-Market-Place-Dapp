@@ -12,6 +12,7 @@ interface CoffeeCardProps {
   bidEndDate?: string;
   numberOfNFT?: number; // cart
   id?: number; //  cart
+  qty?: number; // cart
 }
 
 interface ButtonProps {
