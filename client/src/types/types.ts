@@ -43,7 +43,7 @@ interface HeroProps {
   variant: HeroVariant;
 }
 
-interface ConfirmationDialogProps { // resuable dialog component that shows - "Are you sure you want to ..." with "YES" or "NO" options
+interface ConfirmationDialogProps { // resuable customised dialog component 
   open: boolean;
   title: string;
   message: string;
