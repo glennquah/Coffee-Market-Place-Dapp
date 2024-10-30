@@ -1,40 +1,25 @@
 import { FaShoppingCart, FaTrash } from 'react-icons/fa';
 import { useState } from 'react';
-
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Button from '@mui/material/Button';
-import { styled } from '@mui/material/styles';
-
 import mockCoffeeData from '../../data/mockCoffeeItems';
 import { CoffeeCardProps } from '../../types/types';
+import ConfirmationDialog from '../../components/ConfirmationDialog/ConfirmationDialog';
 
-const StyledDialog = styled(Dialog)({
-    '& .MuiPaper-root': {
-        backgroundColor: '#5F6F52',
-        color: 'white',
-    }
-});
-
-const StyledButton = styled(Button)({
-    color: 'white',
-    '&:hover': {
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    }
-});
-
-
-const CoffeeDialog = () => {
+const CartDialog = () => {
     const [cartItems, setCartItems] = useState<CoffeeCardProps[]>(mockCoffeeData.filter((item): item is CoffeeCardProps => item.type === 'cart')); // TODO: Edit to call the `viewCart()` from smart contract
     const [itemToDelete, setItemToDelete] = useState<CoffeeCardProps | null>(null);
-
-    // dialogs
     const [modal, setModal] = useState(false);
-    const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
-    const [showClearDialog, setShowClearDialog] = useState<boolean>(false);
+
+    const [dialogConfig, setDialogConfig] = useState<{
+        open: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+    }>({
+        open: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+    });
 
     // title
     const h1Header = "Shopping Cart";
@@ -44,39 +29,38 @@ const CoffeeDialog = () => {
         setModal(!modal);
     };
 
+    const handleCloseDialog = (): void => {
+        setDialogConfig(prev => ({ ...prev, open: false }));
+        setItemToDelete(null);
+    };
+
     const handleDeleteClick = (item: CoffeeCardProps): void => {
         setItemToDelete(item);
-        setShowDeleteDialog(true);
-    };
-
-    const handleDeleteConfirm = (): void => {
-        if (itemToDelete) {
-            // TODO: Edit to call the `removeFromCart()` from smart contract
-            setCartItems(prevItems => 
-                prevItems.filter(item => item.id !== itemToDelete.id)
-            );
-        }
-        setShowDeleteDialog(false);
-        setItemToDelete(null);
-    };
-
-    const handleDeleteCancel = (): void => {
-        setShowDeleteDialog(false);
-        setItemToDelete(null);
+        setDialogConfig({
+            open: true,
+            title: 'Are you sure?',
+            message: 'Are you sure you want to delete this item from your cart?',
+            onConfirm: () => {
+                // TODO: Edit to call the `removeFromCart()` from smart contract
+                setCartItems(prevItems => 
+                    prevItems.filter(cartItem => cartItem.id !== item.id)
+                );
+                handleCloseDialog();
+            },
+        });
     };
 
     const handleClearClick = (): void => {
-        setShowClearDialog(true);
-    };
-
-    const handleClearConfirm = (): void => {
-        // TODO: Edit to call `removeAllProductsFromCart()` from smart contract
-        setCartItems([]);
-        setShowClearDialog(false);
-    };
-
-    const handleClearCancel = (): void => {
-        setShowClearDialog(false);
+        setDialogConfig({
+            open: true,
+            title: 'Clear All Items?',
+            message: 'Are you sure you want to remove all items from your cart?',
+            onConfirm: () => {
+                // TODO: Edit to call `removeAllProductsFromCart()` from smart contract
+                setCartItems([]);
+                handleCloseDialog();
+            },
+        });
     };
 
     const fetchCartItems = (): JSX.Element | JSX.Element[] => {
@@ -121,12 +105,12 @@ const CoffeeDialog = () => {
     const checkout = (): void => {
         if (cartItems.length > 0) {
             // TODO: Edit to call `checkout()` from smart contract
-            handleClearConfirm();
+            setCartItems([]);
             alert("May the beans roast with you!");
         } else {
             alert("You have not added any item to the cart!");
-        };
-    }
+        }
+    };
 
     return (
         <>
@@ -140,8 +124,8 @@ const CoffeeDialog = () => {
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="p-6 text-center text-white">
-                        <h1 className="text-2xl font-bold mb-2">{h1Header}</h1>
-                        <h2 className="text-lg">{h2Header}</h2>
+                            <h1 className="text-2xl font-bold mb-2">{h1Header}</h1>
+                            <h2 className="text-lg">{h2Header}</h2>
                         </div>
 
                         {cartItems.length > 0 && (
@@ -170,71 +154,19 @@ const CoffeeDialog = () => {
                         <div className="p-6 mt-auto border-t border-green-600 flex justify-end">
                             <button 
                                 className="bg-[#a0522d] text-white py-2 px-4 rounded hover:bg-[#8b4513]"
-                                onClick={checkout}>
+                                onClick={checkout}
+                            >
                                 Checkout
                             </button>
                         </div>
 
-                        <StyledDialog
-                            open={showClearDialog}
-                            onClose={handleClearCancel}
-                            aria-labelledby="clear-dialog-title"
-                            aria-describedby="clear-dialog-description"
-                        >
-                            <DialogTitle id="clear-dialog-title">
-                                {"Clear All Items?"}
-                            </DialogTitle>
-                            <DialogContent>
-                                <DialogContentText id="clear-dialog-description" sx={{ color: 'white' }}>
-                                    Are you sure you want to remove all items from your cart?
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions>
-                                <StyledButton onClick={handleClearCancel}>No</StyledButton>
-                                <StyledButton 
-                                    onClick={handleClearConfirm} 
-                                    autoFocus
-                                    sx={{ 
-                                        '&:hover': { 
-                                            backgroundColor: 'rgba(239, 68, 68, 0.2)' 
-                                        } 
-                                    }}
-                                >
-                                    Yes
-                                </StyledButton>
-                            </DialogActions>
-                        </StyledDialog>
-
-                        <StyledDialog
-                            open={showDeleteDialog}
-                            onClose={handleDeleteCancel}
-                            aria-labelledby="alert-dialog-title"
-                            aria-describedby="alert-dialog-description"
-                        >
-                            <DialogTitle id="alert-dialog-title">
-                                {"Are you sure?"}
-                            </DialogTitle>
-                            <DialogContent>
-                                <DialogContentText id="alert-dialog-description" sx={{ color: 'white' }}>
-                                    Are you sure you want to delete this item from your cart?
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions>
-                                <StyledButton onClick={handleDeleteCancel}>No</StyledButton>
-                                <StyledButton 
-                                    onClick={handleDeleteConfirm} 
-                                    autoFocus
-                                    sx={{ 
-                                        '&:hover': { 
-                                            backgroundColor: 'rgba(239, 68, 68, 0.2)' 
-                                        } 
-                                    }}
-                                >
-                                    Yes
-                                </StyledButton>
-                            </DialogActions>
-                        </StyledDialog>
-
+                        <ConfirmationDialog
+                            open={dialogConfig.open}
+                            title={dialogConfig.title}
+                            message={dialogConfig.message}
+                            onClose={handleCloseDialog}
+                            onConfirm={dialogConfig.onConfirm}
+                        />
                     </div>
                 </div>
             )}
@@ -242,4 +174,4 @@ const CoffeeDialog = () => {
     );
 };
 
-export default CoffeeDialog;
+export default CartDialog;

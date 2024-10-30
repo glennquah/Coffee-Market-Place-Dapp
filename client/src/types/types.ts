@@ -43,6 +43,14 @@ interface HeroProps {
   variant: HeroVariant;
 }
 
+interface ConfirmationDialogProps { // resuable dialog component that shows - "Are you sure you want to ..." with "YES" or "NO" options
+  open: boolean;
+  title: string;
+  message: string;
+  onClose: () => void;
+  onConfirm: () => void;
+}
+
 export enum HeroVariant {
   V1 = 'V1',
   V2 = 'V2',
@@ -56,4 +64,5 @@ export type {
   CoffeeCarouselProps,
   HeroProps,
   TimerHeroProps,
+  ConfirmationDialogProps
 };
