@@ -1,5 +1,6 @@
-import homePagehero from '../assets/homePagehero.svg';
+import homePagehero from '../assets/homePageHero.svg';
 import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
+import CustomerService from '../components/CustomerService';
 import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import { coffeeMockListings } from '../data/mockCoffeeItems';
@@ -16,11 +17,13 @@ function HomePage() {
           imageUrl={homePagehero}
           variant={HeroVariant.V1}
         />
-        <CoffeeCarousel
-          items={coffeeMockListings}
-          title="Our Coffee For You"
-          subtitle="NFTRoasters Coffee"
-        />
+        <div className="pt-8">
+          <CoffeeCarousel
+            items={coffeeMockListings}
+            title="Our Coffee For You"
+            subtitle="NFTRoasters Coffee"
+          />
+        </div>
         <CustomerService />
       </ResponsiveContainer>
     </div>

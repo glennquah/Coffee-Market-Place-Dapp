@@ -3,7 +3,7 @@ import { HeroProps, HeroVariant } from '../types/types';
 
 const Hero: FC<HeroProps> = ({ title, imageUrl, subTitle, variant }) => {
   return (
-    <div className="py-12 flex flex-col gap-8">
+    <div className="pb-8 flex flex-col gap-8">
       {variant === HeroVariant.V1 ? (
         <div className="flex flex-col gap-4">
           {title && <h1 className="text-5xl font-bold text-center">{title}</h1>}

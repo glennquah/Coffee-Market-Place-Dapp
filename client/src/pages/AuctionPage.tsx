@@ -17,6 +17,14 @@ function AuctionPage() {
           }
           imageUrl={auctionPageHero}
         />
+        <div className="pt-8 py-4 gap-2 flex flex-col justify-center items-center max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold">Auction Catalogs</h2>
+          <p className="text-lg text-center text-gray-500">
+            The highest bid wins the auction, and the coffee will be shipped
+            directly to your door. Place your bid now and don't miss your chance
+            to own this exclusive brew!
+          </p>
+        </div>
         <CoffeeCardList items={coffeeMockAuctions} />
       </ResponsiveContainer>
     </div>
