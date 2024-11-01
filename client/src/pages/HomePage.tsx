@@ -5,7 +5,6 @@ import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import { coffeeMockListings } from '../data/mockCoffeeItems';
 import { HeroVariant } from '../types/types';
-import CustomerService from '../components/CustomerService';
 
 function HomePage() {
   return (
