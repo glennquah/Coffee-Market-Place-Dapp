@@ -1,8 +1,20 @@
 import marketPlaceHero from '../assets/marketplaceHero.png';
 import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
-import { HeroVariant } from '../types/types';
+import { HeroVariant, CoffeeCardProps } from '../types/types';
+import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
 import CoffeeDialog from '../components/Dialog/CoffeeDialog';
+import mockCoffeeData from '../data/mockCoffeeItems';
+
+const coffeeListingItems: CoffeeCardProps[] = [];
+for (let i = 0; i < 3; i++) {
+  coffeeListingItems.push(mockCoffeeData[0]);
+}
+
+for (let i = 0; i < 3; i++) {
+  coffeeListingItems.push(mockCoffeeData[1]);
+}
+
 function MarketPlacePage() {
   return (
     <div className="py-8">
@@ -15,7 +27,12 @@ function MarketPlacePage() {
           }
           imageUrl={marketPlaceHero}
         />
-        <CoffeeDialog/>
+        <CoffeeCarousel
+          items={coffeeListingItems}
+          title="Listings"
+          subtitle="Browse Listings"
+        />
+        <CoffeeDialog />
       </ResponsiveContainer>
     </div>
   );
