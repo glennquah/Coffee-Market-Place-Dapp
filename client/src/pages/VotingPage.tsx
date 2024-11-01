@@ -1,14 +1,8 @@
 import CoffeeCardList from '../components/CoffeeCardList';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import TimerHero from '../components/TimerHero';
-import mockCoffeeData from '../data/mockCoffeeItems';
-import { CoffeeCardProps } from '../types/types';
-
-// TODO: Remove this mock data and replace when intergrating with smart contract
-const coffeeVotingItems: CoffeeCardProps[] = [];
-for (let i = 0; i < 6; i++) {
-  coffeeVotingItems.push(mockCoffeeData[2]);
-}
+import { coffeeMockVoting } from '../data/mockCoffeeItems';
+import { voteEndTime } from '../data/voteEndTime';
 
 function VotingPage() {
   return (
@@ -19,10 +13,10 @@ function VotingPage() {
           subTitle={
             'Cast your vote and shape the next featured brew on our marketplace.'
           }
-          endDateTime={new Date('2024-10-30T23:59:59+08:00')}
+          endDateTime={voteEndTime}
         />
 
-        <CoffeeCardList items={coffeeVotingItems} />
+        <CoffeeCardList items={coffeeMockVoting} />
       </ResponsiveContainer>
     </div>
   );

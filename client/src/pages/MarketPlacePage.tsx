@@ -1,19 +1,10 @@
 import marketPlaceHero from '../assets/marketplaceHero.png';
 import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
-import { HeroVariant, CoffeeCardProps } from '../types/types';
+import { HeroVariant } from '../types/types';
 import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
 import CoffeeDialog from '../components/Dialog/CoffeeDialog';
-import mockCoffeeData from '../data/mockCoffeeItems';
-
-const coffeeListingItems: CoffeeCardProps[] = [];
-for (let i = 0; i < 3; i++) {
-  coffeeListingItems.push(mockCoffeeData[0]);
-}
-
-for (let i = 0; i < 3; i++) {
-  coffeeListingItems.push(mockCoffeeData[1]);
-}
+import { coffeeMockListings } from '../data/mockCoffeeItems';
 
 function MarketPlacePage() {
   return (
@@ -28,7 +19,7 @@ function MarketPlacePage() {
           imageUrl={marketPlaceHero}
         />
         <CoffeeCarousel
-          items={coffeeListingItems}
+          items={coffeeMockListings}
           title="Listings"
           subtitle="Browse Listings"
         />
