@@ -1,11 +1,11 @@
-import homePagehero from '../assets/homePagehero.svg';
+import homePagehero from '../assets/homePageHero.svg';
 import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
 import CustomerService from '../components/CustomerService';
 import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import mockCoffeeData from '../data/mockCoffeeItems';
 import { CoffeeCardProps, HeroVariant } from '../types/types';
-// TODO: Remove this mock data and replace when intergrating with smart contract
+
 const coffeeListingItems: CoffeeCardProps[] = [];
 for (let i = 0; i < 3; i++) {
   coffeeListingItems.push(mockCoffeeData[0]);
