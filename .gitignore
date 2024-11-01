@@ -26,3 +26,8 @@ typechain-types
 *.sln
 *.sw?
 /smart_contract/ignition/deployments
+*.woff
+*.woff2
+/client/dist
+*.tsbuildinfo
+client/tsconfig.app.tsbuildinfo
