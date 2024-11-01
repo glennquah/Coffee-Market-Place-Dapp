@@ -10,6 +10,7 @@ interface CoffeeCardProps {
   onBid?: () => void;
   onClickListing?: () => void;
   bidEndDate?: string;
+  voteEndDateTime?: Date;
   numberOfNFT?: number; // cart
   id?: number; //  cart
   qty?: number; // cart

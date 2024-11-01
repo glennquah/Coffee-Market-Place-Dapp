@@ -2,7 +2,10 @@ import marketPlaceHero from '../assets/marketplaceHero.png';
 import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
 import { HeroVariant } from '../types/types';
+import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
 import CoffeeDialog from '../components/Dialog/CoffeeDialog';
+import { coffeeMockListings } from '../data/mockCoffeeItems';
+
 function MarketPlacePage() {
   return (
     <div className="py-8">
@@ -15,7 +18,12 @@ function MarketPlacePage() {
           }
           imageUrl={marketPlaceHero}
         />
-        <CoffeeDialog/>
+        <CoffeeCarousel
+          items={coffeeMockListings}
+          title="Listings"
+          subtitle="Browse Listings"
+        />
+        <CoffeeDialog />
       </ResponsiveContainer>
     </div>
   );

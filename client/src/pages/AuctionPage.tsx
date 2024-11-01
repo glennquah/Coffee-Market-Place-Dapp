@@ -2,14 +2,8 @@ import auctionPageHero from '../assets/auctionHero.png';
 import CoffeeCardList from '../components/CoffeeCardList';
 import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
-import mockCoffeeData from '../data/mockCoffeeItems';
-import { CoffeeCardProps, HeroVariant } from '../types/types';
-
-// TODO: Remove this mock data and replace when intergrating with smart contract
-const coffeeAuctionItems: CoffeeCardProps[] = [];
-for (let i = 0; i < 6; i++) {
-  coffeeAuctionItems.push(mockCoffeeData[3]);
-}
+import { coffeeMockAuctions } from '../data/mockCoffeeItems';
+import { HeroVariant } from '../types/types';
 
 function AuctionPage() {
   return (
@@ -31,7 +25,7 @@ function AuctionPage() {
             to own this exclusive brew!
           </p>
         </div>
-        <CoffeeCardList items={coffeeAuctionItems} />
+        <CoffeeCardList items={coffeeMockAuctions} />
       </ResponsiveContainer>
     </div>
   );

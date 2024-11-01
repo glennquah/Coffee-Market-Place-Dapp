@@ -3,17 +3,9 @@ import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel'
 import CustomerService from '../components/CustomerService';
 import Hero from '../components/MainHero';
 import ResponsiveContainer from '../components/ResponsiveContainer';
-import mockCoffeeData from '../data/mockCoffeeItems';
-import { CoffeeCardProps, HeroVariant } from '../types/types';
-
-const coffeeListingItems: CoffeeCardProps[] = [];
-for (let i = 0; i < 3; i++) {
-  coffeeListingItems.push(mockCoffeeData[0]);
-}
-
-for (let i = 0; i < 3; i++) {
-  coffeeListingItems.push(mockCoffeeData[1]);
-}
+import { coffeeMockListings } from '../data/mockCoffeeItems';
+import { HeroVariant } from '../types/types';
+import CustomerService from '../components/CustomerService';
 
 function HomePage() {
   return (
@@ -27,7 +19,7 @@ function HomePage() {
         />
         <div className="pt-8">
           <CoffeeCarousel
-            items={coffeeListingItems}
+            items={coffeeMockListings}
             title="Our Coffee For You"
             subtitle="NFTRoasters Coffee"
           />
