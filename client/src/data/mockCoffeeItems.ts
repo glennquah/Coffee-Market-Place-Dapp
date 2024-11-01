@@ -19,10 +19,10 @@ const imageUrls = {
   image2: 'https://m.media-amazon.com/images/I/71GPU8X9StL.jpg',
   image3: 'https://s7d6.scene7.com/is/image/bjs/322416',
   image4:
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfb174Q7aM37jOW6ddJJ_ueKGKhcCRk-2_WQ&s',
+    'https://can.com.sg/wp-content/uploads/2020/07/sumatraweb-1.jpg',
   image5: 'https://m.media-amazon.com/images/I/71O6J3vDlGL.jpg',
   image6:
-    'https://m.media-amazon.com/images/I/71fl1jcEi0L._AC_UF894,1000_QL80_.jpg',
+    'https://refill-it.net/cdn/shop/products/santosmain_720x_16fcb3d1-cc31-47cf-b2d3-961de2d30e2f_720x.webp?v=1652210706',
 };
 
 const coffeeMockListings: CoffeeCardProps[] = [
