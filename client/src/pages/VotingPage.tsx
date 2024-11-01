@@ -21,11 +21,11 @@ function VotingPage() {
           }
           endDateTime={new Date('2024-11-04T23:59:59+08:00')}
         />
-        <div className="pt-8 py-4 gap-2 flex flex-col justify-center items-center max-w-2xl mx-auto">
+        <div className="pt-8 py-4 gap-2 flex flex-col justify-center items-center max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold">
             Cast your vote for Next Week's Coffee
           </h2>
-          <p className="text-lg text-center">
+          <p className="text-lg text-center text-gray-500">
             Each user gets one vote. The coffee with the most votes will be
             featured and sold on our website next week. Make your pick count!
           </p>
