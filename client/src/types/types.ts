@@ -53,6 +53,14 @@ interface ConfirmationDialogProps { // resuable customised dialog component
   onConfirm: () => void;
 }
 
+interface CoffeeMostVotedCardProps {
+  imageUrl: string;
+  name: string;
+  label?: string;
+  className?: string;
+  onClick?: () => void;
+}
+
 export enum HeroVariant {
   V1 = 'V1',
   V2 = 'V2',
@@ -66,5 +74,6 @@ export type {
   CoffeeCarouselProps,
   HeroProps,
   TimerHeroProps,
-  ConfirmationDialogProps
+  ConfirmationDialogProps,
+  CoffeeMostVotedCardProps
 };
