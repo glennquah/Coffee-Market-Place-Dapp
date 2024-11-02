@@ -1,13 +1,13 @@
 import { FaShoppingCart, FaTrash } from 'react-icons/fa';
 import { useState } from 'react';
-import { coffeeMockListings } from '../../data/mockCoffeeItems';
+import { coffeeMockCart } from '../../data/mockCoffeeItems';
 import { CoffeeCardProps } from '../../types/types';
 
 import ConfirmationDialog from '../DialogComponents/ConfirmationDialog';
 import EditQuantityDialog from '../DialogComponents/EditQuantityDialog';
 
 const CartDialog = () => {
-    const [cartItems, setCartItems] = useState<CoffeeCardProps[]>(coffeeMockListings.filter((item): item is CoffeeCardProps => item.type === 'cart')); // TODO: Edit to call the `viewCart()` from smart contract
+    const [cartItems, setCartItems] = useState<CoffeeCardProps[]>(coffeeMockCart); // TODO: Edit to call the `viewCart()` from smart contract
     const [modal, setModal] = useState(false);
     const [updatedItem, setUpdatedItem] = useState<CoffeeCardProps | null>(null);
 
