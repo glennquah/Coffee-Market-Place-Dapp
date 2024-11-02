@@ -5,6 +5,7 @@ import { HeroVariant } from '../types/types';
 import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel';
 import CoffeeDialog from '../components/Dialog/CoffeeDialog';
 import { coffeeMockListings } from '../data/mockCoffeeItems';
+import CoffeeMostVotedCarousel from '../components/CoffeeMostVotedCarousel/CoffeeMostVotedCarousel';
 
 function MarketPlacePage() {
   return (
@@ -24,6 +25,11 @@ function MarketPlacePage() {
           subtitle="Browse Listings"
         />
         <CoffeeDialog />
+        <CoffeeMostVotedCarousel
+          items={coffeeMockListings}
+          title="Most Voted Coffee Beans From The Past Few Weeks"
+          subtitle="Most Voted For"
+        />
       </ResponsiveContainer>
     </div>
   );
