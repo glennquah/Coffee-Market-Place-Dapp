@@ -6,7 +6,6 @@ import ResponsiveContainer from '../components/ResponsiveContainer';
 import { coffeeMockListings } from '../data/mockCoffeeItems';
 import { HeroVariant } from '../types/types';
 
-// Test Deployment
 function HomePage() {
   return (
     <div className="py-8">
