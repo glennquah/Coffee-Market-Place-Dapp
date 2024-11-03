@@ -2,7 +2,7 @@ import { Trophy } from 'lucide-react';
 
 interface LeaderboardEntryProps {
   rank: number;
-  username: string;
+  address: string;
   spending: number;
   nftReward: string;
 }
@@ -25,7 +25,7 @@ const getRankStyle = (rank: number) => {
   }
 };
 
-const LeaderboardEntry = ({ rank, username, spending, nftReward }: LeaderboardEntryProps) => {
+const LeaderboardEntry = ({ rank, address, spending, nftReward }: LeaderboardEntryProps) => {
   return (
     <div
       className={`p-6 rounded-lg border-2 transition-all hover:shadow-lg transform hover:-translate-y-1 ${getRankStyle(rank)}`}
@@ -47,7 +47,7 @@ const LeaderboardEntry = ({ rank, username, spending, nftReward }: LeaderboardEn
           </div>
 
           <div>
-            <h3 className="text-lg font-bold">{username}</h3>
+            <h3 className="text-lg font-bold">{address}</h3>
             <p className="text-sm text-gray-600">{spending.toLocaleString()} ETH total spent</p>
           </div>
         </div>
