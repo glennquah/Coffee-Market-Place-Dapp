@@ -11,6 +11,8 @@ const CoffeeDialog = () => {
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
+  const [roastDate, setRoastDate] = useState(new Date());
+  const [processMethod, setProcessMethod] = useState('');
   const [image, setImage] = useState<string>(ImageNotFound);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onImageChange = (event: any) => {
@@ -28,6 +30,8 @@ const CoffeeDialog = () => {
     console.log(description);
     console.log(quantity);
     console.log(price);
+    console.log(roastDate);
+    console.log(processMethod);
     console.log('====================================');
   }
   const toggleModal = () => {
@@ -180,6 +184,50 @@ const CoffeeDialog = () => {
                     }}
                     placeholder="Bean type"
                     onChange={(e) => setBeanType(e.target.value)}
+                  ></input>
+                </div>
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: 10,
+                    marginBottom: 10,
+                  }}
+                >
+                  <label style={{ fontSize: 20 }}>Process Method:</label>
+                  <input
+                    type="text"
+                    style={{
+                      width: 250,
+                      borderRadius: 5,
+                      color: 'black',
+                      padding: 5,
+                    }}
+                    placeholder="Process method"
+                    onChange={(e) => setProcessMethod(e.target.value)}
+                  ></input>
+                </div>
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    marginTop: 10,
+                    marginBottom: 10,
+                  }}
+                >
+                  <label style={{ fontSize: 20 }}>Roast Date:</label>
+                  <input
+                    type="date"
+                    style={{
+                      width: 250,
+                      borderRadius: 5,
+                      color: 'black',
+                      padding: 5,
+                    }}
+                    placeholder="Roast date"
+                    onChange={(e) => setRoastDate(new Date(e.target.value))}
                   ></input>
                 </div>
                 <div
