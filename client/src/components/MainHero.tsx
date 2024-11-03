@@ -13,7 +13,11 @@ const Hero: FC<HeroProps> = ({ title, imageUrl, subTitle, variant }) => {
       ) : (
         imageUrl && (
           <div className="relative w-full z-0">
-            <img src={imageUrl} alt="hero" className="w-full opacity-40" />
+            <img
+              src={imageUrl}
+              alt="hero"
+              className="w-full opacity-40 max-h-80 object-cover"
+            />
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-12">
               {title && (
                 <h1 className="text-5xl font-bold text-center text-black drop-shadow-lg">
