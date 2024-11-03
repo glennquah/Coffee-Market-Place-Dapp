@@ -58,6 +58,7 @@ const CoffeeDialog = () => {
             height: '100%',
             justifyContent: 'center',
             alignItems: 'center',
+            zIndex: 1000,
           }}
         >
           <div onClick={toggleModal} className="overlay"></div>
