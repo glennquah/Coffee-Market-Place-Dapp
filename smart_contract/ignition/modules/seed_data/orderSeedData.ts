@@ -32,9 +32,9 @@ export const orderSeedData = {
       ethers.parseEther('1.5')
     ],
     timestamps: [
-      Date.now(),
-      Date.now(),
-      Date.now(),
-      Date.now()
+      1632979200,
+      1632979200,
+      1632979200,
+      1632979200
     ]
   };
