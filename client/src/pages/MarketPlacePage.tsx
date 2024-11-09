@@ -16,6 +16,10 @@ function MarketPlacePage() {
     getAllAvailableListings();
   }, [getAllAvailableListings]);
 
+  const refreshListings = () => {
+    getAllAvailableListings();
+  };
+
   return (
     <div className="py-8">
       <ResponsiveContainer>
@@ -32,7 +36,7 @@ function MarketPlacePage() {
           title="Listings"
           subtitle="Browse Listings"
         />
-        <CoffeeDialog />
+        <CoffeeDialog onListingAdded={refreshListings} />
         <CoffeeMostVotedCarousel
           items={coffeeMockListings}
           title="Most Voted Coffee Beans From The Past Few Weeks"

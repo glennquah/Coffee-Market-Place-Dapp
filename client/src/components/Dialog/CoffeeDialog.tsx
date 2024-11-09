@@ -7,10 +7,11 @@ import { ethers } from 'ethers';
 import Button from '../Button';
 import usePinataUpload from '../../hooks/usePinataUpload';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { CoffeeDialogProps } from '../../types/types';
 
-const CoffeeDialog = () => {
+
+const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
   const [modal, setModal] = useState(false);
-
   const [name, setName] = useState('');
   const [origin, setOrigin] = useState('');
   const [roastLevel, setRoastLevel] = useState('');
@@ -83,6 +84,9 @@ const CoffeeDialog = () => {
 
       console.log('Transaction sent:', tx.hash);
       await tx.wait();
+
+      // Trigger the callback after a successful listing creation
+      onListingAdded();
 
       console.log('Transaction confirmed:', tx.hash);
       setSuccess('Listing created successfully!');
@@ -362,10 +366,10 @@ const CoffeeDialog = () => {
                 {success && (
                   <div
                     style={{
-                      color: 'green',
+                      color: 'white',
                       textAlign: 'center',
                       marginTop: '10px',
-                      fontSize: '14px',
+                      fontSize: '16px',
                     }}
                   >
                     {success}
