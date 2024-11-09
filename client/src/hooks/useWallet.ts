@@ -34,10 +34,13 @@ const useWallet = (): Wallet => {
         setCurrentChainId(chainId ? chainId.toString() : null);
         localStorage.setItem("isWalletConnected", "true");
 
-        // Initialize provider and signer using MetaMask's provider
+        // Initialize provider and signer using BrowserProvider without passing sdk.provider
         const ethProvider = new ethers.BrowserProvider(window.ethereum!);
+        await ethProvider.ready;
         setProvider(ethProvider);
-        setSigner(await ethProvider.getSigner());
+        const ethSigner = await ethProvider.getSigner();
+        setSigner(ethSigner);
+        console.log("Signer initialized:", ethSigner);
       }
     } catch (error) {
       console.error("Failed to connect wallet:", error);
@@ -79,8 +82,11 @@ const useWallet = (): Wallet => {
 
           // Update provider and signer when account changes
           const ethProvider = new ethers.BrowserProvider(window.ethereum!);
+          await ethProvider.ready;
           setProvider(ethProvider);
-          setSigner(await ethProvider.getSigner());
+          const ethSigner = await ethProvider.getSigner();
+          setSigner(ethSigner);
+          console.log("Signer updated after account change:", ethSigner);
         } else {
           console.log("No accounts available, disconnecting wallet");
           disconnectWallet();
@@ -106,7 +112,7 @@ const useWallet = (): Wallet => {
   useEffect(() => {
     console.log("Current Account State:", currentAccount);
     console.log("Current Chain ID State:", currentChainId);
-    console.log("signer", signer)
+    console.log("Signer State:", signer);
   }, [currentAccount, currentChainId, signer]);
 
   return { currentAccount, chainId: currentChainId, connectWallet, disconnectWallet, provider, signer };
