@@ -1,4 +1,3 @@
-// src/hooks/useBlockchain.ts
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import ProductContractABI from '../../../smart_contract/artifacts/contracts/Product.sol/Product.json';
@@ -20,13 +19,20 @@ const useBlockchain = (isLocal: boolean = true): UseBlockchain => {
       let tempProvider: ethers.Provider;
       let tempSigner: ethers.Signer | null = null;
 
+      const rpcUrl = isLocal
+        ? import.meta.env.VITE_LOCAL_RPC_URL
+        : import.meta.env.VITE_ALCHEMY_RPC_URL;
+      const coffeeMarketplaceAddress = isLocal
+        ? import.meta.env.VITE_LOCAL_COFFEE_MARKETPLACE_ADDRESS
+        : import.meta.env.VITE_ALCHEMY_COFFEE_MARKETPLACE_ADDRESS;
+      const productContractAddress = isLocal
+        ? import.meta.env.VITE_LOCAL_PRODUCT_CONTRACT_ADDRESS
+        : import.meta.env.VITE_ALCHEMY_PRODUCT_CONTRACT_ADDRESS;
+
       if (isLocal) {
-        // Connect to Local Blockchain (e.g., Hardhat)
-        const rpcUrl = 'http://127.0.0.1:8545';
         tempProvider = new ethers.JsonRpcProvider(rpcUrl);
         tempSigner = await (tempProvider as ethers.JsonRpcProvider).getSigner();
       } else {
-        // Use Provider and Signer from useWallet (e.g., MetaMask)
         if (provider && signer) {
           tempProvider = provider;
           tempSigner = signer;
@@ -36,15 +42,6 @@ const useBlockchain = (isLocal: boolean = true): UseBlockchain => {
         }
       }
 
-      // Define contract addresses based on the network
-      const coffeeMarketplaceAddress = isLocal
-        ? '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9'
-        : '0x21af70e00463556008f3ad7B5436fbAB3D6Cc5cA';
-      const productContractAddress = isLocal
-        ? '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0'
-        : '0x51f9E9B7Fe9E5f628356F6215104134261323D80';
-
-      // Initialize Contracts with Signer for Write Operations
       if (tempSigner) {
         const coffeeMarketplaceInstance = new ethers.Contract(
           coffeeMarketplaceAddress,
@@ -61,7 +58,6 @@ const useBlockchain = (isLocal: boolean = true): UseBlockchain => {
         setCoffeeMarketplace(coffeeMarketplaceInstance);
         setProductContract(productContractInstance);
       } else {
-        // If no signer (read-only), initialize contracts with provider
         const coffeeMarketplaceInstance = new ethers.Contract(
           coffeeMarketplaceAddress,
           CoffeeMarketplaceABI.abi,

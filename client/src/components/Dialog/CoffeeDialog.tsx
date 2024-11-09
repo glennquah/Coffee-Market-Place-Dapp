@@ -5,7 +5,8 @@ import '../../styles/Modal.css';
 import useWallet from '../../hooks/useWallet';
 import useBlockchain from '../../hooks/useBlockchain';
 import { ethers } from 'ethers';
-import Button from '../Button'; // Assuming you have a Button component
+import Button from '../Button';
+import axios from 'axios'; // Ensure axios is installed: npm install axios
 
 const CoffeeDialog = () => {
   const [modal, setModal] = useState(false);
@@ -17,6 +18,8 @@ const CoffeeDialog = () => {
   const [quantity, setQuantity] = useState(1);
   const [price, setPrice] = useState(0.0001);
   const [image, setImage] = useState<string>(ImageNotFound);
+  const [file, setFile] = useState<File | null>(null); // To store the actual file
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -24,10 +27,48 @@ const CoffeeDialog = () => {
   const { signer, currentAccount } = useWallet();
   const { coffeeMarketplace } = useBlockchain();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onImageChange = (event: any) => {
+  // Handle image upload
+  const onImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setImage(URL.createObjectURL(event.target.files[0]));
+      const selectedFile = event.target.files[0];
+      setFile(selectedFile); // Store the actual file
+      const objectUrl = URL.createObjectURL(selectedFile);
+      setImage(objectUrl);
+    }
+  };
+
+  // Function to upload image to Pinata
+  const uploadImageToPinata = async (file: File): Promise<string> => {
+    const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
+
+    // Initialize FormData
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // Optional: Add metadata and options
+    formData.append('pinataOptions', JSON.stringify({ cidVersion: 0 }));
+    formData.append(
+      'pinataMetadata',
+      JSON.stringify({ name: file.name, keyvalues: { company: 'NFTRoasters' } })
+    );
+
+    try {
+      const response = await axios.post(url, formData, {
+        maxContentLength: Infinity,
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_PINATA_JWT}`,
+        },
+      });
+
+      // Return the IPFS URL
+      return `https://gateway.pinata.cloud/ipfs/${response.data.IpfsHash}`;
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error uploading file to Pinata:', error.message);
+      } else {
+        console.error('Unexpected error uploading to Pinata:', error);
+      }
+      throw new Error('Failed to upload image to IPFS.');
     }
   };
 
@@ -52,23 +93,30 @@ const CoffeeDialog = () => {
       return;
     }
 
+    if (!file) {
+      setError("Please upload an image for your coffee.");
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
       setSuccess(null);
 
-      // Assuming your smart contract has a function like createListing
-      // Replace the following parameters with actual ones as per your contract
+      // Upload image to Pinata
+      const imageUrl = await uploadImageToPinata(file);
+
+      // Call the smart contract function to create a listing
       const tx = await coffeeMarketplace.addRoasterListing(
         name,
         description,
-        image, // Assuming image is the IPFS hash or URL
-        ethers.parseEther(price.toString()), // Convert ETH to Wei
+        imageUrl, // Use the IPFS URL
+        ethers.parseEther(price.toString()), 
         quantity,
         origin,
         roastLevel,
         beanType,
-        description // Adjust parameters as needed
+        description 
       );
 
       console.log("Transaction sent:", tx.hash);
@@ -76,15 +124,15 @@ const CoffeeDialog = () => {
       console.log("Transaction confirmed:", tx.hash);
       setSuccess("Listing created successfully!");
 
-      // Optionally, reset form fields
       setName('');
       setOrigin('');
       setRoastLevel('');
       setBeanType('');
       setDescription('');
-      setQuantity(0);
-      setPrice(0);
+      setQuantity(1); // Reset to 1
+      setPrice(0.0001); // Reset to initial value
       setImage(ImageNotFound);
+      setFile(null);
     } catch (err: unknown) {
       if (err instanceof Error) {
         console.error("Error creating listing:", err);
@@ -124,11 +172,16 @@ const CoffeeDialog = () => {
           style={{
             width: '100%',
             height: '100%',
+            display: 'flex', // Ensure flex to center content
             justifyContent: 'center',
             alignItems: 'center',
+            overflow: 'auto', // Handle overflow
           }}
         >
+          {/* Overlay */}
           <div onClick={toggleModal} className="overlay"></div>
+
+          {/* Modal Content */}
           <div className="modal-content">
             <div style={{ width: '100%', justifyItems: 'center' }}>
               <h1 style={{ fontSize: 20, fontWeight: 'bold' }}>
@@ -141,7 +194,16 @@ const CoffeeDialog = () => {
             <div className="containers">
               <div className="inner-containers">
                 <div style={{ width: 300, height: 300 }}>
-                  <img src={image} style={{ width: 300, height: 300 }} alt="Coffee" />
+                  <img
+                    src={image}
+                    style={{
+                      width: 300,
+                      height: 300,
+                      objectFit: 'cover',
+                      borderRadius: '10px',
+                    }}
+                    alt="Coffee"
+                  />
                 </div>
                 <div
                   style={{
@@ -156,7 +218,7 @@ const CoffeeDialog = () => {
                     type="file"
                     style={{ marginLeft: 20, width: 110, borderRadius: 5 }}
                     multiple={false}
-                    accept="image/png, image/jpeg" // Updated to accept more image types
+                    accept="image/png, image/jpeg" // Accept more image types
                     onChange={onImageChange}
                   ></input>
                 </div>
@@ -306,6 +368,7 @@ const CoffeeDialog = () => {
                         setQuantity(Number.parseInt(e.target.value))
                       }
                       min="1"
+                      step="1"
                     ></input>
                   </div>
                   <div
@@ -349,6 +412,7 @@ const CoffeeDialog = () => {
                       backgroundColor: '#783E19',
                       borderRadius: 15,
                       fontSize: 20,
+                      cursor: 'pointer',
                     }}
                     className="mint-button"
                     onClick={createListing}
@@ -369,11 +433,11 @@ const CoffeeDialog = () => {
                 )}
               </div>
             </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-};
+              </div>
+            </div>
+          )}
+        </>
+      );
+    };
 
-export default CoffeeDialog;
+    export default CoffeeDialog;
