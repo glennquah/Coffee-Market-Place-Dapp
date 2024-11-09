@@ -24,12 +24,13 @@ export const productSeedData = {
     'Smooth and balanced with notes of cocoa and nuts.',
   ],
 
+  //! To replace with IPFS
   ipfsHashes: [
-    'https://example.com/columbian.png',
-    'https://example.com/brazil.png',
-    'https://example.com/costa_rica.png',
-    'https://example.com/kenya.png',
-    'https://example.com/guatemala.png',
+    'https://www.nativeamericancoffee.com/cdn/shop/products/CostaRican_276a85fd-9f2c-471c-81ca-e0a590fb0987_1400x.jpg?v=1603977811',
+    'https://m.media-amazon.com/images/I/71GPU8X9StL.jpg',
+    'https://s7d6.scene7.com/is/image/bjs/322416',
+    'https://can.com.sg/wp-content/uploads/2020/07/sumatraweb-1.jpg',
+    'https://m.media-amazon.com/images/I/71O6J3vDlGL.jpg',
   ],
 
   prices: [

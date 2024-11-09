@@ -81,6 +81,21 @@ interface Listing {
   roastDate: string;
 }
 
+interface Product {
+  productId: number;
+  name: string;
+  description: string;
+  ipfsHash: string;
+  price: string; // Ethers.js returns prices as strings when using formatUnits
+  quantity: number;
+  origin: string;
+  roastLevel: string;
+  beanType: string;
+  processMethod: string;
+  roastDate: string;
+  available: boolean;
+}
+
 export type {
   ButtonProps,
   CoffeeCardListProps,
@@ -91,5 +106,6 @@ export type {
   TimerHeroProps,
   ConfirmationDialogProps,
   CoffeeMostVotedCardProps,
-  Listing
+  Listing,
+  Product
 };
