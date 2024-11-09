@@ -109,7 +109,7 @@ const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
       {modal && (
         <div className="modal" style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'auto' }}>
           <div onClick={toggleModal} className="overlay"></div>
-          <div className="modal-content" style={{ maxHeight: '90%', overflowY: 'auto' }}>
+          <div className="modal-content">
             <div style={{ width: '100%', justifyItems: 'center' }}>
               <h1 style={{ fontSize: 20, fontWeight: 'bold' }}>Upload your coffee into an NFT ☕</h1>
               <h1 style={{ fontSize: 20, fontWeight: 'bold' }}>Let’s tokenise your coffee into NFTs!</h1>
@@ -282,7 +282,7 @@ const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
                     <input
                       type="number"
                       style={{
-                        width: 50,
+                        width: 80,
                         borderRadius: 5,
                         color: 'black',
                         padding: 5,
@@ -320,7 +320,6 @@ const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
                     onClick={createListing}
                     disabled={
                       uploadStatus.loading ||
-                      uploadStatus.imageUrl === null ||
                       loading
                     }
                   >
@@ -335,7 +334,7 @@ const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
                       color: 'red',
                       textAlign: 'center',
                       marginTop: '10px',
-                      fontSize: '14px',
+                      fontSize: '16px',
                     }}
                   >
                     {error}
