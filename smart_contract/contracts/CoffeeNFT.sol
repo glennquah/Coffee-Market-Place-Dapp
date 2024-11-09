@@ -8,7 +8,7 @@ contract CoffeeNFT is ERC721URIStorage, Ownable {
     uint256 public tokenCounter = 0; // Counter for NFT IDs
     address public marketplaceContract;
     address public auctionContract;
-
+    // deployment
     struct NFTMetadata {
         uint256 tokenId;
         string name;

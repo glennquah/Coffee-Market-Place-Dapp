@@ -14,8 +14,19 @@ body.active-modal {
     border-radius: 15px;
 }
 
-.modal,
+.modal {
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    position: fixed;
+    z-index: 10;
+}
+
 .overlay {
+    background: rgba(49, 49, 49, 0.8);
     width: 100vw;
     height: 100vh;
     top: 0;
@@ -25,16 +36,12 @@ body.active-modal {
     position: fixed;
 }
 
-.overlay {
-    background: rgba(49, 49, 49, 0.8);
-}
-
 .modal-content {
     margin: auto;
     padding: 30px;
     width: 1000px;
     height: 530px;
-    z-index: 10;
+    z-index: 11;
     transform: translate(0, 0);
     margin-top: 10%;
     line-height: 1.4;

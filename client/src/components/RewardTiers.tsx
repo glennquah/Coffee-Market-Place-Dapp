@@ -49,7 +49,7 @@ const RewardTiers = () => {
                     bgColor="bg-gray-50"
                     borderColor="border-gray-200"
                     trophyColor="#C0C0C0"
-                    title="Premium Single-Origin (Top 4-7)"
+                    title="Premium Single-Origin Collection (Top 4-7)"
                     items={[
                         "Hawaiian Kona",
                         "Yemen Mocha",
