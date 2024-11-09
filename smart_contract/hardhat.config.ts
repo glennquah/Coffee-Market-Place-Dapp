@@ -26,24 +26,3 @@ const config: HardhatUserConfig = {
 };
 
 export default config;
-
-// import '@nomicfoundation/hardhat-toolbox';
-
-// module.exports = {
-//   solidity: '0.8.27',
-//   settings: {
-//     optimizer: {
-//       enabled: true,
-//       runs: 200,
-//     },
-//     viaIR: true,
-//   },
-//   networks: {
-//     sephoia: {
-//       url: 'https://eth-sepolia.g.alchemy.com/v2/-syud7h1xPZD4vu_tXAOXmqcOlWknhWL',
-//       accounts: [
-//         'fff5e1ee0394758443e3f8d315ccf59337bf39687ed4535c3d975fa1d9c4a1df',
-//       ],
-//     },
-//   },
-// };
