@@ -220,50 +220,6 @@ const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
                     marginBottom: 10,
                   }}
                 >
-                  <label style={{ fontSize: 20 }}>Process Method:</label>
-                  <input
-                    type="text"
-                    style={{
-                      width: 250,
-                      borderRadius: 5,
-                      color: 'black',
-                      padding: 5,
-                    }}
-                    placeholder="Process method"
-                    onChange={(e) => setProcessMethod(e.target.value)}
-                  ></input>
-                </div>
-                <div
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginTop: 10,
-                    marginBottom: 10,
-                  }}
-                >
-                  <label style={{ fontSize: 20 }}>Roast Date:</label>
-                  <input
-                    type="date"
-                    style={{
-                      width: 250,
-                      borderRadius: 5,
-                      color: 'black',
-                      padding: 5,
-                    }}
-                    placeholder="Roast date"
-                    onChange={(e) => setRoastDate(new Date(e.target.value))}
-                  ></input>
-                </div>
-                <div
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginTop: 10,
-                    marginBottom: 10,
-                  }}
-                >
                   <label style={{ fontSize: 20 }}>Description:</label>
                   <textarea
                     style={{
