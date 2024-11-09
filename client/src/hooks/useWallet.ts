@@ -109,12 +109,6 @@ const useWallet = (): Wallet => {
     }
   }, [disconnectWallet, sdk]);
 
-  useEffect(() => {
-    console.log("Current Account State:", currentAccount);
-    console.log("Current Chain ID State:", currentChainId);
-    console.log("Signer State:", signer);
-  }, [currentAccount, currentChainId, signer]);
-
   return { currentAccount, chainId: currentChainId, connectWallet, disconnectWallet, provider, signer };
 };
 

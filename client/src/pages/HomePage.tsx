@@ -7,11 +7,9 @@ import ResponsiveContainer from '../components/ResponsiveContainer';
 import { HeroVariant, CoffeeCardProps } from '../types/types';
 import useBlockchain from '../hooks/useBlockchain';
 import { ethers } from "ethers";
-import useWallet from '../hooks/useWallet';
 
 function HomePage() {
   const { coffeeMarketplace } = useBlockchain();
-  const { currentAccount, chainId } = useWallet();
   const [listings, setListings] = useState<CoffeeCardProps[]>([]);
 
   // Function to fetch all available listings and format for CoffeeCarousel
@@ -75,18 +73,6 @@ function HomePage() {
           imageUrl={homePagehero}
           variant={HeroVariant.V1}
         />
-
-        {/* Display Connected Account and Chain ID */}
-        {currentAccount && (
-          <div className="mt-4">
-            {chainId ? (
-              <p>Connected chain: {chainId}</p>
-            ) : (
-              <p>Fetching connected chain...</p>
-            )}
-            <p>Connected account: {currentAccount}</p>
-          </div>
-        )}
 
         {/* Coffee Carousel Section */}
         <div className="pt-8">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   AiOutlineClose,
   AiOutlineFacebook,
@@ -15,17 +15,27 @@ import useWallet from '../hooks/useWallet';
 function Navbar() {
   const [nav, setNav] = useState(false);
   const { connectWallet, disconnectWallet, currentAccount } = useWallet();
+  const hasReloaded = useRef(false);
 
   const handleNav = () => {
     setNav(!nav);
   };
 
+  // Make it such when user logs in it reloads the page
   const handleConnectWallet = async () => {
     await connectWallet();
+    if (!hasReloaded.current) {
+      hasReloaded.current = true;
+      window.location.reload();
+    }
   };
 
   const handleDisconnectWallet = () => {
     disconnectWallet();
+    if (!hasReloaded.current) {
+      hasReloaded.current = true;
+      window.location.reload();
+    }
   };
 
   return (
