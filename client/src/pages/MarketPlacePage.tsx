@@ -6,8 +6,16 @@ import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel'
 import CoffeeDialog from '../components/Dialog/CoffeeDialog';
 import { coffeeMockListings } from '../data/mockCoffeeItems';
 import CoffeeMostVotedCarousel from '../components/CoffeeMostVotedCarousel/CoffeeMostVotedCarousel';
+import useCoffeeMarketplace from '../hooks/useCoffeeMarketplace';
+import { useEffect } from 'react';
 
 function MarketPlacePage() {
+  const { listings, getAllAvailableListings } = useCoffeeMarketplace();
+
+  useEffect(() => {
+    getAllAvailableListings();
+  }, [getAllAvailableListings]);
+
   return (
     <div className="py-8">
       <ResponsiveContainer>
@@ -20,7 +28,7 @@ function MarketPlacePage() {
           imageUrl={marketPlaceHero}
         />
         <CoffeeCarousel
-          items={coffeeMockListings}
+          items={listings}
           title="Listings"
           subtitle="Browse Listings"
         />
