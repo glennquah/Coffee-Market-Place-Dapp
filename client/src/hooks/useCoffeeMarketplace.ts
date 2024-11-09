@@ -7,6 +7,7 @@ const useCoffeeMarketplace = () => {
   const { coffeeMarketplace } = useBlockchain();
   const [listings, setListings] = useState<CoffeeCardProps[]>([]);
 
+  // Fetch all available listings
   const getAllAvailableListings = useCallback(async () => {
     if (!coffeeMarketplace) {
       console.error("CoffeeMarketplace contract instance not found.");
@@ -24,7 +25,6 @@ const useCoffeeMarketplace = () => {
         return;
       }
 
-      // Format listings to match CoffeeCardProps structure
       const formattedProducts: CoffeeCardProps[] = availableProducts[0].map((_: unknown, i: number) => ({
         type: 'listing',
         imageUrl: availableProducts[3][i],
@@ -36,13 +36,41 @@ const useCoffeeMarketplace = () => {
       setListings(formattedProducts);
       console.log("Fetched Listings for Carousel:", formattedProducts);
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Error fetching listings:", error.message);
-      } else {
-        console.error("Error fetching listings:", error);
-      }
+      console.error("Error fetching listings:", error instanceof Error ? error.message : error);
     }
   }, [coffeeMarketplace]);
+
+  const addRoasterListing = useCallback(
+    async (
+      name: string,
+      description: string,
+      imageUrl: string,
+      price: string,
+      quantity: number,
+      origin: string,
+      roastLevel: string,
+      beanType: string
+    ) => {
+      if (!coffeeMarketplace) {
+        throw new Error("CoffeeMarketplace contract instance not found.");
+      }
+
+      const tx = await coffeeMarketplace.addRoasterListing(
+        name,
+        description,
+        imageUrl,
+        ethers.parseEther(price),
+        quantity,
+        origin,
+        roastLevel,
+        beanType,
+        description
+      );
+      await tx.wait();
+      await getAllAvailableListings(); // Refresh listings after adding a new one
+    },
+    [coffeeMarketplace, getAllAvailableListings]
+  );
 
   const handleListing = (productId: number) => {
     console.log("Listing clicked:", productId);
@@ -54,7 +82,7 @@ const useCoffeeMarketplace = () => {
     }
   }, [coffeeMarketplace, getAllAvailableListings]);
 
-  return { listings, getAllAvailableListings };
+  return { listings, getAllAvailableListings, addRoasterListing };
 };
 
 export default useCoffeeMarketplace;

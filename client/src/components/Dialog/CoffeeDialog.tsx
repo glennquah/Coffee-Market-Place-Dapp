@@ -2,13 +2,11 @@ import { useState } from 'react';
 import ImageNotFound from '../../assets/imageNotFound.png';
 import '../../styles/Modal.css';
 import useWallet from '../../hooks/useWallet';
-import useBlockchain from '../../hooks/useBlockchain';
-import { ethers } from 'ethers';
 import Button from '../Button';
 import usePinataUpload from '../../hooks/usePinataUpload';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { CoffeeDialogProps } from '../../types/types';
-
+import useCoffeeMarketplace from '../../hooks/useCoffeeMarketplace';
 
 const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
   const [modal, setModal] = useState(false);
@@ -17,7 +15,7 @@ const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
   const [roastLevel, setRoastLevel] = useState('');
   const [beanType, setBeanType] = useState('');
   const [description, setDescription] = useState('');
-  const [quantity, setQuantity] = useState(1); 
+  const [quantity, setQuantity] = useState(1);
   const [price, setPrice] = useState(0.0001);
   const [image, setImage] = useState<string>(ImageNotFound);
 
@@ -25,9 +23,8 @@ const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const { signer, currentAccount } = useWallet();
-  const { coffeeMarketplace } = useBlockchain(true); 
-
+  const { currentAccount } = useWallet();
+  const { addRoasterListing } = useCoffeeMarketplace();
   const { uploadImage, status: uploadStatus } = usePinataUpload();
 
   const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,16 +42,8 @@ const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
   };
 
   const createListing = async () => {
-    if (!coffeeMarketplace) {
-      setError('Smart contract not initialized.');
-      return;
-    }
-    if (!signer) {
-      setError('Wallet not connected.');
-      return;
-    }
     if (!currentAccount) {
-      setError('No connected account.');
+      setError('Wallet not connected.');
       return;
     }
     if (!name || !origin || !roastLevel || !beanType || !description || quantity < 1 || price <= 0) {
@@ -70,42 +59,31 @@ const CoffeeDialog = ({ onListingAdded }: CoffeeDialogProps) => {
       setError(null);
       setSuccess(null);
 
-      const tx = await coffeeMarketplace.addRoasterListing(
+      await addRoasterListing(
         name,
         description,
         image,
-        ethers.parseEther(price.toString()),
+        price.toString(),
         quantity,
         origin,
         roastLevel,
-        beanType,
-        description
+        beanType
       );
 
-      console.log('Transaction sent:', tx.hash);
-      await tx.wait();
-
-      // Trigger the callback after a successful listing creation
+      setSuccess('Listing created successfully!');
       onListingAdded();
 
-      console.log('Transaction confirmed:', tx.hash);
-      setSuccess('Listing created successfully!');
+      // Reset form fields
       setName('');
       setOrigin('');
       setRoastLevel('');
       setBeanType('');
       setDescription('');
-      setQuantity(1); 
-      setPrice(0.0001); 
+      setQuantity(1);
+      setPrice(0.0001);
       setImage(ImageNotFound);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error('Error creating listing:', err);
-        setError(err.message || 'An error occurred while creating the listing.');
-      } else {
-        console.error('Unexpected error:', err);
-        setError('An unexpected error occurred.');
-      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
