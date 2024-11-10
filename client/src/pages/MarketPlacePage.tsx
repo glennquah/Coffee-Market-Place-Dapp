@@ -6,20 +6,8 @@ import CoffeeCarousel from '../components/CoffeeCardCarousel/CoffeeCardCarousel'
 import CoffeeDialog from '../components/Dialog/CoffeeDialog';
 import { coffeeMockListings } from '../data/mockCoffeeItems';
 import CoffeeMostVotedCarousel from '../components/CoffeeMostVotedCarousel/CoffeeMostVotedCarousel';
-import useCoffeeMarketplace from '../hooks/useCoffeeMarketplace';
-import { useEffect } from 'react';
 
 function MarketPlacePage() {
-  const { listings, getAllAvailableListings } = useCoffeeMarketplace();
-
-  useEffect(() => {
-    getAllAvailableListings();
-  }, [getAllAvailableListings]);
-
-  const refreshListings = () => {
-    getAllAvailableListings();
-  };
-
   return (
     <div className="py-8">
       <ResponsiveContainer>
@@ -32,11 +20,11 @@ function MarketPlacePage() {
           imageUrl={marketPlaceHero}
         />
         <CoffeeCarousel
-          items={listings}
+          items={coffeeMockListings}
           title="Listings"
           subtitle="Browse Listings"
         />
-        <CoffeeDialog onListingAdded={refreshListings} />
+        <CoffeeDialog />
         <CoffeeMostVotedCarousel
           items={coffeeMockListings}
           title="Most Voted Coffee Beans From The Past Few Weeks"

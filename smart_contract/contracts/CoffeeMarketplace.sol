@@ -298,7 +298,7 @@ contract CoffeeMarketplace is
             nftContract.ownerOf(tokenId) == address(this),
             'NFT not owned by marketplace'
         );
-        (, , , , uint256 price, , , , , , ) = nftContract.getNFTMetadata(
+        (, , , , uint256 price, , , , , ,) = nftContract.getNFTMetadata(
             tokenId
         );
         return price;
@@ -309,7 +309,7 @@ contract CoffeeMarketplace is
         bytes calldata
     ) external view override returns (bool upkeepNeeded, bytes memory) {
         upkeepNeeded = (block.timestamp >= lastRewardTime + 30 days);
-        return (upkeepNeeded, '');
+        return (upkeepNeeded, "");
     }
 
     // Chainlink Keeper-compatible performUpkeep function to perform upkeep (distribute reward)
@@ -357,6 +357,8 @@ contract CoffeeMarketplace is
             address topCustomer = leaderboardEntries[i].customer;
 
             if (topCustomer != address(0)) {
+                // ! When NFT is completed to finish this logic
+                // TODO: Assume the product to be rewarded has already been listed and to transfer to the top customer?
                 uint256 tokenId = nftContract.mint(
                     topCustomer,
                     name,
@@ -376,98 +378,5 @@ contract CoffeeMarketplace is
 
         // Update last reward time
         lastRewardTime = block.timestamp;
-    }
-
-    function getAllAvailableListings()
-        public
-        view
-        returns (
-            uint256[] memory productIds,
-            string[] memory names,
-            string[] memory descriptions,
-            string[] memory ipfsHashes,
-            uint256[] memory prices,
-            uint256[] memory quantities,
-            string[] memory origins,
-            string[] memory roastLevels,
-            string[] memory beanTypes,
-            string[] memory processMethods,
-            uint256[] memory roastDates
-        )
-    {
-        uint256 totalProducts = productContract.productCounter();
-        uint256 availableCount = 0;
-
-        for (uint256 i = 0; i < totalProducts; i++) {
-            uint256 productId = i + 1;
-
-            (
-                ,
-                ,
-                ,
-                ,
-                uint256 quantity,
-                ,
-                bool available,
-                ,
-                ,
-                ,
-                ,
-
-            ) = productContract.getProduct(productId);
-
-            if (available && quantity > 0) {
-                availableCount++;
-            }
-        }
-
-        // Initialize arrays with the exact count of available products
-        productIds = new uint256[](availableCount);
-        names = new string[](availableCount);
-        descriptions = new string[](availableCount);
-        ipfsHashes = new string[](availableCount);
-        prices = new uint256[](availableCount);
-        quantities = new uint256[](availableCount);
-        origins = new string[](availableCount);
-        roastLevels = new string[](availableCount);
-        beanTypes = new string[](availableCount);
-        processMethods = new string[](availableCount);
-        roastDates = new uint256[](availableCount);
-
-        // Populate arrays with available products
-        uint256 count = 0;
-        for (uint256 i = 0; i < totalProducts; i++) {
-            uint256 productId = i + 1;
-
-            (
-                string memory name,
-                string memory description,
-                string memory ipfsHash,
-                uint256 price,
-                uint256 quantity,
-                ,
-                bool available,
-                string memory origin,
-                string memory roastLevel,
-                string memory beanType,
-                string memory processMethod,
-                uint256 roastDate
-            ) = productContract.getProduct(productId);
-
-            if (available && quantity > 0) {
-                productIds[count] = productId;
-                names[count] = name;
-                descriptions[count] = description;
-                ipfsHashes[count] = ipfsHash;
-                prices[count] = price;
-                quantities[count] = quantity;
-                origins[count] = origin;
-                roastLevels[count] = roastLevel;
-                beanTypes[count] = beanType;
-                processMethods[count] = processMethod;
-                roastDates[count] = roastDate;
-                count++;
-            }
-        }
     }
 }

@@ -1,41 +1,21 @@
-import { useRef, useState } from 'react';
 import {
   AiOutlineClose,
   AiOutlineFacebook,
   AiOutlineInstagram,
   AiOutlineTwitter,
-  AiOutlineWallet,
 } from 'react-icons/ai';
 import { FaBars } from 'react-icons/fa';
 import Logo from '../assets/NFTRoasterLogo.svg';
+
+import { useState } from 'react';
 import ResponsiveContainer from './ResponsiveContainer';
 import CartDialog from '../components/Dialog/CartDialog';
-import useWallet from '../hooks/useWallet';
 
 function Navbar() {
   const [nav, setNav] = useState(false);
-  const { connectWallet, disconnectWallet, currentAccount } = useWallet();
-  const hasReloaded = useRef(false);
 
   const handleNav = () => {
     setNav(!nav);
-  };
-
-  // Make it such when user logs in it reloads the page
-  const handleConnectWallet = async () => {
-    await connectWallet();
-    if (!hasReloaded.current) {
-      hasReloaded.current = true;
-      window.location.reload();
-    }
-  };
-
-  const handleDisconnectWallet = () => {
-    disconnectWallet();
-    if (!hasReloaded.current) {
-      hasReloaded.current = true;
-      window.location.reload();
-    }
   };
 
   return (
@@ -81,20 +61,10 @@ function Navbar() {
               </li>
             </ul>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center">
             <div className="hidden sm:block cursor-pointer">
-              <CartDialog />
+              <CartDialog/>
             </div>
-            {/* Wallet Connection Section */}
-            <button
-              onClick={currentAccount ? handleDisconnectWallet : handleConnectWallet}
-              className={`mx-5 p-3 rounded-full ${
-                currentAccount ?  'bg-green-600 hover:bg-green-500' : 'bg-red-500 hover:bg-red-600'
-              }`}
-              aria-label={currentAccount ? 'Disconnect Wallet' : 'Connect Wallet'}
-            >
-              <AiOutlineWallet size={24} color="white" />
-            </button>
             <div onClick={handleNav} className="sm:hidden cursor-pointer">
               <FaBars size={25} />
             </div>

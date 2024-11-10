@@ -148,7 +148,6 @@ export async function deployContracts(): Promise<{
 
   const hash = await HashFactory.deploy();
   await hash.waitForDeployment();
-
   return {
     coffeeMarketplace,
     product,

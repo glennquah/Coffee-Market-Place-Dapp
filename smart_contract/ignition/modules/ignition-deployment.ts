@@ -6,13 +6,6 @@ import { votingSeedData } from './seed_data/votingSeedData';
 export default buildModule('TESTING_MODULES', (m) => {
   const deployer = m.getAccount(0);
 
-  const coffeeNFTContract = m.contract(
-    'CoffeeNFT',
-    [],
-    { from: deployer }
-  );
-
-
   const productContract = m.contract(
     'Product',
     [
@@ -23,11 +16,6 @@ export default buildModule('TESTING_MODULES', (m) => {
       productSeedData.prices,
       productSeedData.quantities,
       productSeedData.nftIds,
-      productSeedData.origins,
-      productSeedData.roastLevels,
-      productSeedData.beanTypes,
-      productSeedData.processMethods,
-      productSeedData.roastDates,
     ],
     { from: deployer }
   );
@@ -49,13 +37,13 @@ export default buildModule('TESTING_MODULES', (m) => {
 
   const coffeeMarketplaceContract = m.contract(
     'CoffeeMarketplace',
-    [productContract, leaderboardContract, coffeeNFTContract],
+    [productContract, leaderboardContract],
     { from: deployer }
   );
 
-  // const auctionContract = m.contract('Auction', [productContract, 0.001], {
-  //   from: deployer,
-  // });
+  const auctionContract = m.contract('Auction', [productContract, 0.001], {
+    from: deployer,
+  });
 
   const votingContract = m.contract(
     'Voting',
@@ -67,12 +55,12 @@ export default buildModule('TESTING_MODULES', (m) => {
       votingSeedData.origins,
       votingSeedData.types,
       votingSeedData.roastLevels,
-      votingSeedData.processMethods,
       votingSeedData.prices,
       votingSeedData.duration,
     ],
     { from: deployer }
   );
+
   const cartContract = m.contract(
     'Cart',
     [coffeeMarketplaceContract, orderContract],
@@ -84,7 +72,7 @@ export default buildModule('TESTING_MODULES', (m) => {
     productContract,
     orderContract,
     cartContract,
-    // auctionContract,
+    auctionContract,
     leaderboardContract,
   };
 });
