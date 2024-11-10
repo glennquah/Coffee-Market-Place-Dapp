@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import ProductContractABI from '../contracts/Product.json';
 import CoffeeMarketplaceABI from '../contracts/CoffeeMarketplace.json';
@@ -9,10 +8,12 @@ interface UseBlockchain {
   coffeeMarketplace: ethers.Contract | null;
 }
 
-const useBlockchain = (isLocal: boolean = true): UseBlockchain => {
+const useBlockchain = (isLocal: boolean = false): UseBlockchain => {
   const { provider, signer } = useWallet();
-  const [productContract, setProductContract] = useState<ethers.Contract | null>(null);
-  const [coffeeMarketplace, setCoffeeMarketplace] = useState<ethers.Contract | null>(null);
+  const [productContract, setProductContract] =
+    useState<ethers.Contract | null>(null);
+  const [coffeeMarketplace, setCoffeeMarketplace] =
+    useState<ethers.Contract | null>(null);
 
   useEffect(() => {
     const initialize = async () => {
@@ -37,7 +38,7 @@ const useBlockchain = (isLocal: boolean = true): UseBlockchain => {
           tempProvider = provider;
           tempSigner = signer;
         } else {
-          console.error("Provider or Signer is not available from useWallet.");
+          console.error('Provider or Signer is not available from useWallet.');
           return;
         }
       }
@@ -46,13 +47,13 @@ const useBlockchain = (isLocal: boolean = true): UseBlockchain => {
         const coffeeMarketplaceInstance = new ethers.Contract(
           coffeeMarketplaceAddress,
           CoffeeMarketplaceABI.abi,
-          tempSigner
+          tempSigner,
         );
 
         const productContractInstance = new ethers.Contract(
           productContractAddress,
           ProductContractABI.abi,
-          tempSigner
+          tempSigner,
         );
 
         setCoffeeMarketplace(coffeeMarketplaceInstance);
@@ -61,13 +62,13 @@ const useBlockchain = (isLocal: boolean = true): UseBlockchain => {
         const coffeeMarketplaceInstance = new ethers.Contract(
           coffeeMarketplaceAddress,
           CoffeeMarketplaceABI.abi,
-          tempProvider
+          tempProvider,
         );
 
         const productContractInstance = new ethers.Contract(
           productContractAddress,
           ProductContractABI.abi,
-          tempProvider
+          tempProvider,
         );
 
         setCoffeeMarketplace(coffeeMarketplaceInstance);
