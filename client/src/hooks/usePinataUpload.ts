@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import axios from 'axios';
+import { useState } from 'react';
 
 interface UploadStatus {
   loading: boolean;
@@ -25,7 +25,10 @@ const usePinataUpload = () => {
     formData.append('pinataOptions', JSON.stringify({ cidVersion: 0 }));
     formData.append(
       'pinataMetadata',
-      JSON.stringify({ name: file.name, keyvalues: { company: 'NFTRoasters' } })
+      JSON.stringify({
+        name: file.name,
+        keyvalues: { company: 'NFTRoasters' },
+      }),
     );
 
     try {
@@ -53,7 +56,8 @@ const usePinataUpload = () => {
       });
 
       return imageUrl;
-    } catch (error: unknown) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       let errorMessage = 'Failed to upload image to IPFS.';
       if (axios.isAxiosError(error) && error.response) {
         errorMessage = `Pinata Upload Error: ${error.response.data.error}`;
