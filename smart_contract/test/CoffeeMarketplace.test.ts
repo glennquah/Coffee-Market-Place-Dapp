@@ -10,6 +10,7 @@ import {
   Product,
 } from '../typechain-types';
 import { deployContracts } from './test_setup/deployContract';
+import { productSeedData } from '../ignition/modules/seed_data/productSeedData';
 
 describe('CoffeeMarketplace', function () {
   let coffeeMarketplace: CoffeeMarketplace;
@@ -557,5 +558,56 @@ describe('CoffeeMarketplace', function () {
         'Reward distribution is not available yet'
       );
     });
+  });
+
+  it('Should retrieve all available listings, excluding out-of-stock or unavailable listings', async function () {
+    // Expected total available products (5 pre-seeded + 1 additional for this test)
+    const expectedAvailableCount =
+      productSeedData.quantities.filter(
+        (quantity, index) =>
+          quantity > 0 && index < productSeedData.roasters.length
+      ).length + 1;
+
+    const ipfsHash = 'https://example.com/product.png';
+    const price = ethers.parseEther('0.1');
+
+    // Listing 1: Available with quantity > 0
+    await coffeeMarketplace
+      .connect(roaster)
+      .addRoasterListing(
+        'Available Coffee 1',
+        'Description for coffee 1',
+        ipfsHash,
+        price,
+        5,
+        'Origin 1',
+        'Medium',
+        'Arabica',
+        'Washed'
+      );
+
+    // Listing 2: Not available
+    await coffeeMarketplace
+      .connect(roaster)
+      .addRoasterListing(
+        'Unavailable Coffee',
+        'Description for unavailable coffee',
+        ipfsHash,
+        price,
+        5,
+        'Origin 2',
+        'Dark',
+        'Robusta',
+        'Natural'
+      );
+
+    // Manually set Listing 2 to unavailable
+    await product.connect(roaster).updateListingQuantity(2, 0); // Adjust ID to avoid conflict with pre-seeded
+
+    // Retrieve all available listings
+    const listings = await coffeeMarketplace.getAllAvailableListings();
+
+    // Verify the total count matches expectedAvailableCount
+    expect(listings.productIds.length).to.equal(expectedAvailableCount);
   });
 });

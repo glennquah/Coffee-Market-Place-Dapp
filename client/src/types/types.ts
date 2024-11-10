@@ -66,6 +66,40 @@ export enum HeroVariant {
   V2 = 'V2',
 }
 
+interface Listing {
+  name: string;
+  description: string;
+  ipfsHash: string;
+  price: string;
+  quantity: number;
+  nftIds: number[];
+  available: boolean;
+  origin: string;
+  roastLevel: string;
+  beanType: string;
+  processMethod: string;
+  roastDate: string;
+}
+
+interface Product {
+  productId: number;
+  name: string;
+  description: string;
+  ipfsHash: string;
+  price: string;
+  quantity: number;
+  origin: string;
+  roastLevel: string;
+  beanType: string;
+  processMethod: string;
+  roastDate: string;
+  available: boolean;
+}
+
+interface CoffeeDialogProps {
+  onListingAdded: () => void;
+}
+
 export type {
   ButtonProps,
   CoffeeCardListProps,
@@ -75,5 +109,8 @@ export type {
   HeroProps,
   TimerHeroProps,
   ConfirmationDialogProps,
-  CoffeeMostVotedCardProps
+  CoffeeMostVotedCardProps,
+  Listing,
+  Product,
+  CoffeeDialogProps
 };
