@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
-import ProductContractABI from '../../../smart_contract/artifacts/contracts/Product.sol/Product.json';
-import CoffeeMarketplaceABI from '../../../smart_contract/artifacts/contracts/CoffeeMarketplace.sol/CoffeeMarketplace.json';
+import ProductContractABI from '../contracts/Product.json';
+import CoffeeMarketplaceABI from '../contracts/CoffeeMarketplace.json';
 import useWallet from './useWallet';
 
 interface UseBlockchain {
