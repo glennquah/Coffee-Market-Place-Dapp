@@ -225,62 +225,57 @@ describe('CoffeeMarketplace', function () {
       expect(updatedListing.quantity).to.equal(2); // Original quantity (3) - 1
     });
 
-    // it('Should allow bulk NFT purchase', async function () {
-    //   const tokenIds = [2, 3];
-    //   const buyerAddress = await buyer.getAddress();
-    //   const roasterAddress = await roaster.getAddress();
+    it('Should allow bulk purchase of NFTs', async function () {
+      const listingId = 6;
+      const tokenIds = [1, 2, 3]; // Purchase 3 NFTs
+      const totalPrice = price * BigInt(tokenIds.length);
+      const buyerAddress = await buyer.getAddress();
+      const roasterAddress = await roaster.getAddress();
 
-    //   // Calculate total price from metadata
-    //   let totalPrice = BigInt(0);
-    //   for (const tokenId of tokenIds) {
-    //     const metadata = await coffeeNFT.tokenMetadata(tokenId);
-    //     totalPrice += metadata.price;
-    //   }
+      // Get initial balances
+      const buyerBalanceBefore = await ethers.provider.getBalance(buyerAddress);
+      const roasterBalanceBefore = await ethers.provider.getBalance(roasterAddress);
 
-    //   // Get initial balances
-    //   const buyerBalanceBefore = await ethers.provider.getBalance(buyerAddress);
-    //   const roasterBalanceBefore = await ethers.provider.getBalance(roasterAddress);
+      // Verify initial ownership
+      for (const tokenId of tokenIds) {
+        expect(await coffeeNFT.ownerOf(tokenId)).to.equal(
+          await coffeeMarketplace.getAddress()
+        );
+      }
 
-    //   // Verify initial ownership and availability
-    //   for (const tokenId of tokenIds) {
-    //     expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(
-    //       await coffeeMarketplace.getAddress()
-    //     );
-    //     expect(await coffeeMarketplace.isNFTAvailableForPurchase(tokenId)).to.be
-    //       .true;
-    //   }
+      // Execute bulk purchase
+      const tx = await coffeeMarketplace
+        .connect(buyer)
+        .bulkPurchaseNFTs(listingId, tokenIds, { value: totalPrice });
 
-    //   // Get initial listing details
-    //   const initialListing = await coffeeMarketplace.getListing(listingId);
-    //   const initialQuantity = initialListing.quantity;
+      const receipt = await tx.wait();
+      if (!receipt) throw new Error('No receipt received');
 
-    //   // Purchase NFTs in bulk
-    //   const tx = await coffeeMarketplace.connect(buyer).bulkPurchaseNFTs(listingId, tokenIds, {
-    //     value: totalPrice,
-    //   });
+      // Calculate gas costs
+      const gasCost = receipt.gasUsed * receipt.gasPrice;
 
-    //   // Verify NFTPurchased events are emitted for each token
-    //   await Promise.all(tokenIds.map(async (tokenId) => {
-    //     await expect(tx)
-    //       .to.emit(coffeeMarketplace, 'NFTPurchased')
-    //       .withArgs(listingId, tokenId, buyerAddress, price); // price per token
-    //   }));
+      // Verify new ownership
+      for (const tokenId of tokenIds) {
+        expect(await coffeeNFT.ownerOf(tokenId)).to.equal(buyerAddress);
+      }
 
-    //   // Verify new ownership and availability
-    //   for (const tokenId of tokenIds) {
-    //     expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(buyerAddress);
-    //     expect(await coffeeMarketplace.isNFTAvailableForPurchase(tokenId)).to.be
-    //       .false;
-    //   }
+      // Verify balances
+      const buyerBalanceAfter = await ethers.provider.getBalance(buyerAddress);
+      const roasterBalanceAfter = await ethers.provider.getBalance(roasterAddress);
 
-    //   // Verify balances have been updated correctly
-    //   const roasterBalanceAfter = await ethers.provider.getBalance(roasterAddress);
-    //   expect(roasterBalanceAfter - roasterBalanceBefore).to.equal(totalPrice);
+      // Buyer's balance should be reduced by total price + gas
+      expect(buyerBalanceAfter).to.be.closeTo(
+        buyerBalanceBefore - totalPrice - gasCost,
+        ethers.parseEther('0.0001')
+      );
 
-    //   // Verify listing quantity has been updated
-    //   const updatedListing = await coffeeMarketplace.getListing(listingId);
-    //   expect(updatedListing.quantity).to.equal(initialQuantity - BigInt(tokenIds.length));
-    // });
+      // Roaster's balance should increase by total price
+      expect(roasterBalanceAfter - roasterBalanceBefore).to.equal(totalPrice);
+
+      // Check listing quantity was updated
+      const listingAfter = await coffeeMarketplace.getListing(listingId);
+      expect(listingAfter.quantity).to.equal(2n); // 5 initial - 3 purchased = 2 remaining
+    });
 
     it('Should revert purchase if NFT is not available', async function () {
       const tokenId = 1;
@@ -345,21 +340,6 @@ describe('CoffeeMarketplace', function () {
       ).to.be.revertedWith('Insufficient payment');
     });
 
-    //   it('Should update listing status when all NFTs are sold', async function () {
-    //     const listing = await coffeeMarketplace.getListing(6); // Get listing created in beforeEach
-    //     const allTokenIds = listing.nftIds; // Get all NFT IDs for this listing
-    //     const totalPrice = price * BigInt(allTokenIds.length);
-
-    //     await coffeeMarketplace.connect(buyer).bulkPurchaseNFTs(listingId, allTokenIds, {
-    //       value: totalPrice,
-    //     });
-
-    //     // Purchase all NFTs in the listing at once using bulkPurchaseNFTs
-    //     // Get the updated listing details
-    //     const updatedListing = await coffeeMarketplace.getListing(6);
-    //     expect(listing.available).to.be.false;
-    //     expect(listing.quantity).to.equal(0);
-    //   });
   });
 
   describe('NFT Transfers', function () {
@@ -418,60 +398,6 @@ describe('CoffeeMarketplace', function () {
       // Verify new ownership
       expect(await coffeeNFT.ownerOf(tokenId)).to.equal(secondBuyerAddress);
     });
-
-    // it('Should allow paid user-to-user transfer', async function () {
-    //   const tokenId = 1;
-    //   const transferPrice = ethers.parseEther('0.05');
-    //   const buyerAddress = await buyer.getAddress();
-    //   const secondBuyerAddress = await secondBuyer.getAddress();
-
-    //   // Initial balances
-    //   const sellerBalanceBefore = await ethers.provider.getBalance(buyerAddress);
-    //   const buyerBalanceBefore = await ethers.provider.getBalance(secondBuyerAddress);
-
-    //   // Grant approval for the transfer
-    //   await coffeeMarketplace.connect(buyer).approve(await coffeeMarketplace.getAddress(), tokenId);
-
-    //   // Verify initial ownership
-    //   expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(buyerAddress);
-
-    //   // Execute paid transfer - secondBuyer initiates and pays
-    //   const tx = await coffeeMarketplace.connect(secondBuyer).transferNFT(
-    //     tokenId,
-    //     secondBuyerAddress,  // secondBuyer's address as recipient
-    //     transferPrice,
-    //     { value: transferPrice }
-    //   );
-
-    //   const receipt = await tx.wait();
-    //   if (!receipt) {
-    //     throw new Error("No receipt received");
-    //   }
-
-    //   // Calculate gas costs
-    //   const gasCost = receipt.gasUsed * receipt.gasPrice;
-
-    //   // Verify new ownership
-    //   expect(await coffeeMarketplace.ownerOf(tokenId)).to.equal(secondBuyerAddress);
-
-    //   // Verify seller (original buyer) received the payment
-    //   const sellerBalanceAfter = await ethers.provider.getBalance(buyerAddress);
-    //   expect(sellerBalanceAfter).to.equal(sellerBalanceBefore + transferPrice);
-
-    //   // Verify buyer (secondBuyer) paid the correct amount (price + gas)
-    //   const buyerBalanceAfter = await ethers.provider.getBalance(secondBuyerAddress);
-
-    //   // Use closeTo for balance comparison to account for small differences
-    //   expect(buyerBalanceAfter).to.be.closeTo(
-    //     buyerBalanceBefore - transferPrice - gasCost,
-    //     ethers.parseEther('0.0001') // Allow for small difference due to gas estimation
-    //   );
-
-    //   // Verify the event
-    //   await expect(tx)
-    //     .to.emit(coffeeMarketplace, 'NFTTransferred')
-    //     .withArgs(tokenId, buyerAddress, secondBuyerAddress, transferPrice);
-    // });
 
     it('Should revert transfer if recipient address is invalid', async function () {
       const tokenId = 1;
