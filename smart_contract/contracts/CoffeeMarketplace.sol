@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
+import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import {AutomationCompatibleInterface} from '@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol';
 import './Product.sol';
 import './Leaderboard.sol';
@@ -12,7 +13,8 @@ contract CoffeeMarketplace is
     ERC721URIStorage,
     Ownable,
     IERC721Receiver,
-    AutomationCompatibleInterface
+    AutomationCompatibleInterface,
+    ReentrancyGuard
 {
     Product public productContract;
     Leaderboard public leaderboardContract;
@@ -172,7 +174,7 @@ contract CoffeeMarketplace is
     }
 
     // Contract-to-user transfer (purchase from marketplace)
-    function purchaseNFT(uint256 productId, uint256 tokenId) public payable {
+    function purchaseNFT(uint256 productId, uint256 tokenId) public payable nonReentrant {
         require(
             nftContract.ownerOf(tokenId) == address(this),
             'NFT not owned by marketplace'
@@ -206,7 +208,7 @@ contract CoffeeMarketplace is
         uint256 tokenId,
         address to,
         uint256 price
-    ) public payable {
+    ) public payable nonReentrant {
         // Get the current owner of the NFT (seller)
         address seller = nftContract.ownerOf(tokenId);
         require(
@@ -233,7 +235,7 @@ contract CoffeeMarketplace is
     function bulkPurchaseNFTs(
         uint256 productId,
         uint256[] memory tokenIds
-    ) public payable {
+    ) public payable nonReentrant {
         require(tokenIds.length > 0, 'No tokens specified');
 
         uint256 totalPrice = 0;
@@ -322,7 +324,7 @@ contract CoffeeMarketplace is
     }
 
     // Distribute rewards to customers every month
-    function distributeMonthlyReward() public {
+    function distributeMonthlyReward() public nonReentrant {
         // Ensure at least 30 days have passed since the last reward distribution
         require(
             block.timestamp >= lastRewardTime + 30 days,
