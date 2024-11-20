@@ -10,15 +10,10 @@ import { HeroVariant } from '../types/types';
 
 function HomePage() {
   const { listings, getAllAvailableListings } = useCoffeeMarketplace();
-  const [isDialogOpen, setisDialogOpen] = useState(false);
+  const [isDialogOpen, setisDialogOpen] = useState(true);
   const closeDialog = () => setisDialogOpen(false);
   useEffect(() => {
     getAllAvailableListings();
-    const hasVisited = sessionStorage.getItem('hasVisited');
-    if (!hasVisited) {
-      setisDialogOpen(true);
-      sessionStorage.setItem('hasVisited', 'true');
-    }
   }, []);
 
   return (
