@@ -47,7 +47,7 @@ const LandingPageDialog: React.FC<LandingPageDialogProps> = ({
           </div>
           <div className="text-xs text-gray-500 text-center px-12">
             We hope you enjoy this decentralized application as much as we
-            enjoyed creating it for you. - The NFTRoasters Team
+            enjoyed creating it for you. ❤️ - The NFTRoasters Team
           </div>
         </div>
       </div>

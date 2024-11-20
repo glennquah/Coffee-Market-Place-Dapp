@@ -14,16 +14,16 @@ function HomePage() {
   const closeDialog = () => setisDialogOpen(false);
   useEffect(() => {
     getAllAvailableListings();
-    const hasVisited = localStorage.getItem('hasVisited');
+    const hasVisited = sessionStorage.getItem('hasVisited');
     if (!hasVisited) {
       setisDialogOpen(true);
-      localStorage.setItem('hasVisited', 'true');
+      sessionStorage.setItem('hasVisited', 'true');
     }
-  }, [getAllAvailableListings]);
+  }, []);
 
   return (
     <div className="py-8">
-      <LandingPageDialog isOpen={true} onClose={closeDialog} />
+      <LandingPageDialog isOpen={isDialogOpen} onClose={closeDialog} />
       <ResponsiveContainer>
         <Hero
           title="Welcome to NFTRoasters"
