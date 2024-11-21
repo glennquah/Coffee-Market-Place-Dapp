@@ -1,8 +1,22 @@
 # Coffee Marketplace dApp
 
+## Table of Contents
+1. [Introduction](#introduction)  
+2. [Problem Statement](#problem-statement)  
+3. [Solutions](#solutions)  
+4. [Features](#features)  
+5. [Smart Contracts](#smart-contracts)  
+6. [Running it Locally](#running-it-locally)  
+7. [Tech Stack](#tech-stack)  
+8. [Deployment](#deployment)  
+9. [How to Contribute](#how-to-contribute)  
+
+
 ## 1. Introduction
 
 Welcome to **NFTRoasters, your Blockchain Coffee Marketplace**, a decentralized platform revolutionizing the global coffee industry. Leveraging blockchain technology, our platform connects coffee enthusiasts directly with growers and roasters, ensuring transparency, fairness, and community-driven product offerings. By integrating NFTs, voting systems, and sealed-bid auctions, we create an engaging and authentic coffee ecosystem that benefits all stakeholders.
+
+---
 
 ## 2. Problem Statement
 
@@ -14,6 +28,8 @@ The specialty coffee market, particularly for rare and high-quality beans, faces
 - **Reward Systems for Loyalty:** Few platforms offer robust loyalty rewards, hindering customer retention.
 
 **Coffee Marketplace** addresses these issues by providing a transparent, fair, and engaging platform where consumers have control over product offerings and earn rewards through their participation.
+
+---
 
 ## 3. Solutions
 
@@ -27,6 +43,8 @@ The specialty coffee market, particularly for rare and high-quality beans, faces
   - **Voting System for Product Selection:** Consumers vote on which coffee varieties to introduce, ensuring offerings align with community preferences.
   - **Auction Feature for Rare Products:** Sealed-bid auctions for limited-edition coffees ensure fairness and excitement.
 
+---
+
 ## 4. Features
 
 - **NFT Integration:** Unique NFTs for each coffee product, ensuring authenticity and traceability.
@@ -35,6 +53,8 @@ The specialty coffee market, particularly for rare and high-quality beans, faces
 - **Leaderboard and Rewards:** Incentivizes user engagement by rewarding top spenders with exclusive NFTs.
 - **Decentralized Storage:** Utilizes IPFS for immutable storage of NFT metadata.
 - **Automated Processes:** Chainlink Keepers automate monthly reward distributions.
+
+---
 
 ## 5. Smart Contracts
 
@@ -48,6 +68,8 @@ The platform employs a suite of smart contracts to manage various functionalitie
 - **Auction Contract Module:** Manages auction creation, bidding, finalization, and fund withdrawals.
 - **Voting Contract Module:** Facilitates community voting on product selections and mints reward NFTs based on results.
 - **Leaderboard Contract Module:** Tracks and updates the leaderboard, rewarding top customers.
+
+---
 
 ## 6. Running it locally
 
@@ -80,6 +102,8 @@ The platform employs a suite of smart contracts to manage various functionalitie
  npm run dev
  ```
 Access the application at http://localhost:5173
+
+---
 
 ### 7. Tech Stack
 
