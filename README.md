@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-Welcome to **Coffee Marketplace**, a decentralized platform revolutionizing the global coffee industry. Leveraging blockchain technology, our platform connects coffee enthusiasts directly with growers and roasters, ensuring transparency, fairness, and community-driven product offerings. By integrating NFTs, voting systems, and sealed-bid auctions, we create an engaging and authentic coffee ecosystem that benefits all stakeholders.
+Welcome to **NFTRoasters, your Blockchain Coffee Marketplace**, a decentralized platform revolutionizing the global coffee industry. Leveraging blockchain technology, our platform connects coffee enthusiasts directly with growers and roasters, ensuring transparency, fairness, and community-driven product offerings. By integrating NFTs, voting systems, and sealed-bid auctions, we create an engaging and authentic coffee ecosystem that benefits all stakeholders.
 
 ## 2. Problem Statement
 
