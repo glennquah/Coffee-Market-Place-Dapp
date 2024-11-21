@@ -1,15 +1,15 @@
 # Coffee Marketplace dApp
 
 ## Table of Contents
-1. [Introduction](#introduction)  
-2. [Problem Statement](#problem-statement)  
-3. [Solutions](#solutions)  
-4. [Features](#features)  
-5. [Smart Contracts](#smart-contracts)  
-6. [Running it Locally](#running-it-locally)  
-7. [Tech Stack](#tech-stack)  
-8. [Deployment](#deployment)  
-9. [How to Contribute](#how-to-contribute)  
+1. [Introduction](#1-introduction)  
+2. [Problem Statement](#2-problem-statement)  
+3. [Solutions](#3-solutions)  
+4. [Features](#4-features)  
+5. [Smart Contracts](#5-smart-contracts)  
+6. [Running it Locally](#6-running-it-locally)  
+7. [Tech Stack](#7-tech-stack)  
+8. [Deployment](#8-deployment)  
+9. [How to Contribute](#9-how-to-contribute)  
 
 
 ## 1. Introduction
