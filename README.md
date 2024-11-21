@@ -9,7 +9,8 @@
 6. [Running it Locally](#6-running-it-locally)  
 7. [Tech Stack](#7-tech-stack)  
 8. [Deployment](#8-deployment)  
-9. [How to Contribute](#9-how-to-contribute)  
+9. [Environment Setup](#9-environment-setup)  
+10. [How to Contribute](#10-how-to-contribute)  
 
 
 ## 1. Introduction
@@ -145,5 +146,25 @@ Access the deployed frontend at: [https://nft-roaster.vercel.app/](https://nft-r
 
 ---
 
-### 9. How to Contribute
+## 9. Environment Setup
+
+To run the application successfully, you need to set up `.env` variables in the `client` folder:
+
+```plaintext
+VITE_PINATA_JWT="your_pinata_jwt_token"
+VITE_LOCAL_RPC_URL="http://127.0.0.1:8545"
+VITE_ALCHEMY_RPC_URL="https://eth-sepolia.g.alchemy.com/v2/your_alchemy_key"
+
+VITE_ALCHEMY_COFFEE_MARKETPLACE_ADDRESS="your_sepolia_marketplace_address"
+VITE_ALCHEMY_PRODUCT_CONTRACT_ADDRESS="your_sepolia_product_address"
+
+VITE_LOCAL_COFFEE_MARKETPLACE_ADDRESS="your_local_marketplace_address"
+VITE_LOCAL_PRODUCT_CONTRACT_ADDRESS="your_local_product_address"
+```
+- Pinata JWT: Create an account on `Pinata` and obtain your JWT token for NFT metadata storage.
+- Alchemy API Key: Create an account on `Alchemy` and set up an Ethereum app to get the API key for connecting to the Sepolia Testnet.
+
+---
+
+### 10. How to Contribute
 We would like this project to be `open source`, so feel free to create a branch & a PR, tagging any one of us as maintainers. Once approved, your changes will be merged into the main project.
