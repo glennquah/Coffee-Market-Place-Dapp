@@ -1,4 +1,4 @@
-# Coffee Marketplace dApp
+# Coffee Marketplace dApp | NFTRoasters
 
 ## Table of Contents
 1. [Introduction](#1-introduction)  
